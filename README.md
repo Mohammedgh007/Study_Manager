@@ -30,11 +30,17 @@ Classes:
 
 Features not included yet (not ordered by significance nor when it will be implemented):
 1- Courses - on courses activity - are pre-selected if the user input the schedual manually.
+
 2- Optionally disable notifications while the user is using flash cards.
+
 3- The app alarm the user for unfinished assignments two hours before its due time.
+
 4- To-do list widget for assignemnts.
+
 5- Remarks should inlude exams and major assignments using calander view. 
+
 6- class notes' section accepts inputs by voice recording and shows outputs by voice and text.
+
 
 
 Potential bugs:
