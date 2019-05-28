@@ -1,6 +1,8 @@
 # Study_Manager
 Author: Mohammed Alghamdi.
+
 Languages: Java and XML.
+
 Program's porpuse: The progrem aims to be a tool that a college student or a high school student can use to manage
   tasks related to college/school. First, it helps students keep track of thier assignments by using assignments' 
   section whose style is very similar to-do list. Second, it helps students archive class notes. 
