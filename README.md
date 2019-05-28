@@ -10,7 +10,9 @@ Program's porpuse: The progrem aims to be a tool that a college student or a hig
 # Important notes about the program:
 1- It is personal progect, so any try to change,copy, or delete something in the project is not allowed by
    means.
+   
 2- It is working on Android, and this is the link to download it from Google play: link.
+
 3- The project uses MVVM as a software architectural pattern.
 
 # Program details/Ducmontation
