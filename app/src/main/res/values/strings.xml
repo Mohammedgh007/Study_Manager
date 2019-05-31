@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Study Manager</string>
+    <string-array name="significance_levels">
+        <item>Regular</item>
+        <item>Low</item>
+        <item>High</item>
+    </string-array>
+</resources>
