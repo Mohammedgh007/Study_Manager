@@ -5,4 +5,5 @@
         <item>Low</item>
         <item>High</item>
     </string-array>
+    <string name="schedulePhotoIdMemory">scheduleId1232223</string>
 </resources>

@@ -15,7 +15,7 @@
         android:layout_marginTop="35dp"
         android:layout_weight="0.6">
 
-        <Button
+        <ImageView
             android:id="@+id/course_schedule_home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -50,7 +50,7 @@
     <android.widget.RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.3"
+        android:layout_weight="0.4"
         android:layout_marginHorizontal="20dp">
 
         <Button

@@ -1,0 +1,13 @@
+package creative.developer.m.studymanager;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+public class AssignmentActivity extends Activity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.assignment);
+    }
+
+}
