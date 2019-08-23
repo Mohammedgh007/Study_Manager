@@ -12,30 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"
-        android:text="Please Select a Course"
-        android:textSize="30sp"
+        android:text="Please Select a Course and a Lesson"
+        android:textSize="27sp"
         android:textStyle="bold"
         android:paddingLeft="10dp"
         android:textAlignment="viewStart"/>
 
-    <ScrollView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.75"
-        android:layout_marginBottom="15dp">
+        android:layout_weight="0.75">
 
-        <LinearLayout
-            android:id="@+id/cources_layout"
+        <Spinner
+            android:id="@+id/course_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-
-        </LinearLayout>
-
-    </ScrollView>
-
+            android:spinnerMode="dropdown" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -21,47 +21,19 @@
         <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Course's name: "
+            android:text="Title: "
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:textStyle="bold"
             android:padding="15dp"/>
 
         <EditText
-            android:id="@+id/name_addassignment"
+            android:id="@+id/title_addremark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
             android:hint="Type Here"/>
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:layout_marginTop="10dp"
-        android:layout_marginHorizontal="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:text="Significance Level: "
-            android:layout_marginRight="5dp"
-            android:background="@color/peach"
-            android:textStyle="bold"
-            android:padding="15dp"/>
-
-        <Spinner
-            android:id="@+id/significance_addassignment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:entries="@array/significance_levels"
-            android:layout_weight="1" />
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -78,11 +50,11 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Due at day, hour : "
+            android:text="Date and Time: "
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/datetime_addassignment"
+            android:id="@+id/datetime_addremark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -111,7 +83,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/disc_addassignment"
+            android:id="@+id/disc_addremark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -130,22 +102,22 @@
         android:layout_marginHorizontal="10dp"
         android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/cancel_addassignment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/orange_button"
-        android:layout_marginRight="5dp"
-        android:text="Cancel"/>
-    <Button
-        android:id="@+id/add_addassignment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/orange_button"
-        android:layout_marginLeft="5dp"
-        android:text="Add"/>
+        <Button
+            android:id="@+id/cancel_addremark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:layout_marginRight="5dp"
+            android:text="Cancel"/>
+        <Button
+            android:id="@+id/add_addremark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:layout_marginLeft="5dp"
+            android:text="Add"/>
 
     </LinearLayout>
 </android.widget.LinearLayout>

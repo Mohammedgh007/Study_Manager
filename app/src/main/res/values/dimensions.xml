@@ -2,4 +2,5 @@
 <resources>
     <dimen name="width2_4Button">150dp</dimen>
     <dimen name="height2_4Button">60dp</dimen>
+    <dimen name="size_edit_btn">48dp</dimen>
 </resources>

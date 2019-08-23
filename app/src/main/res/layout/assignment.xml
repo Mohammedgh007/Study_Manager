@@ -20,18 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:background="@color/peach"
-                android:textAlignment="viewStart"
-                android:textStyle="bold"
-                android:padding="15dp"
-                android:textSize="30sp"
-                android:text="Due Today" />
-
         </LinearLayout>
 
     </ScrollView>
