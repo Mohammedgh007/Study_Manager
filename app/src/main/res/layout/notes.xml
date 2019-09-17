@@ -12,38 +12,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:orientation="horizontal"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        android:layout_weight="0.1"
+        android:orientation="horizontal">
 
 
         <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Title: "
             android:layout_marginRight="5dp"
             android:background="@color/peach"
-            android:textStyle="bold"
-            android:padding="15dp"/>
+            android:padding="15dp"
+            android:text="Course: "
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/title_addremark"
+        <TextView
+            android:id="@+id/course_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:hint="Type Here"/>
+            android:ems="10" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.1"
         android:orientation="horizontal">
 
         <TextView
@@ -52,76 +51,57 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Date and Time: "
+            android:text="Lesson: "
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/datetime_addremark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10"
-            android:inputType="datetime"
-            android:text="@string/selectTimeDate" />
-
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:background="@color/peach"
-            android:padding="15dp"
-            android:text="Discribtion: "
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/disc_addremark"
+            android:id="@+id/lesson_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textMultiLine"
-            android:hint="Type Here"/>
+            android:ems="10" />
 
     </LinearLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7">
+
+        <EditText
+            android:id="@+id/note_te_note"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textMultiLine" />
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.2"
-        android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_weight="0.1"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/cancel_addremark"
+            android:id="@+id/close_save_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/orange_button"
             android:layout_marginRight="5dp"
-            android:text="Cancel"/>
-        <Button
-            android:id="@+id/add_addremark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
+            android:text="Close with saving the changes" />
+
+        <Button
+            android:id="@+id/close_notsave_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:text="Add"/>
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:text="close without saving" />
 
     </LinearLayout>
 </android.widget.LinearLayout>

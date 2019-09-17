@@ -7,4 +7,6 @@
     <color name="grey">#CED6CA</color>
     <color name="orange">#FFBF90</color>
     <color name="beige">#FFF5D7</color>
+    <color name="card_question">#FFCDDC39</color>
+    <color name="card_answer">#FF4CAF50</color>
 </resources>

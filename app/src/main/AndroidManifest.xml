@@ -7,25 +7,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".HomeActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        android:theme="@style/AppTheme"></application>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".AssignmentActivity"/>
-        <activity android:name=".AddAssignmentActivity"/>
-        <activity android:name=".ClassNotesActivity"/>
-        <activity android:name=".CoursesActivity"/>
-        <activity android:name=".FlashCardsActivity"/>
-        <activity android:name=".RemarksActivity"/>
-        <activity android:name=".AddRemarkActivity"/>
-    </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
 </manifest>

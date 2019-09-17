@@ -8,60 +8,63 @@
     android:background="@color/beige"
     android:weightSum="1">
 
-    <TextView
+    <ScrollView
+        android:id="@+id/card_background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="15dp"
+        android:layout_weight="0.8"
+        android:background="#4CAF50">
+
+        <TextView
+            android:id="@+id/card_textview_flash_cards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="Hello World"
+            android:textSize="25sp" />
+
+    </ScrollView>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"
-        android:text="Flash card number 1 out of"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:paddingLeft="10dp"
-        android:textAlignment="viewStart"/>
+        android:background="@color/peach">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.75"
-        android:orientation="vertical"
-        android:layout_marginVertical="15dp">
-
-        <LinearLayout
-            android:id="@+id/cources_layout"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/prev_flash_card"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_weight="1"
+            android:text="Previous card" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.7"
-                android:background="#ffffff"
-                android:gravity="center"
-                android:layout_marginBottom="15dp"/>
+        <Button
+            android:id="@+id/flip_flash_card"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Flip the card" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="0.3"
-                android:textStyle="bold"
-                android:textSize="25sp"
-                android:background="@drawable/orange_button"
-                android:text="Reveal The Answer"/>
-
-        </LinearLayout>
-
+        <Button
+            android:id="@+id/next_flash_card"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Next card" />
     </LinearLayout>
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.15"
-        android:orientation="horizontal">
+        android:layout_weight="0.1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
 
         <Button
-            android:id="@+id/edit_cards"
+            android:id="@+id/edit_flash_cards"
             android:layout_marginHorizontal="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,21 +73,21 @@
             android:text="Edit" />
 
         <Button
-            android:id="@+id/home_cards"
+            android:id="@+id/finish_flash_cards"
             android:layout_marginHorizontal="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/orange_button"
             android:layout_weight="1"
-            android:text="Home" />
+            android:text="Finish" />
 
         <Button
-            android:id="@+id/next_cards"
+            android:id="@+id/restart_flash_card"
             android:layout_marginHorizontal="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
-            android:text="Next" />
+            android:text="Restart" />
     </LinearLayout>
 </android.widget.LinearLayout>
