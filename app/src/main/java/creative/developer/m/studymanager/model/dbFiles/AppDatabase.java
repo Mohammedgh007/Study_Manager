@@ -3,7 +3,7 @@
 Author: Mohammed Alghamdi
 Class name : AppDatebase
 purpose: This is a model class. It is used to generate a new data base or find
-  an existing onr.
+  an existing one.
 Methods:
     - getInstance(context) -> it generates a new data base or find an existing one then
       it returns an object that can be used to interact with the data base.
