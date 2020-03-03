@@ -50,17 +50,17 @@
         <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="priority Level: "
+            android:text="reminder time"
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:textStyle="bold"
             android:padding="15dp"/>
 
         <Spinner
-            android:id="@+id/significance_addassignment"
+            android:id="@+id/notify_time_add_assignment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/significance_levels"
+            android:entries="@array/notification_times"
             android:layout_weight="1" />
 
 

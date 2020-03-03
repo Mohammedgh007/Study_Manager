@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : AppDatebase
-purpose: This is a model class. It is used to generate a new data base or find
-  an existing onr.
+purpose: This is a model class. It is used to generate a new database or find
+  an existing one.
 Methods:
     - getInstance(context) -> it generates a new data base or find an existing one then
       it returns an object that can be used to interact with the data base.
@@ -15,6 +15,9 @@ package creative.developer.m.studymanager.model.dbFiles;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import android.content.Context;
 
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.AssignmentDao;
@@ -32,7 +35,7 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 
 @Database(entities = {AssignmentsEntity.class, RemarkEntity.class, CourseEntity.class,
         NoteEntity.class, LessonEntity.class, FlashCardEntity.class},
-        version = 1, exportSchema = false)
+        version = 3, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "StudyManagerDB00";
     private static AppDatabase sInstance;
@@ -50,13 +53,11 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (sInstance == null) {
                     sInstance = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
-                            .build();
+                            .fallbackToDestructiveMigration().build();
                 }
             }
         }
         return sInstance;
     }
-
-
 
 }

@@ -23,13 +23,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import java.util.Arrays;
 import java.util.Collections;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 
-public class FlashCardsActivity extends Activity {
+public class FlashCardsActivity extends AppCompatActivity {
 
     // declaring view
     private ScrollView backgroundCard;
@@ -155,11 +158,23 @@ public class FlashCardsActivity extends Activity {
         // click event handling which is closing this activity to go back to CoursesActivity
         finishBtn.setOnClickListener((btn) -> {
             btn.setClickable(false);
-            Intent intent = new Intent(FlashCardsActivity.this, CoursesActivity.class);
+            Intent intent = new Intent(FlashCardsActivity.this, MainActivity.class);
             intent.putExtra("finalDistanation", "cards");
             startActivity(intent);
             btn.setClickable(true);
+            finish();
         });
+    }
+
+
+    // let the app launches CourseActivity via MainActivity instead of closing the whole app
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(FlashCardsActivity.this, MainActivity.class);
+        intent.putExtra("finalDistanation", "cards");
+        startActivity(intent);
+        finish();
     }
 
 
@@ -179,7 +194,7 @@ public class FlashCardsActivity extends Activity {
 
     // this method handles receiving the sent data by AddFlashActivity
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == EDIT_CODE) {
             // saving the change on lesson's flash cards
             recievedCards = AddFlashCardActivity.getCreatedCards(null);
@@ -189,4 +204,6 @@ public class FlashCardsActivity extends Activity {
             showQuestion();
         }
     }
+
+
 }

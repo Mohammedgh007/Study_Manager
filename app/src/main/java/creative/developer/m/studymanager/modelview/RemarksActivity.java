@@ -19,17 +19,29 @@ Methods:
 package creative.developer.m.studymanager.modelview;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.google.gson.Gson;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.text.DateFormatSymbols;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -40,91 +52,145 @@ import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 
-public class RemarksActivity extends Activity {
+import static android.app.Activity.RESULT_OK;
+
+
+public class RemarksActivity extends Fragment {
 
     private DataRepository repository; // used to access database
     private final int ADDING_CODE = 55; // used as requestCode for startActivityForResult()
     private final int EDITING_CODE = 66; // used as requestCode for startActivityForResult()
     private RemarksList retreivedREmarks; // the retrieved remarks stored in the phone
     private boolean isEditing = false; // true when the user click on edit button
+    // represent the inputted date to show its remarks
+    private int selectedYear, selectedMonth, selectedDay;
+    private HashSet<CalendarDay> highlightedDates;// the highlighted dates on calendarView
     // declaring views; the first two map depends on assignmentId as a key while the third dueDate
     private LinearLayout remarksLayout; // Layout that's holds all added assignments
     private HashMap<Integer, LinearLayout> oneRemarkLayouts; // layout of a single assignment
-    private HashMap<Integer, LinearLayout>  buttonsLayouts; // it stores all the layout of check buttons.
+    private HashMap<Integer, LinearLayout>  buttonsLayouts; //it stores all the layout of edit and delete buttons.
     private HashMap<String, TextView> dueDateViews; // it stores all peach text views of dueDates
-    private Button editBtn;
     private Button addBtn;
-    private Button homeBtn;
+    private TextView remarkDate;
+    private MaterialCalendarView calendarView;
+    private Activity activityMain;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.remarks);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityMain = (Activity) context;
+    }
 
-        // Accessing database to retrieve the data
+    @Override
+    public void onDetach () {
+        super.onDetach();
+        activityMain = null;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Accessing database to retrieve the data then show it in the view
         repository = DataRepository.getInstance(
-                AppDatabase.getInstance(getBaseContext()));
+                AppDatabase.getInstance(activityMain.getBaseContext()));
         Executor dbThread = Executors.newSingleThreadExecutor();
         dbThread.execute(() -> {
-            repository.getRemarks(getBaseContext());
+            retreivedREmarks = repository.getRemarks(activityMain.getBaseContext());
+            System.out.println("hi from remarks " + retreivedREmarks);
+            activityMain.runOnUiThread(() -> {
+                selectedYear = CalendarDay.today().getYear();
+                selectedMonth = CalendarDay.today().getMonth();
+                selectedDay = CalendarDay.today().getDay();
+                createRemarksView(retreivedREmarks, selectedYear, selectedMonth, selectedDay);
+                updateDateText(selectedMonth, selectedDay);
+            });
         });
+
+        // initializing the set of highlighted dates
+        highlightedDates = new HashSet<>();
 
 
         // initializing views
-        remarksLayout = findViewById(R.id.remarks_layout);
-        editBtn = findViewById(R.id.edit_remark);
-        addBtn = findViewById(R.id.add_remark);
-        homeBtn = findViewById(R.id.home_remark);
-
-
-        // Distributing remarks' views on the main thread when
-        // setRetreivedDataListener() is called after remarks are retrieved from database.
-        repository.setRetreivedDataListener((recivedRemarks) -> {
-            retreivedREmarks =  (RemarksList) recivedRemarks;
-            runOnUiThread(() -> createRemarksView(retreivedREmarks));
-        });
-
-        // taking the user back to home screen when clicking on homeBtn
-        homeBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RemarksActivity.this,
-                        HomeActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-        // editing and deleting assignment when clicking editBtn
-        editBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setClickable(false);
-                doEditing();
-                v.setClickable(true);
-            }
-        });
-
+        View root = inflater.inflate(R.layout.remarks, container, false);
+        remarksLayout = root.findViewById(R.id.remarks_layout);
+        addBtn = root.findViewById(R.id.add_remark);
+        remarkDate = root.findViewById(R.id.selected_day_remarks_view);
+        Calendar todayDate = Calendar.getInstance();
+        selectedYear = todayDate.get(Calendar.YEAR);
+        selectedMonth = todayDate.get(Calendar.MONTH);
+        selectedDay = todayDate.get(Calendar.DAY_OF_MONTH);
+        calendarView = ((MaterialCalendarView ) root.findViewById(R.id.calnder_remarks_layout));
 
         // taking user to AddAssignmentActivity to input details of an added assignment.
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RemarksActivity.this,
-                        AddRemarkActivity.class);
-                intent.putExtra("porpuse", "adding");
-                startActivityForResult(intent, ADDING_CODE);
+                if (!isEditing) {
+                    Intent intent = new Intent(activityMain,
+                            AddRemarkActivity.class);
+                    intent.putExtra("porpuse", "adding");
+                    startActivityForResult(intent, ADDING_CODE);
+                } else {
+                    doEditing(); // to close editing mode.
+                }
             }
         });
+
+
+        // create event handling for selecting a day from the calender
+        calendarView.setOnDateChangedListener((view, date, useless) -> {
+            // Managing the highlighted dates.
+            calendarView.clearSelection();
+            for (CalendarDay highlighted : highlightedDates) {
+                System.out.println("test1 " + highlighted.getMonth());
+                calendarView.setDateSelected(highlighted, true);
+            }
+
+
+            // show the remakrs of the selected date
+            updateDateText(date.getMonth(), date.getDay());
+            createRemarksView(retreivedREmarks, date.getYear(),date.getMonth() , date.getDay());
+            if (isEditing) {
+                addBtn.setBackgroundResource(R.drawable.add_btn_icon);
+                isEditing = false;
+            }
+
+            //updating inputted year, month, day
+            selectedYear = date.getYear();
+            selectedMonth = date.getMonth();
+            selectedDay = date.getDay();
+        });
+
+        return root;
     }
+
+
+    /*
+    this method changes the text of remark's date view.
+    @param: day is the day in the new date.
+    @param: month is the month in the selected date.
+    */
+    private void updateDateText(int month, int day) {
+        remarkDate.setText(" Remarks for the date " +
+                new DateFormatSymbols(Locale.getDefault()).
+                        getShortMonths()[month - 1] // January = 1 as month, but it indexes 0
+                + " " + day);
+    }
+
 
     /*
     This function create the view for remarks
     @PARAM: remarks is an object that contains all retrieved remarks from the database.
+    @param: year is the selected year by the user.
+    @param: month is the selected month by the user. (month starts from 1)
+    @param: day is the selected day by the user.
      */
-    private void createRemarksView (RemarksList remarks) {
+    private void createRemarksView (RemarksList remarks, int year, int month, int day) {
         TextView RemarkIfno;
         String info;
+        remarksLayout.removeAllViews(); // clear the previous views.
+        int lastHeight = 120; // used to leave an empty at the the bottom of the remarks layout
 
         // each remark is in a single layout that is oneRemarkLayout, and it has 2
         // layouts, infoLayout for the textView, buttonsLayout for the buttons.
@@ -154,38 +220,75 @@ public class RemarksActivity extends Activity {
         layoutParamsRemark.setLayoutDirection(LinearLayout.HORIZONTAL);
         layoutParamsRemark.setMargins(20, 20, 20, 0);
 
-        for (RemarkEntity remark : retreivedREmarks.getRemarksList()) {
-            // setting text
-            info = remark.getTitle() + "\n";
-            info += "Date: " + getViewedDate(remark.getDate()) + " ";
-            info += "time: " + getViewedTime(remark.getHourNum(),
-                    remark.getMinuteNum()) + "\n";
-            info += "description: " + remark.getDisc();
+        for (RemarkEntity remark : remarks.getRemarksList()) {
+            // adding a remark only if its date is the same as the user's input
+            // otherwise: highlight its date
+            System.out.println("Testing ----- " + remark.getMonthNum() + " " + month);
+            System.out.println("Day " + remark.getDayNum() + " " + day);
+            if (remark.getDayNum() == day && remark.getMonthNum() == month &&
+            remark.getYearNum() == year) {
+                System.out.println("testing " + remark.getRemarkID());
+                // setting text
+                info = remark.getTitle() + "\n";
+                info += "time: " + getViewedTime(remark.getHourNum(),
+                        remark.getMinuteNum()) + "\n";
+                info += "description: " + remark.getDisc();
 
-            // setting the remark layout
-            oneRemarkLayout = new LinearLayout(getBaseContext());
-            remarksLayout.addView(oneRemarkLayout);
-            oneRemarkLayout.setLayoutParams(layoutParamsRemark);
+                // setting the remark layout
+                oneRemarkLayout = new LinearLayout(activityMain.getBaseContext());
+                remarksLayout.addView(oneRemarkLayout);
+                oneRemarkLayout.setLayoutParams(layoutParamsRemark);
 
-            // setting layout of the remark's information
-            infoLayout = new LinearLayout(getBaseContext());
-            oneRemarkLayout.addView(infoLayout);
-            infoLayout.setLayoutParams(layoutParamsInfo);
+                // setting layout of the remark's information
+                infoLayout = new LinearLayout(activityMain.getBaseContext());
+                infoLayout.setOnLongClickListener( (v) -> {
+                    doEditing();
+                    return false;
+                });
+                oneRemarkLayout.addView(infoLayout);
+                infoLayout.setLayoutParams(layoutParamsInfo);
 
-            // setting layout of the remark's check button
-            buttonsLayouts.put(remark.getRemarkID(), new LinearLayout(getBaseContext()));
-            oneRemarkLayout.addView(buttonsLayouts.get(remark.getRemarkID()));
-            buttonsLayouts.get(remark.getRemarkID()).setLayoutParams(layoutParamsButtons);
+                // setting layout of the remark's check button
+                buttonsLayouts.put(remark.getRemarkID(), new LinearLayout(activityMain.getBaseContext()));
+                oneRemarkLayout.addView(buttonsLayouts.get(remark.getRemarkID()));
+                buttonsLayouts.get(remark.getRemarkID()).setLayoutParams(layoutParamsButtons);
 
-            // setting TextView
-            RemarkIfno = new TextView(getBaseContext());
-            RemarkIfno.setText(info);
+                // setting TextView
+                RemarkIfno = new TextView(activityMain.getBaseContext());
+                RemarkIfno.setText(info);
 
-            // adding textview to their layouts
-            infoLayout.addView(RemarkIfno);
+                // adding textview to their layouts
+                infoLayout.addView(RemarkIfno);
 
-            // adding oneRemarksLayout to the hashMap
-            oneRemarkLayouts.put(remark.getRemarkID(), oneRemarkLayout);
+
+                // adding oneRemarksLayout to the hashMap
+                oneRemarkLayouts.put(remark.getRemarkID(), oneRemarkLayout);
+                lastHeight = Math.max(lastHeight, oneRemarkLayout.getHeight());
+
+                // adding remark's date to the set of highlighted dates
+                highlightedDates.add(CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
+                        remark.getDayNum()));
+            } else {
+                calendarView.setDateSelected(CalendarDay.from(remark.getYearNum(),
+                        remark.getMonthNum(), remark.getDayNum()), true);
+
+                // adding remark's date to the set of highlighted dates
+                highlightedDates.add(CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
+                        remark.getDayNum()));
+            }
+        }
+
+        // this section is to append a transparent layout, so that there is an empty space below the
+        // lowest remark to prevent an overlap between add's button and the lowest remark.
+        LinearLayout.LayoutParams layoutParamsTran = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT   , lastHeight);
+        LinearLayout tranLayout = new LinearLayout(activityMain);
+        tranLayout.setLayoutParams(layoutParamsTran);
+        remarksLayout.addView(tranLayout);
+
+        // highlight the current date if it has a remark.
+        if (highlightedDates.contains(CalendarDay.today())) {
+            calendarView.setDateSelected(CalendarDay.today(), true);
         }
     }
 
@@ -229,7 +332,7 @@ public class RemarksActivity extends Activity {
     // this method receives intent from AddRemarkActivity that store details of an added
     // remark.
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    public void onActivityResult (int requestCode, int resultCode, Intent data) {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
             // creating object for the added assignment
             String recievedRemarkStr = data.getExtras().getString("createdRemark");
@@ -241,10 +344,15 @@ public class RemarksActivity extends Activity {
             Executor insertingEx = Executors.newSingleThreadExecutor();
             insertingEx.execute(() -> repository.addRemark(addedRemark));
 
-            this.recreate();
+            this.onCreate(this.getArguments());
+            activityMain.recreate();
             // views are removed to create a new sorted remark view.
             remarksLayout.removeAllViews();
-            createRemarksView(retreivedREmarks);
+            Calendar todayDate = Calendar.getInstance();
+            int year = todayDate.get(Calendar.YEAR);
+            int month = todayDate.get(Calendar.MONTH);
+            int day = todayDate.get(Calendar.DAY_OF_MONTH);
+            createRemarksView(retreivedREmarks, year, month, day);
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // updating the textview's info of the edited remark
             Gson gson = new Gson();
@@ -278,10 +386,8 @@ public class RemarksActivity extends Activity {
     // by holding on a remark
     private void doEditing() {
         if (!isEditing) {
-            // hiding add and home buttons buttons
-            homeBtn.setVisibility(View.GONE);
-            addBtn.setVisibility(View.GONE);
-            editBtn.setText("Done Editing");
+            // changing the appearance of add button.
+            addBtn.setBackgroundResource(R.drawable.done_editing_icon);
             isEditing = true;
 
             Button changeBtn;
@@ -290,49 +396,52 @@ public class RemarksActivity extends Activity {
                     (int) getResources().getDimension(R.dimen.size_edit_btn) ,// for buttons
                     (int) getResources().getDimension(R.dimen.size_edit_btn));
             for (RemarkEntity remark : retreivedREmarks.getRemarksList()) {
-                // setting change button; on the left
-                layoutParamsBtn.leftMargin = 0;
-                changeBtn = new Button(getBaseContext());
-                changeBtn.setLayoutParams(layoutParamsBtn);
-                changeBtn.setBackgroundResource(R.drawable.edit_icon);
-                changeBtn.setOnClickListener((changingBtn) -> {
-                    Intent intent = new Intent(RemarksActivity.this,
-                            AddRemarkActivity.class);
-                    Gson formattedAssignment = new Gson();
-                    String stringRemark = formattedAssignment.toJson(remark);
-                    intent.putExtra("remarkObj", stringRemark);
-                    intent.putExtra("porpuse", "editing");
-                    startActivityForResult(intent, EDITING_CODE);
-                });
+                // showing editing button only for the shows remarks
+                if (buttonsLayouts.get(remark.getRemarkID()) != null) {
+                    // setting change button; on the left
+                    layoutParamsBtn.leftMargin = 0;
+                    changeBtn = new Button(activityMain.getBaseContext());
+                    changeBtn.setLayoutParams(layoutParamsBtn);
+                    changeBtn.setBackgroundResource(R.drawable.edit_icon);
+                    changeBtn.setOnClickListener((changingBtn) -> {
+                        Intent intent = new Intent(activityMain,
+                                AddRemarkActivity.class);
+                        Gson formattedAssignment = new Gson();
+                        String stringRemark = formattedAssignment.toJson(remark);
+                        intent.putExtra("remarkObj", stringRemark);
+                        intent.putExtra("porpuse", "editing");
+                        startActivityForResult(intent, EDITING_CODE);
+                    });
 
-                // setting delete button; on the right
-                layoutParamsBtn.leftMargin = 10;
-                deleteBtn = new Button(getBaseContext());
-                deleteBtn.setLayoutParams(layoutParamsBtn);
-                deleteBtn.setBackgroundResource(R.drawable.delete_icon);
-                deleteBtn.setOnClickListener((deletingBtn) -> {
-                    remarksLayout.removeView(oneRemarkLayouts.
-                            get(remark.getRemarkID()));
-                    Executor deletionThread = Executors.newSingleThreadExecutor();
-                    deletionThread.execute(() -> repository.deleteRemark(remark));
-                    retreivedREmarks.removeRemark(remark);
-                });
+                    // setting delete button; on the right
+                    layoutParamsBtn.leftMargin = 10;
+                    deleteBtn = new Button(activityMain.getBaseContext());
+                    deleteBtn.setLayoutParams(layoutParamsBtn);
+                    deleteBtn.setBackgroundResource(R.drawable.delete_icon);
+                    deleteBtn.setOnClickListener((deletingBtn) -> {
+                        remarksLayout.removeView(oneRemarkLayouts.
+                                get(remark.getRemarkID()));
+                        Executor deletionThread = Executors.newSingleThreadExecutor();
+                        deletionThread.execute(() -> repository.deleteRemark(remark));
+                        retreivedREmarks.removeRemark(remark);
+                    });
 
-                // setting the layout by replacing check button with change and delete
-                buttonsLayouts.get(remark.getRemarkID()).addView(changeBtn, 0);
-                buttonsLayouts.get(remark.getRemarkID()).addView(deleteBtn, 1);
+                    // setting the layout by replacing check button with change and delete
+                    System.out.println("testing " + remark.getRemarkID());
+                    buttonsLayouts.get(remark.getRemarkID()).addView(changeBtn, 0);
+                    buttonsLayouts.get(remark.getRemarkID()).addView(deleteBtn, 1);
+                }
+
             }
 
         } else {
-            // bring back the two buttons
-            homeBtn.setVisibility(View.VISIBLE);
-            addBtn.setVisibility(View.VISIBLE);
-            editBtn.setText("Edit");
+            // bring back the adding button
+            addBtn.setBackgroundResource(R.drawable.add_btn_icon);
             isEditing = false;
 
             // recreating assignments view so that they are sorted
             remarksLayout.removeAllViews();
-            createRemarksView(retreivedREmarks);
+            createRemarksView(retreivedREmarks, selectedYear, selectedMonth, selectedDay);
         }
 
     }

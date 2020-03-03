@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : LessonEntity
-purpose: This is a model class that is used to represent a signle lesson
-    as an object and as a field on a database table called LessonEntity
+purpose: This is a model class that is used to represent a single lesson
+    as an object and as a row on a database table called LessonEntity
 ###############################################################################
  */
 

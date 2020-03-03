@@ -22,17 +22,31 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.navigation.NavigationView;
 
 import creative.developer.m.studymanager.R;
 
-public class HomeActivity extends Activity {
+import static android.app.Activity.RESULT_OK;
+
+public class HomeActivity extends Fragment {
 
     final int EDIT_REQUEST_CODE = 123; // used for editBtn's clicking event.
     final int PROMPT_PERMISSION_CODE = 332; // used for onRequestPermissionsResult()
@@ -42,29 +56,21 @@ public class HomeActivity extends Activity {
     // Declaring views
     private ImageView scheduleImg;
     private Button editBtn;
-    private Button remarksBtn;
-    private Button assignmentBtn;
-    private Button notesBtn;
-    private Button cardsBtn;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_activity);
-
-        // Initializing views
-        scheduleImg = findViewById(R.id.course_schedule_home);
-        editBtn = findViewById(R.id.edit_schedule_home);
-        remarksBtn = findViewById(R.id.remarks_home);
-        assignmentBtn = findViewById(R.id.assignment_home);
-        notesBtn = findViewById(R.id.class_note_home);
-        cardsBtn = findViewById(R.id.flashcards_home);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
+        // initializing views
+        View root = inflater.inflate(R.layout.home_activity, container, false);
+        scheduleImg = root.findViewById(R.id.course_schedule_home);
+        editBtn = root.findViewById(R.id.edit_schedule_home);
 
         // showing the proper background for the schedule view after making sure I get permission
         // to access the device memory, otherwise, I will prompt fot that permission
-        imageRef = this.getPreferences(Context.MODE_PRIVATE);
+        imageRef = getActivity().getPreferences(Context.MODE_PRIVATE);
         imageEditor = imageRef.edit();
-        if ((ContextCompat.checkSelfPermission(this,
+        if ((ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
             if (imageRef.contains(getString(R.string.schedulePhotoIdMemory))){
                 String uriStr = imageRef.getString(getString(R.string.schedulePhotoIdMemory),"");
@@ -72,44 +78,19 @@ public class HomeActivity extends Activity {
                 scheduleImg.setImageURI(Uri.parse(uriStr));
             }
         } else {
-            ActivityCompat.requestPermissions(this,
+            ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PROMPT_PERMISSION_CODE);
         }
 
-        // Going to assignment activity
-        assignmentBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, AssignmentActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        // Going to remarks activity
-        remarksBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, RemarksActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Going to class notes activity
-        notesBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, CoursesActivity.class);
-                intent.putExtra("finalDistanation", "notes");
-                startActivity(intent);
-            }
-        });
-
-        // Going to flash cards activity
-        cardsBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeActivity.this, CoursesActivity.class);
-                intent.putExtra("finalDistanation", "cards");
+        // opening the schedule by the gallery when the user click on it
+        scheduleImg.setOnClickListener((evt) -> {
+            // if the user has choose a picture.
+            if (imageRef.contains(getString(R.string.schedulePhotoIdMemory))) {
+                String uriStr = imageRef.getString(getString(R.string.schedulePhotoIdMemory), "");
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse(uriStr), "image/*");
                 startActivity(intent);
             }
         });
@@ -123,11 +104,14 @@ public class HomeActivity extends Activity {
                 startActivityForResult(intent, EDIT_REQUEST_CODE);
             }
         });
+
+        return root;
     }
+
 
     // this method recieve the image from gallery for editBtn's intent
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == EDIT_REQUEST_CODE) {
             Uri imageUri = data.getData();
@@ -144,7 +128,6 @@ public class HomeActivity extends Activity {
     // external memory permission
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
-        System.out.println("in");
         if (requestCode == PROMPT_PERMISSION_CODE) {
             // checking the permission is granted, if so then change background
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -152,7 +135,7 @@ public class HomeActivity extends Activity {
                 scheduleImg.setBackground(null);
                 scheduleImg.setImageURI(Uri.parse(uriStr));
             } else { // if it is not granted, then show a message
-                Toast.makeText(this, "Please allow the app to access the memory, " +
+                Toast.makeText(getActivity(), "Please allow the app to access the memory, " +
                         "so that the app can show the selected photo", Toast.LENGTH_LONG).show();
             }
         }

@@ -20,14 +20,19 @@ Methods:
 package creative.developer.m.studymanager.modelview;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 
 import com.google.gson.Gson;
 
@@ -45,7 +50,9 @@ import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
 
-public class AssignmentActivity extends Activity{
+import static android.app.Activity.RESULT_OK;
+
+public class AssignmentActivity extends Fragment {
 
     private DataRepository repository; // used to access database
     private final int ADDING_CODE = 55; // used as requestCode for startActivityForResult()
@@ -57,80 +64,67 @@ public class AssignmentActivity extends Activity{
     private HashMap<Integer, LinearLayout> oneAssignmentLayouts; // layout of a single assignment
     private HashMap<Integer, LinearLayout>  buttonsLayouts; // it stores all the layout of check buttons.
     private HashMap<String, TextView> dueDateViews; // it stores all peach text views of dueDates
-    private Button editBtn;
     private Button addBtn;
-    private Button homeBtn;
+    private Activity activityMain;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityMain = (Activity) context;
+    }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.assignment);
+    public void onDetach() {
+        super.onDetach();
+        activityMain = null;
+    }
 
-        // Accessing database to retrieve the data
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                            Bundle savedInstanceState) {
+        // Accessing database to retrieve the data then show it in the view.
         repository = DataRepository.getInstance(
-                AppDatabase.getInstance(getBaseContext()));
+                AppDatabase.getInstance(activityMain.getBaseContext()));
         Executor dbThread = Executors.newSingleThreadExecutor();
         dbThread.execute(() -> {
-            repository.getAssignments(getBaseContext());
+            System.out.println("start");
+            retreivedAssignemnts = repository.getAssignments(activityMain.getBaseContext());
+            System.out.println("finished");
+            activityMain.runOnUiThread(() -> createAssignemntsView(retreivedAssignemnts));
         });
 
         // initializing views
-        assignmentsLayout = findViewById(R.id.assignemt_layout);
-        editBtn = findViewById(R.id.edit_assignment);
-        addBtn = findViewById(R.id.add_assignment);
-        homeBtn = findViewById(R.id.home_assignment);
+        View root = inflater.inflate(R.layout.assignment, container, false);
+        assignmentsLayout = root.findViewById(R.id.assignemt_layout);
+        addBtn = root.findViewById(R.id.add_assignment);
 
-        // Distributing assignments' views on the main thread when
-        // setRetreivedDataListener() is called after assignments are retrieved from database.
-        repository.setRetreivedDataListener((recievedAssignments) -> {
-            retreivedAssignemnts =  (AssignmentsList) recievedAssignments;
-            runOnUiThread(() -> createAssignemntsView(retreivedAssignemnts));
-        });
-
-
-
-        // taking the user back to home screen when clicking on homeBtn
-        homeBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(AssignmentActivity.this,
-                        HomeActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
-
-
-        // editing and deleting assignment when clicking editBtn
-        editBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.setClickable(false);
-                doEditing();
-                v.setClickable(true);
-            }
-        });
 
         // taking user to AddAssignmentActivity to input details of an added assignment.
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AssignmentActivity.this,
-                        AddAssignmentActivity.class);
-                intent.putExtra("porpuse", "adding");
-                startActivityForResult(intent, ADDING_CODE);
+                if (!isEditing) {
+                    Intent intent = new Intent(activityMain,
+                            AddAssignmentActivity.class);
+                    intent.putExtra("porpuse", "adding");
+                    startActivityForResult(intent, ADDING_CODE);
+                } else {
+                    doEditing(); // to close editing mode.
+                }
             }
         });
 
+
+        return root;
     }
 
 
     // this method receives intent from AddAssignmentActivity that store details of an added
     // assignemnt.
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    public void onActivityResult (int requestCode, int resultCode, Intent data) {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
             // creating object for the added assignment
             String recievedAssignmentStr = data.getExtras().getString("createdAssignment");
@@ -142,7 +136,7 @@ public class AssignmentActivity extends Activity{
             Executor insertingEx = Executors.newSingleThreadExecutor();
             insertingEx.execute(() -> repository.addAssignment(addedAssignment));
 
-            this.recreate();
+            activityMain.recreate();
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // updating the textview's info of the edited assignment
             Gson gson = new Gson();
@@ -153,11 +147,9 @@ public class AssignmentActivity extends Activity{
             AssignmentsEntity oldAssignment = gson.fromJson(oldAssignmentStr, AssignmentsEntity.class);
 
             String course = updatedAssignment.getCourse();
-            String significance = updatedAssignment.getSignificance();
             String disc = updatedAssignment.getDisc();
 
             String info = course + "\n";
-            info += "Significance: " + significance + "\n";
             info += "Due time: " + getViewedTime(updatedAssignment.getHourNum(),
                     updatedAssignment.getMinuteNum()) + "\n";
             info += "description: " + disc;
@@ -183,6 +175,7 @@ public class AssignmentActivity extends Activity{
         String info;
         Button markedBtn;
         TextView dueDateSingleView;
+        int lastHeight = 120; // used to leave an empty at the the bottom of the assignment layout
 
         // each assignment is in a single layout that is oneAssignmentLayout, and it has 2
         // layouts, infoLayout for the textView, buttonsLayout for the buttons.
@@ -215,10 +208,9 @@ public class AssignmentActivity extends Activity{
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParamsAssignment.setLayoutDirection(LinearLayout.HORIZONTAL);
         layoutParamsAssignment.setMargins(20, 20, 20, 0);
-
         for (List<AssignmentsEntity> dayList: assignments.getAssignments().values()) {
             // creating textview that shows the due day date
-            dueDateSingleView = new TextView(getBaseContext());
+            dueDateSingleView = new TextView(activityMain.getBaseContext());
             assignmentsLayout.addView(dueDateSingleView);
             dueDateViews.put(dayList.get(0).getDueDate(), dueDateSingleView);
             dueDateSingleView.setLayoutParams(layoutParamsDueDate);
@@ -231,18 +223,17 @@ public class AssignmentActivity extends Activity{
             for (AssignmentsEntity assignment : dayList) {
                 // setting text
                 info = assignment.getCourse() + "\n";
-                info += "Significance: " + assignment.getSignificance() + "\n";
                 info += "Due time: " + getViewedTime(assignment.getHourNum(),
                         assignment.getMinuteNum()) + "\n";
                 info += "description: " + assignment.getDisc();
 
                 // setting the assignment layout
-                oneAssignmentLayout = new LinearLayout(getBaseContext());
+                oneAssignmentLayout = new LinearLayout(activityMain.getBaseContext());
                 assignmentsLayout.addView(oneAssignmentLayout);
                 oneAssignmentLayout.setLayoutParams(layoutParamsAssignment);
 
                 // setting layout of the assignment's information
-                infoLayout = new LinearLayout(getBaseContext());
+                infoLayout = new LinearLayout(activityMain.getBaseContext());
                 infoLayout.setOnLongClickListener( (v) -> {
                     doEditing();
                     return false;
@@ -251,16 +242,16 @@ public class AssignmentActivity extends Activity{
                 infoLayout.setLayoutParams(layoutParamsInfo);
 
                 // setting layout of the assignment's check button
-                buttonsLayouts.put(assignment.getAssignmentID(), new LinearLayout(getBaseContext()));
+                buttonsLayouts.put(assignment.getAssignmentID(), new LinearLayout(activityMain.getBaseContext()));
                 oneAssignmentLayout.addView(buttonsLayouts.get(assignment.getAssignmentID()));
                 buttonsLayouts.get(assignment.getAssignmentID()).setLayoutParams(layoutParamsButtons);
 
                 // setting TextView
-                assignmentIfno = new TextView(getBaseContext());
+                assignmentIfno = new TextView(activityMain.getBaseContext());
                 assignmentIfno.setText(info);
 
                 // setting button's view
-                markedBtn = new Button(getBaseContext());
+                markedBtn = new Button(activityMain.getBaseContext());
                 markedBtn.setLayoutParams(layoutParamsBtn);
                 if (assignment.getIsMarked()) {
                     markedBtn.setBackgroundResource(R.drawable.check_mark_icon);
@@ -291,8 +282,17 @@ public class AssignmentActivity extends Activity{
 
                 // adding oneAssignmentsLayout to the hashMap
                 oneAssignmentLayouts.put(assignment.getAssignmentID(), oneAssignmentLayout);
+                lastHeight = Math.max(lastHeight, oneAssignmentLayout.getHeight());
             }
         }
+
+        // this section is to append a transparent layout, so that there is an empty space below the
+        // lowest assignment to prevent an overlap between add's button and the lowest assignment.
+        LinearLayout.LayoutParams layoutParamsTran = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT   , lastHeight);
+        LinearLayout tranLayout = new LinearLayout(activityMain);
+        tranLayout.setLayoutParams(layoutParamsTran);
+        assignmentsLayout.addView(tranLayout);
     }
 
 
@@ -349,10 +349,8 @@ public class AssignmentActivity extends Activity{
     // an assignment
     private void doEditing(){
         if (!isEditing) {
-            // hiding add and home buttons buttons
-            homeBtn.setVisibility(View.GONE);
-            addBtn.setVisibility(View.GONE);
-            editBtn.setText("Done Editing");
+            // changing the appearance of add button.
+            addBtn.setBackgroundResource(R.drawable.done_editing_icon);
             isEditing = true;
 
             Button changeBtn;
@@ -365,11 +363,11 @@ public class AssignmentActivity extends Activity{
                 for (AssignmentsEntity assignment : assignmentList) {
                     // setting change button; on the left
                     layoutParamsBtn.leftMargin = 0;
-                    changeBtn = new Button(getBaseContext());
+                    changeBtn = new Button(activityMain.getBaseContext());
                     changeBtn.setLayoutParams(layoutParamsBtn);
                     changeBtn.setBackgroundResource(R.drawable.edit_icon);
                     changeBtn.setOnClickListener((changingBtn) -> {
-                        Intent intent = new Intent(AssignmentActivity.this,
+                        Intent intent = new Intent(activityMain,
                                 AddAssignmentActivity.class);
                         Gson formattedAssignment = new Gson();
                         String stringAssignment = formattedAssignment.toJson(assignment);
@@ -380,7 +378,7 @@ public class AssignmentActivity extends Activity{
 
                     // setting delete button; on the right
                     layoutParamsBtn.leftMargin = 10;
-                    deleteBtn = new Button(getBaseContext());
+                    deleteBtn = new Button(activityMain.getBaseContext());
                     deleteBtn.setLayoutParams(layoutParamsBtn);
                     deleteBtn.setBackgroundResource(R.drawable.delete_icon);
                     deleteBtn.setOnClickListener((deletingBtn) -> {
@@ -402,10 +400,8 @@ public class AssignmentActivity extends Activity{
             }
 
         } else {
-            // bring back the two buttons
-            homeBtn.setVisibility(View.VISIBLE);
-            addBtn.setVisibility(View.VISIBLE);
-            editBtn.setText("Edit");
+            // bring back the add button
+            addBtn.setBackgroundResource(R.drawable.add_btn_icon);
             isEditing = false;
 
             // recreating assignments view so that they are sorted

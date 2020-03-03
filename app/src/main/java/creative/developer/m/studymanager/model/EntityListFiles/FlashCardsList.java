@@ -103,8 +103,10 @@ public class FlashCardsList {
 
     public List<String> getCourseLessons (String course) {
         List<String> lessons = new ArrayList<>();
-        for (String lesson : cardsMap.get(course).keySet()) {
-            lessons.add(lesson);
+        if (cardsMap.get(course) != null) {
+            for (String lesson : cardsMap.get(course).keySet()) {
+                lessons.add(lesson);
+            }
         }
         return lessons;
     }

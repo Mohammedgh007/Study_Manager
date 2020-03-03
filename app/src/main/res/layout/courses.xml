@@ -9,16 +9,10 @@
     android:weightSum="1">
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.3"
-        android:orientation="vertical"></LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.6">
+        android:layout_weight="0.2">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:paddingLeft="10dp"
-                android:text="Please Select a Course or add new one with a lesson"
+                android:text="Please select a course or add a course"
                 android:textAlignment="viewStart"
                 android:textSize="27sp"
                 android:textStyle="bold" />
@@ -43,85 +37,48 @@
                     android:id="@+id/coursesBtnLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:id="@+id/add_course_courses"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/add_btn_icon" />
+                </LinearLayout>
             </ScrollView>
-
-            <LinearLayout
-                android:id="@+id/lesson_spinner_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="30dp"
-                android:orientation="horizontal"
-                android:visibility="invisible">
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="7dp"
-                    android:background="@color/peach"
-                    android:text="Select a Lesson"
-                    android:textSize="20sp" />
-
-                <Spinner
-                    android:id="@+id/lesson_spinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:spinnerMode="dialog" />
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <Button
-                    android:id="@+id/enter_lesson"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/orange_button"
-                    android:text="Show The lesson"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:orientation="horizontal">
+        android:layout_weight="0.8">
 
-
-        <Button
-            android:id="@+id/remove_courses"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="3dp"
-            android:layout_weight="0.33"
-            android:background="@drawable/orange_button"
-            android:text="Remove a lesson" />
+            android:id="@+id/lessonsBtnLayout_courses"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/home_courses"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="3dp"
-            android:layout_weight="0.33"
-            android:background="@drawable/orange_button"
-            android:text="Home" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:paddingLeft="10dp"
+                android:text="Next, please select a lesson or add a lesson"
+                android:textAlignment="viewStart"
+                android:textSize="27sp"
+                android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/add_courses"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="3dp"
-            android:layout_weight="0.33"
-            android:background="@drawable/orange_button"
-            android:text="Add a lesson" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/add_lesson_courses"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:background="@drawable/add_btn_icon" />
+
+        </LinearLayout>
+    </ScrollView>
+
 </android.widget.LinearLayout>

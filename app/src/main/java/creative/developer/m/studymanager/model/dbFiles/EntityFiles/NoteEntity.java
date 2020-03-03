@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : NoteEntity
-purpose: This is a model class that is used to represent a signle notes' class
-    as an object and as a field on a database table called NoteEntity
+purpose: This is a model class that is used to represent a single notes' class
+    as an object and as a row on a database table called NoteEntity
 ###############################################################################
  */
 

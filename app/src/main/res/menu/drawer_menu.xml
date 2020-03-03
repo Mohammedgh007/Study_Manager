@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_assignment"
+            android:title="Assignments" />
+        <item
+            android:id="@+id/nav_remark"
+            android:title="Remarks" />
+        <item
+            android:id="@+id/nav_notes"
+            android:title="Notes" />
+        <item
+            android:id="@+id/nav_flash"
+            android:title="Flash Cards" />
+    </group>
+</menu>

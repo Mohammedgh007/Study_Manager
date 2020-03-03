@@ -4,6 +4,10 @@
     package="creative.developer.m.studymanager">
 
     <dist:module dist:instant="true" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
 
     <application
         android:allowBackup="true"
@@ -11,8 +15,33 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"></application>
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".modelview.MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".modelview.HomeActivity"/>
+        <activity android:name=".modelview.AssignmentActivity" />
+        <activity android:name=".modelview.AddAssignmentActivity" />
+        <activity android:name=".modelview.NotesActivity" />
+        <activity android:name=".modelview.AddNoteActivity" />
+        <activity android:name=".modelview.CoursesActivity" />
+        <activity android:name=".modelview.FlashCardsActivity" />
+        <activity android:name=".modelview.AddFlashCardActivity" />
+        <activity android:name=".modelview.RemarksActivity" />
+        <activity android:name=".modelview.AddRemarkActivity" />
+        <activity android:name=".modelview.AddCourseActivity" />
+        <receiver android:name=".view.AlarmManagement$AlarmReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
 
 </manifest>

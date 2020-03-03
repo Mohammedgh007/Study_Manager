@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ public class AddNoteActivity extends Activity {
     private NoteList existedNotes;
     private Button addNoteBtn;
     private Button cancelBtn;
-    private EditText courseET;
+    private TextView courseET;
     private EditText lessonET;
     private EditText recoredNoteET;
 
@@ -39,10 +40,13 @@ public class AddNoteActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_note);
 
+        String courseName = this.getIntent().getStringExtra("courseStr");
+
         // initializing views
         addNoteBtn = findViewById(R.id.add_addnote);
         cancelBtn = findViewById(R.id.cancel_addnote);
         courseET = findViewById(R.id.course_add_note);
+        courseET.setText(courseName);
         lessonET = findViewById(R.id.lesson_add_note);
         recoredNoteET = findViewById(R.id.recorded_note_te);
 
@@ -65,8 +69,8 @@ public class AddNoteActivity extends Activity {
                 System.out.println("in Adding");
                 Intent intent = new Intent(AddNoteActivity.this,
                         CoursesActivity.class);
-                NoteEntity added = new NoteEntity(courseET.getText().toString().toLowerCase().trim(),
-                        lessonET.getText().toString().toLowerCase().trim(),
+                NoteEntity added = new NoteEntity(courseET.getText().toString().toUpperCase().trim(),
+                        lessonET.getText().toString().toUpperCase().trim(),
                         recoredNoteET.getText().toString());
                 Gson gson = new Gson();
                 String addedJson = gson.toJson(added);
@@ -81,11 +85,11 @@ public class AddNoteActivity extends Activity {
     // this method returns true if the user has filled the fields, and the lesson field does not
     // include a written question previously. It also shows messages for the user miss inputs
     private boolean isInputValid() {
-        String course = courseET.getText().toString().toLowerCase();
-        String lesson = lessonET.getText().toString().toLowerCase();
+        String course = courseET.getText().toString().toUpperCase();
+        String lesson = lessonET.getText().toString().toUpperCase();
         String note = recoredNoteET.getText().toString();
         System.out.println("in valid 1");
-        if (!course.equals("") && !lesson.equals("") && !note.equals("")) {
+        if (!lesson.equals("") && !note.equals("")) {
             System.out.println("in valid 2");
             if (existedNotes.containLesson(course, lesson)) {
                 Toast.makeText(this, "This lesson has been already added, please select" +

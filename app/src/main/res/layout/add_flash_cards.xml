@@ -28,13 +28,12 @@
             android:text="Course: "
             android:textStyle="bold" />
 
-        <EditText
+        <TextView
             android:id="@+id/course_add_flash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:ems="10"
-            android:hint="Type Here" />
+            android:ems="10" />
     </LinearLayout>
 
     <LinearLayout

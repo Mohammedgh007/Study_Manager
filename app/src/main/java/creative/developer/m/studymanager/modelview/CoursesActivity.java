@@ -13,6 +13,7 @@ Methods:
      FlashCardsActivity.
   updateSentCards() -> this method change the value of sentCards in case the user edit them after
      it is sent to FlashCardsActivity
+  getExistingCourses() -> this method returns the set of existing courses.
 ###############################################################################
  */
 
@@ -20,18 +21,27 @@ Methods:
 package creative.developer.m.studymanager.modelview;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -45,197 +55,146 @@ import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 
-public class CoursesActivity extends Activity {
+import static android.app.Activity.RESULT_OK;
+
+public class CoursesActivity extends Fragment {
 
     // used to access database; static to access editing it from FlashCardsActivity
     private static DataRepository repository;
     private final int ADDING_CODE_NOTE = 55; // used as requestCode for startActivityForResult()
     private final int ENTER_CODE_NOTE = 57; // used as requestCode for startActivityForResult()
+    private final int ADD_COURSSE_CODE = 59; // used as requestCode for startActivityForResult()
     private final int ADDING_CODE_CARD = 66; // used as requestCode for startActivityForResult()
+    private final int EDIT_CARDS_CODE = 60; // used as requestCode for startActivityForResult()
     private String selectedCourse; // used to recognize the selected course.
     private String distination; // it is used to distinquish whether the activity will use notes or cards
     private NoteList retreivedNotes; // the retrieved notes stored in the phone
     // the retrieved cards stored in the phone,; static to access editing it from FlashCardsActivity
     private static FlashCardsList retreivedCards;
     private static FlashCardEntity[] sentCards; // to send the selected lesson's cards to FlashCardActivity
+    private static Set<String> coursesSet; // names of the courses
+    private Activity activityMain;
+    public static int count = 0;
 
-    Button removeBtn;
-    Button addBtn; // add new course  or lesson
-    Button homeBtn;
-    Button showBtn;
+    // views
+    Button addLessonBtn;
+    Button addCourseBtn;
     Button []clickedCourse; // it is the last clicked course, so that it would be easier to access it.
     LinearLayout courseBtnLayout; // it is a layout that contain all courses buttons
-    LinearLayout lessonSpinnerLayout; // it includes the lesson spinner.
-    Spinner lessonSpinner;
-    ArrayAdapter<String> arrSpinnerAdaptor; // it stores the strings shown in the lesson spinner.
+    LinearLayout lessonsBtnLayout; // it is a layout that contain all courses buttons
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activityMain = (Activity) context;
+    }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.courses);
-        distination = this.getIntent().getStringExtra("finalDistanation");
+    public void onDetach() {
+        super.onDetach();
+        activityMain = null;
+    }
 
-        // Accessing database to retrieve the data
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             Bundle savedInstanceState) {
+        distination = MainActivity.getCoursesDistination();
+        coursesSet = new HashSet<>();
+        clickedCourse = new Button[1];
+
+        // Accessing database to retrieve the data then show on the view
         repository = DataRepository.getInstance(
-                AppDatabase.getInstance(getBaseContext()));
+                AppDatabase.getInstance(activityMain.getBaseContext()));
         Executor dbThread = Executors.newSingleThreadExecutor();
         dbThread.execute(() -> {
-            if (distination.equals("notes")) {
-                repository.getNotes(getBaseContext());
+            // Initializing courses set depending on this activity is opened for notes or flash cards
+            coursesSet = repository.getCoursesStr();
+            System.out.println("the count in exe is" + (++count));
+            if (distination.equals("notes activity")) {
+                retreivedNotes = repository.getNotes(activityMain.getBaseContext());;
+                activityMain.runOnUiThread(() -> createCoursesView());
             } else {
-                repository.getCards(getBaseContext());
+                retreivedCards = repository.getCards(activityMain.getBaseContext());
+                activityMain.runOnUiThread(() -> createCoursesView());
             }
         });
 
         // initializing views
-        removeBtn = findViewById(R.id.remove_courses);
-        addBtn = findViewById(R.id.add_courses);
-        homeBtn = findViewById(R.id.home_courses);
-        showBtn = findViewById(R.id.enter_lesson);
-        showBtn.setVisibility(View.INVISIBLE);
-        lessonSpinner = findViewById(R.id.lesson_spinner);
-        courseBtnLayout = findViewById(R.id.coursesBtnLayout);
-        lessonSpinnerLayout = findViewById(R.id.lesson_spinner_layout);
+        View root = inflater.inflate(R.layout.courses, container, false);
+        addCourseBtn = root.findViewById(R.id.add_course_courses);
+        courseBtnLayout = root.findViewById(R.id.coursesBtnLayout);
+        addLessonBtn = root.findViewById(R.id.add_lesson_courses);
+        lessonsBtnLayout = root.findViewById(R.id.lessonsBtnLayout_courses);
 
-        // Distributing notes/cards' views on the main thread when
-        // setRetreivedDataListener() is called after remarks are retrieved from database.
-        repository.setRetreivedDataListener((recieveddata) ->{
-            if (distination.equals("notes")) {
-                retreivedNotes = (NoteList) recieveddata;
-            } else {// for cards class
-                retreivedCards = (FlashCardsList) recieveddata;
+
+        // handling the event of adding a course
+        addCourseBtn.setOnClickListener((view -> {
+            Intent popupIntent = new Intent(activityMain, AddCourseActivity.class);
+            startActivityForResult(popupIntent, ADD_COURSSE_CODE);
+        }));
+
+        // click button event handling for addLessonBtn. It will go to either AddNote or AddCard
+        addLessonBtn.setOnClickListener((btn) -> {
+            // make sure that there is a selected course
+            if (clickedCourse[0] == null || clickedCourse[0].getBackground().getConstantState()
+                    != getResources().getDrawable(R.color.peach).getConstantState()) {
+                Toast.makeText(activityMain.getBaseContext(), "Please select a course first in order" +
+                        " to add a lesson", Toast.LENGTH_LONG).show();
+                return;
             }
-            runOnUiThread(() -> createCoursesView());
-        });
 
-
-        // click button event handling for enterBtn
-        showBtn.setOnClickListener((btn) -> {
-            // changing the lesson button to grey, so that user knows it is not clicked
-            clickedCourse[0].setBackground(null);
-            clickedCourse[0].setBackgroundColor(getResources().getColor(R.color.grey));
-
-            //preparing for showing the lesson on either FlashCardsActivity or NotesActivity
-            if (distination.equals("notes")) {
-                Intent enterIntent = new Intent(CoursesActivity.this,
-                        NotesActivity.class);
-                Gson lessonGson = new Gson();
-                String selectedLesson = lessonSpinner.getSelectedItem().toString();
-                String lessonJson = lessonGson.toJson(retreivedNotes.getNote(selectedCourse,
-                        selectedLesson));
-                enterIntent.putExtra("lessonNote", lessonJson);
-                startActivityForResult(enterIntent, ENTER_CODE_NOTE);
-            } else {
-                Intent enterIntent = new Intent(CoursesActivity.this,
-                        FlashCardsActivity.class);
-                String selectedLesson = lessonSpinner.getSelectedItem().toString();
-                sentCards = retreivedCards.getLessonCards(selectedCourse, selectedLesson);
-                startActivity(enterIntent);
-                finish();
-            }
-        });
-
-
-        // click button event handling for homeBtn
-        homeBtn.setOnClickListener((btn) -> {
-            Intent homeIntent = new Intent(CoursesActivity.this, HomeActivity.class);
-            startActivity(homeIntent);
-        });
-
-
-        // click button event handling for addBtn. It will go to either AddNote or AddCard
-        addBtn.setOnClickListener((btn) -> {
             // changing the lesson button to grey, so that user knows it is not clicked
             if ( clickedCourse[0] != null) {
                 clickedCourse[0].setBackground(null);
                 clickedCourse[0].setBackgroundColor(getResources().getColor(R.color.grey));
             }
 
-            // showing lesson drop list and enter button.
-            lessonSpinnerLayout.setVisibility(View.INVISIBLE);
-            showBtn.setVisibility(View.INVISIBLE);
-
-            if (distination.equals("notes")) { // for notes
-                Intent addIntent = new Intent(CoursesActivity.this,
-                        AddNoteActivity.class);
+            if (distination.equals("notes activity")) { // for notes
+                Intent addIntent = new Intent(activityMain, AddNoteActivity.class);
+                addIntent.putExtra("courseStr", selectedCourse);
                 startActivityForResult(addIntent, ADDING_CODE_NOTE);
             } else { // for flashcards
-                Intent addIntent = new Intent(
-                        CoursesActivity.this,
-                        AddFlashCardActivity.class);
+                Intent addIntent = new Intent(activityMain, AddFlashCardActivity.class);
                 addIntent.putExtra("purpose", "adding");
+                addIntent.putExtra("courseStr", selectedCourse);
                 startActivityForResult(addIntent, ADDING_CODE_CARD);
             }
 
         });
 
-
-        // click button event handling for removeBtn, which is removing a lesson
-        removeBtn.setOnClickListener((btn) -> {
-            if (lessonSpinner.getSelectedItem() != null ) { // if a lesson is selected
-                // removing from the view
-                String selectedLesson = lessonSpinner.getSelectedItem().toString();
-                arrSpinnerAdaptor.remove(selectedLesson);
-                Toast.makeText(getBaseContext(), "The lesson been removed",
-                        Toast.LENGTH_LONG).show();
-                if (arrSpinnerAdaptor.getCount() == 0) {// if the course does not have any lesson left
-                    courseBtnLayout.removeView(clickedCourse[0]);
-                    lessonSpinnerLayout.setVisibility(View.INVISIBLE);
-                    showBtn.setVisibility(View.INVISIBLE);
-                }
-
-                // removing the data from the model
-                if (distination.equals("notes")) {
-                    NoteEntity removed = retreivedNotes.getNote(selectedCourse, selectedLesson);
-                    retreivedNotes.removeNote(selectedCourse, selectedLesson);
-                    dbThread.execute(() -> repository.deleteNote(removed));
-
-                } else {
-                    dbThread.execute(() -> {
-                        repository.deleteCards(retreivedCards.getLessonCards(selectedCourse,
-                                selectedLesson));
-                        retreivedCards.removeLesson(selectedCourse, selectedLesson);
-                    });
-                }
-
-            } else { // if a lesson is not selected
-                Toast.makeText(getBaseContext(), "Please select a lesson",
-                        Toast.LENGTH_LONG).show();
-            }
-        });
+        return root;
     }
 
 
-    // this method creates the buttons for selecting a course and controlling the lesson's spinner.
+    // this method creates the buttons for selecting a course and a lesson
     private void createCoursesView () {
         Button courseBtn;
-        courseBtnLayout.removeAllViews();
         clickedCourse = new Button[1];
         LinearLayout.LayoutParams layoutParamsBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        boolean hasLesson = false;
-
-        // Initializing courses set depending on this activity is opened for notes or flash cards
-        Set<String> coursesSet;
-        if (distination.equals("notes")) {
-            coursesSet = retreivedNotes.getCoursesSet();
-        } else {
-            coursesSet = retreivedCards.getCoursesSet();
-        }
 
         for (String course : coursesSet) {
-            hasLesson = true;
-
             // creating the button for each course
-            courseBtn = new Button(getBaseContext());
+            courseBtn = new Button(activityMain.getBaseContext());
             courseBtn.setLayoutParams(layoutParamsBtn);
             courseBtn.setText(course);
 
             // click event handling
             courseBtn.setOnClickListener((btn) -> {
                 btn.setClickable(false);
+
+                // clear previous view's appearance for the lessons
+                TextView tempTV = (TextView) lessonsBtnLayout.getChildAt(0);
+                Button tempAddCourse = (Button) lessonsBtnLayout.getChildAt(1);
+                lessonsBtnLayout.removeAllViews();
+                System.out.println("the count is " + lessonsBtnLayout.getChildCount());
+                lessonsBtnLayout.addView(tempTV);
+                lessonsBtnLayout.addView(tempAddCourse);
+
                 // adjusting the background of this button to peach color with changing the color to
                 // grey for the last clicked button
                 if (clickedCourse[0] != null) {
@@ -247,36 +206,40 @@ public class CoursesActivity extends Activity {
                 selectedCourse = course;
 
                 //controlling the content of the spinner
-                lessonSpinnerLayout.setVisibility(View.VISIBLE);
+                lessonsBtnLayout.setVisibility(View.VISIBLE);
                 List<String> lessonsList;
-                if (distination.equals("notes")) {
+                if (distination.equals("notes activity")) {
                     lessonsList = retreivedNotes.getLessonsCourse(course);
                 } else {
                     lessonsList = retreivedCards.getCourseLessons(course);
                 }
-                List<String> spinnerList = new ArrayList<String>();
-                for (String lesson : lessonsList) {
-                    spinnerList.add(lesson);
-                }
-                arrSpinnerAdaptor = new ArrayAdapter<>(this,
-                        android.R.layout.select_dialog_item, spinnerList);
-                lessonSpinner.setAdapter(arrSpinnerAdaptor);
 
-                showBtn.setVisibility(View.VISIBLE);
+                // adding buttons for each lesson that belongs to the selected course
+                LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                btn.setBackgroundResource(R.color.peach);
+                for (String lesson : lessonsList) {
+                    Button addedLesson = new Button(activityMain);
+                    addedLesson.setLayoutParams(btnParam);
+                    addedLesson.setText(lesson);
+                    addedLesson.setOnClickListener((view) -> handleClickingLesson(lesson, course));
+                    addedLesson.setOnLongClickListener((view) -> handleHoldBtn(course, lesson, addedLesson));
+                    lessonsBtnLayout.addView(addedLesson);
+                }
+
                 btn.setClickable(true);
             });
 
             // adding the button to the layout
-            if (hasLesson) {
-                courseBtnLayout.addView(courseBtn);
-            }
+            courseBtnLayout.addView(courseBtn);
         }
     }
 
 
     // this method receives the intent from AddNoteActivity, AddCardActivity, NotesActivity
     @Override
-    protected void onActivityResult (int requestCode, int resultCode, Intent data) {
+    public void onActivityResult (int requestCode, int resultCode, Intent data) {
         Gson gson = new Gson();
         if (requestCode == ADDING_CODE_NOTE && resultCode == RESULT_OK) { // for adding notes
             NoteEntity added = gson.fromJson(data.getExtras().getString("addedObjNote")
@@ -302,6 +265,24 @@ public class CoursesActivity extends Activity {
                 }
             });
             createCoursesView();
+        } else if (requestCode == ADD_COURSSE_CODE && resultCode == RESULT_OK) {
+            Executor addDBThread = Executors.newSingleThreadExecutor();
+            System.out.println(data + "testing ");
+            addDBThread.execute(() -> repository.addCourse(data.getStringExtra("added course")));
+            createCoursesView();
+        } else if (requestCode == EDIT_CARDS_CODE && resultCode == RESULT_OK) {
+            // editing in database
+            FlashCardEntity[] editedCards = AddFlashCardActivity.getCreatedCards(null);
+            CoursesActivity.updateSentCards(editedCards, AddFlashCardActivity.getDeletedCards());
+            // in retreivedCards
+            String course = editedCards[0].getCourse();
+            String lesson = editedCards[0].getLesson();
+            retreivedCards.removeLesson(course, lesson);
+            ArrayList<FlashCardEntity> cardsList = new ArrayList<>();
+            for (FlashCardEntity card : editedCards) {
+                cardsList.add(card);
+            }
+            retreivedCards.addLesson(cardsList);
         }
     }
 
@@ -320,4 +301,92 @@ public class CoursesActivity extends Activity {
             repository.deleteCards(deletedCards);
         });
     }
+
+
+    /*
+    this method handles the event of clicking a lesson button.
+    @param: lessonStr is the string that identifies the name of the lesson.
+    @param: courseStr is the string that identifies the name of the course.
+     */
+    private void handleClickingLesson(String lessonStr, String courseStr) {
+        //preparing for showing the lesson on either FlashCardsActivity or NotesActivity
+        if (distination.equals("notes activity")) {
+            Intent enterIntent = new Intent(activityMain, NotesActivity.class);
+            Gson lessonGson = new Gson();
+            String lessonJson = lessonGson.toJson(retreivedNotes.getNote(selectedCourse,
+                    lessonStr));
+            enterIntent.putExtra("lessonNote", lessonJson);
+            startActivityForResult(enterIntent, ENTER_CODE_NOTE);
+        } else {
+            Intent enterIntent = new Intent(activityMain, FlashCardsActivity.class);
+            sentCards = retreivedCards.getLessonCards(selectedCourse, lessonStr);
+            startActivity(enterIntent);
+            activityMain.finish();
+        }
+
+    }
+
+    /*
+    this method returns a set of existing course, so that it is easier to send the list to
+    another activity
+     */
+    protected static Set<String> getExistingCourses() {
+        return coursesSet;
+    }
+
+
+    /*
+    this method is used as button's hold click for a lesson's button. It shows a popup drop list for
+    either deleting a lesson or editing the lesson.
+    @param: courseStr is the name of the course
+    @param: lessonStr is the name of the lesson
+    @param: selectedBtn is the lesson's button
+     */
+    private boolean handleHoldBtn(String courseStr, String lessonStr, Button selectedBtn) {
+        // showing popup list
+        PopupMenu menu = new PopupMenu(activityMain.getBaseContext(), selectedBtn);
+        menu.getMenu().add("Delete the lesson");
+        menu.getMenu().add("Edit the lesson");
+        menu.show();
+
+        // handling deleting the lesson
+        menu.getMenu().getItem(0).setOnMenuItemClickListener((view) -> {
+            // removing from the view
+            Toast.makeText(activityMain.getBaseContext(), "The lesson been removed",
+                    Toast.LENGTH_LONG).show();
+            lessonsBtnLayout.removeView(selectedBtn);
+
+            // removing the data from the model
+            Executor dbThread = Executors.newSingleThreadExecutor();
+            if (distination.equals("notes activity")) {
+                dbThread.execute(() -> {
+                    NoteEntity removed = retreivedNotes.getNote(courseStr, lessonStr);
+                    retreivedNotes.removeNote(courseStr, lessonStr);
+                    repository.deleteNote(removed);
+                });
+            } else {
+                dbThread.execute(() -> {
+                    repository.deleteCards(retreivedCards.getLessonCards(courseStr, lessonStr));
+                    retreivedCards.removeLesson(courseStr, lessonStr);
+                });
+            }
+
+            return true;
+        });
+
+        // handling editing the lesson
+        menu.getMenu().getItem(1).setOnMenuItemClickListener((view) -> {
+            if (distination.equals("notes activity")) {
+                handleClickingLesson(lessonStr, courseStr); // same as a regular click
+            } else {
+                Intent editIntent = new Intent(activityMain, AddFlashCardActivity.class);
+                editIntent.putExtra("purpose", "editing");
+                sentCards = retreivedCards.getLessonCards(selectedCourse, lessonStr);
+                startActivityForResult(editIntent, EDIT_CARDS_CODE);
+            }
+            return true;
+        });
+        return true;
+    }
+
 }

@@ -7,6 +7,7 @@ purpose: this is a model file that stores methods that will be used as
 Methods:
   - getAllAssignments() -> it returns all fields' data on AssignmentEntity table
     as a list<AssignmentEntity>
+  - getAssginmentByNotifyID() -> it is used to search and get an assignment by its notifyID
   - InsertAssignments(added) -> it adds a field to the AsignmentEntity tables.
   - updateAssignment(updated) -> it updates a field in the table. The parameter
     is the object after updating.
@@ -33,6 +34,9 @@ public interface AssignmentDao {
 
     @Query("SELECT * FROM AssignmentsEntity")
     List<AssignmentsEntity> getAllAssignments();
+
+    @Query("SELECT * FROM AssignmentsEntity WHERE notificationID == :notifyID")
+    AssignmentsEntity getAssginmentByNotifyID(String notifyID);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void InsertAssignments(AssignmentsEntity... assignmentObjects);

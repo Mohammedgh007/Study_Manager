@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : RemarkEntity
-purpose: This is a model class that is used to represent a signle remark
-    as an object and as a field on a database table called RemarkEntity
+purpose: This is a model class that is used to represent a single remark
+    as an object and as a row on a database table called RemarkEntity
 Methods:
     - getTimeVal() -> return the registered time as a single integer that can be
          used for sorting.
@@ -74,12 +74,13 @@ public class RemarkEntity  implements Comparable{
                 Integer.parseInt(this.time.substring(this.time.indexOf(":") + 1));
     }
 
-    // used for sorting remarks by date. year * 365 + month * 29 + day
+    // used for sorting remarks by date. (year - 2015) * 365 + month * 29 + day
     @Ignore
     public int getDateVal(){
         String date = this.date;
-        return Integer.parseInt(date.substring(0, date.indexOf(":"))) * 365 +
-                Integer.parseInt(date.substring(date.indexOf(":") + 1,
+        // -2015 is a minor optimization
+        return (Integer.parseInt(date.substring(0, date.indexOf(":"))) - 2015) * 365
+                + Integer.parseInt(date.substring(date.indexOf(":") + 1,
                         date.indexOf(";"))) * 29 +
                 Integer.parseInt(date.substring(date.indexOf(";") + 1));
     }

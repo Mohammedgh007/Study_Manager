@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : AssignmentEntity
-purpose: This is a model class that is used to represent a signle assignment
-    as an object and as a field on a database table called AssignmentEntity
+purpose: This is a model class that is used to represent a single assignment
+    as an object and as a row on a database table called AssignmentEntity
 Methods:
     - getTimeVal() -> return the registered time as a single integer that can be
          used for sorting.
@@ -19,6 +19,8 @@ Methods:
 
 package creative.developer.m.studymanager.model.dbFiles.EntityFiles;
 
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -31,17 +33,19 @@ public class AssignmentsEntity implements Comparable {
     @PrimaryKey (autoGenerate = true)
     private int assignmentID;
     private String course;
-    private String significance;
+    private String notificationID;
+    private String notificationTime; // # d/h ; d for day and h for hour
     private String disc;
     private String dueTime; // hh:mm like 14:20
     private String dueDate; // yyyy:mm;dd I used : with ; to facilitate using substring.
     private boolean isMarked;
 
 
-    public AssignmentsEntity(String course, String significance, String disc, String dueDate,
-                             String dueTime) {
+    public AssignmentsEntity(String course, String notificationID, String notificationTime,
+                             String disc, String dueDate, String dueTime) {
         this.course = course;
-        this.significance = significance;
+        this.notificationID = notificationID;
+        this.notificationTime = notificationTime;
         this.disc = disc;
         this.dueDate = dueDate;
         this.dueTime = dueTime;
@@ -57,8 +61,8 @@ public class AssignmentsEntity implements Comparable {
         return this.course;
     }
 
-    public String getSignificance(){
-        return this.significance;
+    public String getNotificationID(){
+        return this.notificationID;
     }
 
     public String getDisc(){
@@ -77,6 +81,8 @@ public class AssignmentsEntity implements Comparable {
         return this.isMarked;
     }
 
+    public String getNotificationTime() { return notificationTime;  }
+
     // used for sorting assignments by time. hours * 60 + minutes.
     @Ignore
     public int getTimeVal(){
@@ -84,11 +90,12 @@ public class AssignmentsEntity implements Comparable {
                 Integer.parseInt(this.dueTime.substring(this.dueTime.indexOf(":") + 1));
     }
 
-    // used for sorting assignments by date. year * 365 + month * 29 + day
+    // used for sorting assignments by date. (year - 2015) * 365 + month * 29 + day
     @Ignore
     public static Integer getDateVal(String dueDate){
-        return Integer.parseInt(dueDate.substring(0, dueDate.indexOf(":"))) * 365 +
-                Integer.parseInt(dueDate.substring(dueDate.indexOf(":") + 1,
+        // -2015 is a minor optimization
+        return (Integer.parseInt(dueDate.substring(0, dueDate.indexOf(":"))) - 2015) * 365
+                 + Integer.parseInt(dueDate.substring(dueDate.indexOf(":") + 1,
                         dueDate.indexOf(";"))) * 29 +
                 Integer.parseInt(dueDate.substring(dueDate.indexOf(";") + 1));
     }
@@ -133,8 +140,8 @@ public class AssignmentsEntity implements Comparable {
         this.course = course;
     }
 
-    public void setSignificance(String significance) {
-        this.significance = significance;
+    public void setNotificationID(String notificationID) {
+        this.notificationID = notificationID;
     }
 
     public void setDisc(String disc) {
@@ -151,6 +158,10 @@ public class AssignmentsEntity implements Comparable {
 
     public void setIsMarked(boolean val) {
         this.isMarked = val;
+    }
+
+    public void setNotificationTime(String notificationTime) {
+        notificationTime = notificationTime;
     }
 
     @Override // the sooner in terms of time, regardless of date, is smaller.

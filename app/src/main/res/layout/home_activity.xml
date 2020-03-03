@@ -1,94 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.widget.LinearLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/beige"
-    android:weightSum="1">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="35dp"
-        android:layout_weight="0.6">
-
-        <ImageView
-            android:id="@+id/course_schedule_home"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:src="@mipmap/tap_select_schedule" />
-
-
-    </FrameLayout>
+    android:background="@color/beige">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.1"
-        android:layout_marginHorizontal="20dp"
-        android:orientation="horizontal">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <View
-            android:layout_width="0dp"
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="35dp"
+            android:layout_weight="0.6">
 
-        <Button
-            android:id="@+id/edit_schedule_home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edit_icon"
-            android:text="" />
+            <ImageView
+                android:id="@+id/course_schedule_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:src="@mipmap/tap_select_schedule" />
 
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"
+            android:layout_marginHorizontal="20dp"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/edit_schedule_home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/edit_icon"
+                android:text="" />
+
+        </LinearLayout>
     </LinearLayout>
 
 
-    <android.widget.RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.4"
-        android:layout_marginHorizontal="20dp">
-
-        <Button
-            android:id="@+id/remarks_home"
-            android:layout_width="@dimen/width2_4Button"
-            android:layout_height="@dimen/height2_4Button"
-            android:layout_below="@+id/assignment_home"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true"
-            android:background="@drawable/orange_button"
-            android:layout_marginTop="20dp"
-            android:text="Remarks" />
-
-        <Button
-            android:id="@+id/assignment_home"
-            android:layout_width="@dimen/width2_4Button"
-            android:layout_height="@dimen/height2_4Button"
-            android:background="@drawable/orange_button"
-            android:text="Assignment" />
-
-        <Button
-            android:id="@+id/flashcards_home"
-            android:layout_width="@dimen/width2_4Button"
-            android:layout_height="@dimen/height2_4Button"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/orange_button"
-            android:text="Flash Card" />
-
-        <Button
-            android:id="@+id/class_note_home"
-            android:layout_width="@dimen/width2_4Button"
-            android:layout_height="@dimen/height2_4Button"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/flashcards_home"
-            android:background="@drawable/orange_button"
-            android:layout_marginTop="20dp"
-            android:text="Class Notes" />
-
-    </android.widget.RelativeLayout>
-
-</android.widget.LinearLayout>
+</LinearLayout>

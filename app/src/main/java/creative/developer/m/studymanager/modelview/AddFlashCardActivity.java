@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class AddFlashCardActivity extends Activity {
     // declaring views
     private LinearLayout cardSetLayout; // it contains the cards' buttons
     private HorizontalScrollView scrollViewCards;  // it contains cardSetlayout
-    private EditText courseET;
+    private TextView courseET;
     private EditText lessonET;
     private EditText questionET;
     private EditText answerET;
@@ -70,11 +71,13 @@ public class AddFlashCardActivity extends Activity {
         setContentView(R.layout.add_flash_cards);
 
         String purpose = this.getIntent().getStringExtra("purpose");
+        String courseName = this.getIntent().getStringExtra("courseStr");
 
         // initializing views
         scrollViewCards = findViewById(R.id.scroll_view_card_add_flash);
         cardSetLayout = findViewById(R.id.cards_set_layout);
         courseET = findViewById(R.id.course_add_flash);
+        courseET.setText(courseName);
         lessonET = findViewById(R.id.lesson_add_flash);
         questionET = findViewById(R.id.question_add_flash);
         answerET = findViewById(R.id.answer_add_flash);
@@ -92,12 +95,17 @@ public class AddFlashCardActivity extends Activity {
             cards.put("Card 1", new FlashCardEntity("", "", "", ""));
             cardsNum = 1;
         } else { // editing a lesson
-            cardsNum = FlashCardsActivity.recievedCards.length;
             deletedCards = new LinkedList<>();
 
             // preparing cards and buttons for recieving the data from FlashCardsActivity
             String cardStr = "Card ";
-            FlashCardEntity[] FlashCardsArr = FlashCardsActivity.recievedCards.clone();
+            FlashCardEntity[] FlashCardsArr;
+            if (FlashCardsActivity.recievedCards != null) { // opened by FlashCardsActivity
+                FlashCardsArr = FlashCardsActivity.recievedCards.clone();
+            } else {
+                FlashCardsArr = CoursesActivity.getSentCards();
+            }
+            cardsNum = FlashCardsArr.length;
             cards.put(cardStr + lastAddedIndex, FlashCardsArr[0]);
             showCardData(card1Btn);
             for (int i = 1; i < cardsNum; i++) {
@@ -183,8 +191,8 @@ public class AddFlashCardActivity extends Activity {
         finishLessonBtn.setOnClickListener((btn) -> {
             if (!purpose.equals("adding") || isInputValid()) {
                 // assigning course and lesson fields for cards
-                String course = courseET.getText().toString().toLowerCase().trim();
-                String lesson = lessonET.getText().toString().toLowerCase().trim();
+                String course = courseET.getText().toString().toUpperCase().trim();
+                String lesson = lessonET.getText().toString().toUpperCase().trim();
                 for (FlashCardEntity card : cards.values()) {
                     card.setCourse(course);
                     card.setLesson(lesson);
@@ -258,10 +266,10 @@ public class AddFlashCardActivity extends Activity {
     // Also, it provides a feedback for the user in order for providing a valid input
     private boolean isInputValid(){
         // check if lesson and course fields are filled
-        String course = courseET.getText().toString();
-        String lesson = lessonET.getText().toString();
-        if (lesson.equals("") || course.equals("")) {
-            Toast.makeText(this, "Please fill course's and lesson's fields",
+        String course = courseET.getText().toString().toUpperCase().trim();
+        String lesson = lessonET.getText().toString().toUpperCase().trim();
+        if (lesson.equals("")) {
+            Toast.makeText(this, "Please fill lesson's field",
                     Toast.LENGTH_LONG).show();
             return false;
         }

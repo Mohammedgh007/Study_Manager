@@ -19,10 +19,17 @@ Methods:
 
 package creative.developer.m.studymanager.modelview;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -33,18 +40,23 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.prefs.Preferences;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.view.AlarmManagement;
 
 public class AddAssignmentActivity extends Activity implements
         DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
+    private final int PROMPT_PERMISSION_CODE = 1;
     // variables that store date and time values
     private int selectedYear;
     private int selectedMonth;
@@ -54,7 +66,7 @@ public class AddAssignmentActivity extends Activity implements
     AssignmentsEntity editedAssignment;
     // views
     private EditText editTextCourse;
-    private Spinner spinnerSignificance;
+    private Spinner spinnerNotifyTime;
     private Button pickTimeDate;
     private EditText editTextDisc;
     private Button addBtn;
@@ -67,7 +79,7 @@ public class AddAssignmentActivity extends Activity implements
 
         // initializing views
         editTextCourse = findViewById(R.id.name_addassignment);
-        spinnerSignificance = findViewById(R.id.significance_addassignment);
+        spinnerNotifyTime = findViewById(R.id.notify_time_add_assignment);
         pickTimeDate = findViewById(R.id.datetime_addassignment);
         editTextDisc = findViewById(R.id.disc_addassignment);
         addBtn = findViewById(R.id.add_addassignment);
@@ -120,10 +132,13 @@ public class AddAssignmentActivity extends Activity implements
             @Override
             public void onClick(View v) {
                 // check first that the user has entered inputs
+                int notifyID = (intent.getExtras().get("porpuse").equals("editing")) ?
+                        Integer.parseInt(editedAssignment.getNotificationID()) : getNotifyId();
                 if (isInputsValid()) {
                     AssignmentsEntity createdAssignment = new AssignmentsEntity(
                             editTextCourse.getText().toString(),
-                            spinnerSignificance.getSelectedItem().toString(),
+                            Integer.toString(notifyID),
+                            spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
                             editTextDisc.getText().toString(),
                             (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
                             getDueStr(selectedHour, ":", selectedMinute));
@@ -138,6 +153,7 @@ public class AddAssignmentActivity extends Activity implements
                     }
                     String assignmentStr = gosnAssignment.toJson(createdAssignment);
                     intentSendback.putExtra("createdAssignment", assignmentStr);
+                    createNotification(createdAssignment);
                     setResult(RESULT_OK, intentSendback);
                     finish();
 
@@ -279,4 +295,31 @@ public class AddAssignmentActivity extends Activity implements
         }
         return true;
     }
+
+
+    /*
+    this method gets a unique id for notifications
+     */
+    private int getNotifyId() {
+        SharedPreferences nofiyIdCounterRef = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor notifyIdEditor = nofiyIdCounterRef.edit();
+        if (!nofiyIdCounterRef.contains("notifyIDCounter")) {
+            notifyIdEditor.putInt("notifyIDCounter", 1);
+        }
+        int notifyId = nofiyIdCounterRef.getInt("notifyIDCounter", 0);
+        notifyIdEditor.putInt("notifyIDCounter",
+                nofiyIdCounterRef.getInt("notifyIDCounter", 0) + 1);
+        notifyIdEditor.apply();
+        return notifyId;
+    }
+
+    /*
+    it setups the notification for the assignment
+    @param: assignment is the object that the notification is created/edited for.
+     */
+    private void createNotification(AssignmentsEntity assignment) {
+        AlarmManagement alarm = new AlarmManagement(assignment);
+        alarm.setAlarm(this);
+    }
+
 }

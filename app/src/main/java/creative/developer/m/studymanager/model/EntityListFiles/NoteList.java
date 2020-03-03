@@ -64,8 +64,10 @@ public class NoteList{
     // this returns the list of lesson for the inputted course
     public List<String> getLessonsCourse (String course) {
         List<String> lessonsList = new ArrayList<>();
-        for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity note : this.notesMap.get(course)) {
-            lessonsList.add(note.getLesson());
+        if (this.notesMap.get(course) != null) {
+            for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity note : this.notesMap.get(course)) {
+                lessonsList.add(note.getLesson());
+            }
         }
         return lessonsList;
     }

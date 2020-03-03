@@ -2,8 +2,8 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : FlashCardEntity
-purpose: This is a model class that is used to represent a signle flash card
-    as an object and as a field on a database table called FlashCardEntity
+purpose: This is a model class that is used to represent a single flash card
+    as an object and as a row on a database table called FlashCardEntity
 ###############################################################################
  */
 
