@@ -29,7 +29,7 @@
                 android:textSize="27sp"
                 android:textStyle="bold" />
 
-            <ScrollView
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -45,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/add_btn_icon" />
                 </LinearLayout>
-            </ScrollView>
+            </HorizontalScrollView>
 
         </LinearLayout>
     </ScrollView>

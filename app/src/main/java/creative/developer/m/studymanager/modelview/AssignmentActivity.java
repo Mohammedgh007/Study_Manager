@@ -89,9 +89,7 @@ public class AssignmentActivity extends Fragment {
                 AppDatabase.getInstance(activityMain.getBaseContext()));
         Executor dbThread = Executors.newSingleThreadExecutor();
         dbThread.execute(() -> {
-            System.out.println("start");
             retreivedAssignemnts = repository.getAssignments(activityMain.getBaseContext());
-            System.out.println("finished");
             activityMain.runOnUiThread(() -> createAssignemntsView(retreivedAssignemnts));
         });
 
@@ -134,11 +132,13 @@ public class AssignmentActivity extends Fragment {
 
             // adding the assignment to the database
             Executor insertingEx = Executors.newSingleThreadExecutor();
-            insertingEx.execute(() -> repository.addAssignment(addedAssignment));
+            insertingEx.execute(() -> {
+                repository.addAssignment(addedAssignment);
+                // reopen this fragment
+                this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new AssignmentActivity()).commit();
+            });
 
-            // reopen this fragment
-            this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new AssignmentActivity()).commit();
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // updating the textview's info of the edited assignment
             Gson gson = new Gson();

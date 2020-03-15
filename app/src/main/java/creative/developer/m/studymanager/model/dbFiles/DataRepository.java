@@ -186,7 +186,6 @@ public class DataRepository {
         System.out.println("length is " + deleted.length);
         if (deleted != null) {
             database.flashCardsDao().deleteCards(deleted);
-            database.lessonDao().deleteLesson(deleted[0].getLesson());
         }
     }
 
