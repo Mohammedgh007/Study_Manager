@@ -2,7 +2,7 @@
     <string name="app_name">Study Manager</string>
     <string name="schedulePhotoIdMemory">scheduleId1232223</string>
     <string name="selectTimeDate">Select Date and Time</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Study Manager</string>
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
     <array name="notification_times">

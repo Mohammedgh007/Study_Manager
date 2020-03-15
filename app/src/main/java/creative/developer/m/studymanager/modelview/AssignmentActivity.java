@@ -2,10 +2,10 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : AssignmentActivity
-purpose: This is model view class that is responsible for assignment activity
+purpose: This is model view class that is responsible for assignment fragment
   interaction with the user.
 Methods:
-  onCreate() -> It encapsulates/manages all the interaction.
+  onCreateView() -> It encapsulates/manages all the interaction.
   onActivityResult() -> It receives the intent from AddAssignmentActivity that
      holds the data of the added assignment.
   createAssignemntsView() -> It creates the view that show all assignments.
@@ -136,7 +136,9 @@ public class AssignmentActivity extends Fragment {
             Executor insertingEx = Executors.newSingleThreadExecutor();
             insertingEx.execute(() -> repository.addAssignment(addedAssignment));
 
-            activityMain.recreate();
+            // reopen this fragment
+            this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new AssignmentActivity()).commit();
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // updating the textview's info of the edited assignment
             Gson gson = new Gson();

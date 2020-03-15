@@ -36,7 +36,7 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 
 public class NoteList{
 
-    private TreeMap<String, List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity>> notesMap;
+    private TreeMap<String, List<NoteEntity>> notesMap;
     private Context context;
     private DataRepository repository; // used to access database
     private static NoteList instance; // to avoid sending heavy object between activities
@@ -49,9 +49,9 @@ public class NoteList{
         return instance;
     }
 
-    public void setNotesList(List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity> notesList) {
+    public void setNotesList(List<NoteEntity> notesList) {
         notesMap = new TreeMap<>();
-        for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity note : notesList) {
+        for (NoteEntity note : notesList) {
             if (!notesMap.containsKey(note.getCourse())){
                 notesMap.put(note.getCourse(), new ArrayList<>());
             }
@@ -65,7 +65,7 @@ public class NoteList{
     public List<String> getLessonsCourse (String course) {
         List<String> lessonsList = new ArrayList<>();
         if (this.notesMap.get(course) != null) {
-            for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity note : this.notesMap.get(course)) {
+            for (NoteEntity note : this.notesMap.get(course)) {
                 lessonsList.add(note.getLesson());
             }
         }
@@ -80,8 +80,8 @@ public class NoteList{
 
 
     // this returns a particular note object depending on the lesson and the course
-    public creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity getNote(String course, String lesson) {
-        for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity note : notesMap.get(course)) {
+    public NoteEntity getNote(String course, String lesson) {
+        for (NoteEntity note : notesMap.get(course)) {
             if (note.getLesson().equals(lesson)) {
                 return note;
             }
@@ -127,7 +127,7 @@ public class NoteList{
     this method add the noteEntity object to this class structure and to the database
     @PARAM: added is the NoteEntity object that will be added.
      */
-    public void addNote(creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity added) {
+    public void addNote(NoteEntity added) {
         // adding on this class structure
         if (!notesMap.containsKey(added.getCourse())) {
             notesMap.put(added.getCourse(), new ArrayList<>());
@@ -141,7 +141,7 @@ public class NoteList{
     this method updates the noteEntity object on this class structure and on the database
     @PARAM: updated is the NoteEntity object that has been updated.
      */
-    public void updateNote (creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity updated) {
+    public void updateNote (NoteEntity updated) {
         // updating on this class structure
         boolean isUpdated = false;
         List<NoteEntity> searchedList = notesMap.get(updated.getCourse());

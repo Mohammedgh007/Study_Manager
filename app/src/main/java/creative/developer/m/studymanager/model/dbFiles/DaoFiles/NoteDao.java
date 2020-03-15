@@ -33,13 +33,13 @@ public interface NoteDao {
 
 
     @Query("SELECT * FROM NoteEntity")
-    public List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity> getAllNotes();
+    public List<NoteEntity> getAllNotes();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void addNote(creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity... added);
+    public void addNote(NoteEntity... added);
 
     @Delete
-    public void deleteNote(creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity deleted);
+    public void deleteNote(NoteEntity deleted);
 
     @Update
     public void updateNote(NoteEntity update);

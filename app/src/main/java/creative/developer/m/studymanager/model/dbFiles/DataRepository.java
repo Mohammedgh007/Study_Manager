@@ -149,7 +149,6 @@ public class DataRepository {
     }
 
     public void addNote(NoteEntity added) {
-        database.courseDao().InsertCourse(new CourseEntity(added.getCourse()));
         database.noteDao().addNote(added);
     }
 
@@ -178,7 +177,6 @@ public class DataRepository {
 
     public void addCards(FlashCardEntity... added) {
         for (FlashCardEntity card : added) {
-            database.courseDao().InsertCourse(new CourseEntity(card.getCourse()));
             database.lessonDao().insertLesson(new LessonEntity(card.getLesson()));
             database.flashCardsDao().insertCards(card);
         }
@@ -188,6 +186,7 @@ public class DataRepository {
         System.out.println("length is " + deleted.length);
         if (deleted != null) {
             database.flashCardsDao().deleteCards(deleted);
+            database.lessonDao().deleteLesson(deleted[0].getLesson());
         }
     }
 

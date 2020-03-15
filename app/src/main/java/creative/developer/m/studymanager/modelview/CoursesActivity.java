@@ -2,10 +2,10 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : CoursesActivity
-purpose: This is model view class that is responsible for courses activity
+purpose: This is model view class that is responsible for courses fragment
   interaction with the user.
 Methods:
-  onCreate() -> It encapsulates/manages all the interaction.
+  onCreateView() -> It encapsulates/manages all the interaction.
   onActivityResult() -> It receives the intent from FlashCardsActivity or NotesActivity that
      holds the data of the added or modified flash cards or notes..
   createCoursesView() -> It creates the view that show the courses and the lessons..
@@ -14,6 +14,8 @@ Methods:
   updateSentCards() -> this method change the value of sentCards in case the user edit them after
      it is sent to FlashCardsActivity
   getExistingCourses() -> this method returns the set of existing courses.
+  handleHoldBtn(selectedLesson, selectedCourse, selectedBtn) -> this method is used as button's hold
+    click for a lesson's button. It shows a popup drop list for either deleting a lesson or editing the lesson.
 ###############################################################################
  */
 
@@ -176,6 +178,18 @@ public class CoursesActivity extends Fragment {
         LinearLayout.LayoutParams layoutParamsBtn = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         );
+        // cleanup the courses' set
+        View addCourseBtnTemp = courseBtnLayout.getChildAt(0);
+        courseBtnLayout.removeAllViews();
+        courseBtnLayout.addView(addCourseBtnTemp);
+
+        // clear previous view's appearance for the lessons
+        TextView tempTV = (TextView) lessonsBtnLayout.getChildAt(0);
+        Button tempAddCourse = (Button) lessonsBtnLayout.getChildAt(1);
+        lessonsBtnLayout.removeAllViews();
+        System.out.println("the count is " + lessonsBtnLayout.getChildCount());
+        lessonsBtnLayout.addView(tempTV);
+        lessonsBtnLayout.addView(tempAddCourse);
 
         for (String course : coursesSet) {
             // creating the button for each course
@@ -188,8 +202,6 @@ public class CoursesActivity extends Fragment {
                 btn.setClickable(false);
 
                 // clear previous view's appearance for the lessons
-                TextView tempTV = (TextView) lessonsBtnLayout.getChildAt(0);
-                Button tempAddCourse = (Button) lessonsBtnLayout.getChildAt(1);
                 lessonsBtnLayout.removeAllViews();
                 System.out.println("the count is " + lessonsBtnLayout.getChildCount());
                 lessonsBtnLayout.addView(tempTV);
@@ -264,11 +276,13 @@ public class CoursesActivity extends Fragment {
                     repository.addCards(card);
                 }
             });
+            retreivedCards.addLesson(AddFlashCardActivity.getCreatedCards());
             createCoursesView();
         } else if (requestCode == ADD_COURSSE_CODE && resultCode == RESULT_OK) {
             Executor addDBThread = Executors.newSingleThreadExecutor();
             System.out.println(data + "testing ");
             addDBThread.execute(() -> repository.addCourse(data.getStringExtra("added course")));
+            coursesSet.add(data.getStringExtra("added course"));
             createCoursesView();
         } else if (requestCode == EDIT_CARDS_CODE && resultCode == RESULT_OK) {
             // editing in database

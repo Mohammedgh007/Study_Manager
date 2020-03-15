@@ -2,9 +2,11 @@
 ###############################################################################
 Class name : MainActivity
 purpose: This is model view class that manages showing the left side menu with
-   moving from an activity to another.
+   moving from a fragment to another.
 Methods:
-  onCreateView() -> It encapsulates/manages all the interaction.
+  onCreate() -> It encapsulates/manages all the interaction.
+  getCoursesDistination() -> this is a getter for coursesDistination, so that it is for sending
+   an information to CoursesActivity.
 ###############################################################################
  */
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     // Notes and Flash Cards depends on the same Fragment to determine the lesson.
     private static String coursesDistination;
+    private static Toolbar tool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
                 R.string.open_navigation_drawer, R.string.close_navigation_drawer);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        // set home Activity as the default.
         if (savedInstanceState == null) {
             toolbar.setTitle("Home");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
@@ -116,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-    this is a getter for coursesDistination, so that it is to send an information to CoursesActivity.
+    this is a getter for coursesDistination, so that it is for sending an information to CoursesActivity.
      */
     protected static String getCoursesDistination() {return coursesDistination;}
 

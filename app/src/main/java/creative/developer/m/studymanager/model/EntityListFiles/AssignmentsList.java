@@ -32,10 +32,10 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEn
 public class AssignmentsList {
 
     // used temprarly to receive data from database and for quick random access
-    private List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity> retrievedAssignments;
+    private List<AssignmentsEntity> retrievedAssignments;
     // used for createAssignemntsView() in AssignmentActivity because it separates based on days.
-    private TreeMap<String, ArrayList<creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity>> organizedAssignments;
-    private creative.developer.m.studymanager.model.dbFiles.DataRepository repository; // used to remove old assignments
+    private TreeMap<String, ArrayList<AssignmentsEntity>> organizedAssignments;
+    private DataRepository repository; // used to remove old assignments
     private Context context; // repository will need a context.
 
     public AssignmentsList(Context context) {
@@ -48,7 +48,7 @@ public class AssignmentsList {
     organizedAssignments that is used to store the assignments' object in a organized way.
     @PARAM: data is the retrieved list of assignments from the data base.
      */
-    public void setAssignments (List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity> data) {
+    public void setAssignments (List<AssignmentsEntity> data) {
         this.retrievedAssignments = data;
 
         // assignments will be organized in a nested structure. Outer one(sortedMap) will store
@@ -56,7 +56,7 @@ public class AssignmentsList {
         organizedAssignments = new TreeMap<>(new Comparator<String>() {
             @Override
             public int compare(String s, String t1) {
-                return creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity.getDateVal(s).compareTo(creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity.getDateVal(t1));
+                return AssignmentsEntity.getDateVal(s).compareTo(AssignmentsEntity.getDateVal(t1));
             }
         });
 
@@ -64,7 +64,7 @@ public class AssignmentsList {
         Calendar today = Calendar.getInstance();
         Calendar assignmentDate = Calendar.getInstance();
         int i = 0;
-        creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity assignment;
+        AssignmentsEntity assignment;
         while (i < retrievedAssignments.size()) {
             assignment = retrievedAssignments.get(i);
 
@@ -75,7 +75,7 @@ public class AssignmentsList {
                 Executor deletingThread = Executors.newSingleThreadExecutor();
                 int index = i;
                 System.out.println("size is " + retrievedAssignments.size() + " i= " + i);
-                creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity deletedAssignment = assignment;
+                AssignmentsEntity deletedAssignment = assignment;
                 deletingThread.execute(() ->  repository.deleteAssignment(deletedAssignment));
                 retrievedAssignments.remove(i);
             } else {
@@ -88,19 +88,19 @@ public class AssignmentsList {
         }
 
         // sorting inner structure
-        for (ArrayList<creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity> list : organizedAssignments.values()) {
+        for (ArrayList<AssignmentsEntity> list : organizedAssignments.values()) {
             Collections.sort(list);
         }
 
     }
 
     // this is a getter for the field organizedAssignments
-    public TreeMap<String, ArrayList<creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity>> getAssignments () {
+    public TreeMap<String, ArrayList<AssignmentsEntity>> getAssignments () {
         return this.organizedAssignments;
     }
 
     // this method remove the given assignment from organizedAssignments
-    public void removeAssignment (creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity removed) {
+    public void removeAssignment (AssignmentsEntity removed) {
         organizedAssignments.get(removed.getDueDate()).remove(removed);
         if (organizedAssignments.get(removed.getDueDate()).isEmpty()) {
             organizedAssignments.remove(removed.getDueDate());
@@ -108,7 +108,7 @@ public class AssignmentsList {
     }
 
     // this method update the given assignment at organizedAssignment.
-    public void updateAsssignment(creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity outdated, AssignmentsEntity updated) {
+    public void updateAsssignment(AssignmentsEntity outdated, AssignmentsEntity updated) {
         System.out.println("Testing<<<>>> " + organizedAssignments.get(outdated.getDueDate()).size());
         // removing the outdated version from organizedAssignments
         for (int i = 0; i < organizedAssignments.get(outdated.getDueDate()).size(); i++) {

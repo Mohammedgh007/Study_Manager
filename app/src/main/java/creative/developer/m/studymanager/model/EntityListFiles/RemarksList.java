@@ -23,7 +23,7 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 
 public class RemarksList {
 
-    private List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity> remarksList; // store all remarks
+    private List<RemarkEntity> remarksList; // store all remarks
     private DataRepository repository; // used to remove old remarks
     private Context context;
 
@@ -32,18 +32,18 @@ public class RemarksList {
     }
 
     // this method assign the value of remarksList with sorting it
-    public void setRemarksList (List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity> recievedList) {
+    public void setRemarksList (List<RemarkEntity> recievedList) {
         this.remarksList = recievedList;
         Collections.sort(recievedList);
     }
 
     // this is a getter for the field remarksList
-    public List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity> getRemarksList () {
+    public List<RemarkEntity> getRemarksList () {
         return this.remarksList;
     }
 
     // this method removes the given remark object from the remarksList
-    public void removeRemark (creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity deleted) {
+    public void removeRemark (RemarkEntity deleted) {
         for (int i = 0; i < remarksList.size(); i++) {
             if (deleted.getRemarkID() == remarksList.get(i).getRemarkID()){
                 remarksList.remove(i);

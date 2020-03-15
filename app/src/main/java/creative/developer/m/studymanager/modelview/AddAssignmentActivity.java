@@ -14,6 +14,10 @@ Methods:
       return as a proper String for creating an AssignmentEntity's object.
   isInputsCompleted() -> return true if the user has entered all the requires inputs,
      false otherwise.
+  isNotificationTimeValid(notifyTimeStr) -> this method checks if the input notification time is
+    valid or not by checking if it is in between the current time and the deadline time.
+  getNotifyId() -> this method gets a unique id for notifications.
+  createNotification(assignment) -> it setups the notification for the assignment.
 ###############################################################################
  */
 
@@ -293,7 +297,43 @@ public class AddAssignmentActivity extends Activity implements
                     "Please enter the description", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+        // checking if the notification time is between the current time and the deadline
+        if(!isNotificationTimeValid(spinnerNotifyTime.getSelectedItem().toString().substring(0, 5))) {
+            Toast.makeText(getBaseContext(),
+                    "Please change the notification time to either none or a proper time",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
         return true;
+    }
+
+    /*
+    this method checks if the input notification time is valid or not by checking if it is in
+    between the current time and the deadline time
+    @param: notifyStr is the string that captures the notification time.
+     */
+    private boolean isNotificationTimeValid(String notifyStr) {
+        Calendar currTime = Calendar.getInstance();
+
+        Calendar deadlineTime = Calendar.getInstance();
+        deadlineTime.set(selectedYear, selectedMonth - 1, selectedDay, selectedHour, selectedMinute);
+
+        Calendar notifyTime = (Calendar) deadlineTime.clone();
+        if (notifyStr.contains("N")) { // when the user does not want to be notified.
+            return true;
+        } else if(notifyStr.contains("d")) { // d for days
+            String days = notifyStr.substring(0, notifyStr.indexOf(" "));
+            int daysNum = 0 - Integer.parseInt(days);
+            notifyTime.add(Calendar.DAY_OF_MONTH, daysNum);
+        } else {
+            String hours = notifyStr.substring(0, notifyStr.indexOf(" "));
+            int hoursNum = 0 - Integer.parseInt(hours);
+            notifyTime.add(Calendar.HOUR_OF_DAY, hoursNum);
+        }
+        System.out.println("currTime is " + currTime);
+        System.out.println("notify is " + notifyTime);
+        return currTime.before(notifyTime);
     }
 
 

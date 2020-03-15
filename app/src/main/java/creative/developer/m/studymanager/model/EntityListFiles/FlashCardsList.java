@@ -31,9 +31,9 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEnti
 
 public class FlashCardsList {
 
-    private List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity> cardsList; // used temporarily to store the incoming data from db.
+    private List<FlashCardEntity> cardsList; // used temporarily to store the incoming data from db.
     // used to manage cards. It stores as Map<courseStr, Map<LessonStr, List<FlashCardEntity> > >
-    private HashMap<String, TreeMap<String, List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity>>> cardsMap;
+    private HashMap<String, TreeMap<String, List<FlashCardEntity>>> cardsMap;
     private Context context;
     private DataRepository repository; // used to access database
     private static FlashCardsList instance; // to avoid sending heavy object between activities
@@ -46,12 +46,12 @@ public class FlashCardsList {
 
     public static FlashCardsList getInstance() {return instance;}
 
-    public void setList(List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity> recievedCards) {
+    public void setList(List<FlashCardEntity> recievedCards) {
         cardsList = recievedCards;
 
         // building the map for managing the flash cards entities
         cardsMap = new HashMap<>();
-        for (creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity card : cardsList) {
+        for (FlashCardEntity card : cardsList) {
             // checking existing of the course the outter map
             if (!cardsMap.containsKey(card.getCourse())) {
                 cardsMap.put(card.getCourse(), new TreeMap<>());
@@ -66,7 +66,7 @@ public class FlashCardsList {
         instance = this;
     }
 
-    public void addLesson(List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity> addedCards) {
+    public void addLesson(List<FlashCardEntity> addedCards) {
         String course = addedCards.get(0).getCourse();
         String lesson = addedCards.get(0).getLesson();
         System.out.println("lesson in list" + lesson);
@@ -91,8 +91,8 @@ public class FlashCardsList {
         return cardsMap.keySet();
     }
 
-    public creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity[] getLessonCards (String course, String lesson) {
-        creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity[] cards = new creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity[cardsMap.get(course).get(lesson).size()];
+    public FlashCardEntity[] getLessonCards (String course, String lesson) {
+        FlashCardEntity[] cards = new FlashCardEntity[cardsMap.get(course).get(lesson).size()];
         int i = 0;
         for (FlashCardEntity card : cardsMap.get(course).get(lesson)) {
             cards[i] = card;

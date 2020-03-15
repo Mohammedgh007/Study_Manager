@@ -12,7 +12,7 @@ Methods:
   onTimeSet() -> same ^^ but for selecting the time
   getdateTimeStr(num1, seperator, num2) -> this method will get the time or the date as integers to
       return as a proper String for creating an ReamrkEntity's object.
-  isInputsCompleted() -> return true if the user has entered all the requires inputs,
+  isInputsValid() -> return true if the user has entered all the requires inputs correctly,
      false otherwise.
   timeAndDateStringView() -> returns string that will be used to output the date and the time to
       the user.

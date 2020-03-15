@@ -28,10 +28,10 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 public interface CourseDao {
 
     @Query("SELECT * FROM CourseEntity")
-    List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity> getAllCourses();
+    List<CourseEntity> getAllCourses();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void InsertCourse(creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity... courseEntities);
+    void InsertCourse(CourseEntity... courseEntities);
 
     @Delete
     void deleteCourse(CourseEntity... courseEntities);

@@ -2,7 +2,7 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : RemarksActivity
-purpose: This is model view class that is responsible for remark activity
+purpose: This is model view class that is responsible for remark fragment
   interaction with the user.
 Methods:
   onCreate() -> It encapsulates/manages all the interaction.
@@ -64,12 +64,12 @@ public class RemarksActivity extends Fragment {
     private boolean isEditing = false; // true when the user click on edit button
     // represent the inputted date to show its remarks
     private int selectedYear, selectedMonth, selectedDay;
-    private HashSet<CalendarDay> highlightedDates;// the highlighted dates on calendarView
-    // declaring views; the first two map depends on assignmentId as a key while the third dueDate
+    private HashMap<CalendarDay, Integer> highlightedDates;// the highlighted dates on calendarView
+
+    // declaring views; the first two map depends on remarkId as a key while the third uses dueDate
     private LinearLayout remarksLayout; // Layout that's holds all added assignments
     private HashMap<Integer, LinearLayout> oneRemarkLayouts; // layout of a single assignment
     private HashMap<Integer, LinearLayout>  buttonsLayouts; //it stores all the layout of edit and delete buttons.
-    private HashMap<String, TextView> dueDateViews; // it stores all peach text views of dueDates
     private Button addBtn;
     private TextView remarkDate;
     private MaterialCalendarView calendarView;
@@ -108,7 +108,7 @@ public class RemarksActivity extends Fragment {
         });
 
         // initializing the set of highlighted dates
-        highlightedDates = new HashSet<>();
+        highlightedDates = new HashMap<>();
 
 
         // initializing views
@@ -142,10 +142,11 @@ public class RemarksActivity extends Fragment {
         calendarView.setOnDateChangedListener((view, date, useless) -> {
             // Managing the highlighted dates.
             calendarView.clearSelection();
-            for (CalendarDay highlighted : highlightedDates) {
-                System.out.println("test1 " + highlighted.getMonth());
+            for (CalendarDay highlighted : highlightedDates.keySet()) {
                 calendarView.setDateSelected(highlighted, true);
             }
+
+
 
 
             // show the remakrs of the selected date
@@ -180,7 +181,9 @@ public class RemarksActivity extends Fragment {
 
 
     /*
-    This function create the view for remarks
+    This method create the view for remarks that is below the calendar.
+    It also initialize the map highlightedDates that will be used outside of this method to paint
+    the dates that contain a remark.
     @PARAM: remarks is an object that contains all retrieved remarks from the database.
     @param: year is the selected year by the user.
     @param: month is the selected month by the user. (month starts from 1)
@@ -198,7 +201,7 @@ public class RemarksActivity extends Fragment {
         LinearLayout infoLayout;
         oneRemarkLayouts = new HashMap<>();
         buttonsLayouts = new HashMap<>();
-        dueDateViews = new HashMap<>();
+        highlightedDates = new HashMap<>();
 
         // this is used for the layout of text view
         LinearLayout.LayoutParams layoutParamsInfo = new LinearLayout.LayoutParams(
@@ -264,17 +267,22 @@ public class RemarksActivity extends Fragment {
                 // adding oneRemarksLayout to the hashMap
                 oneRemarkLayouts.put(remark.getRemarkID(), oneRemarkLayout);
                 lastHeight = Math.max(lastHeight, oneRemarkLayout.getHeight());
-
                 // adding remark's date to the set of highlighted dates
-                highlightedDates.add(CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
-                        remark.getDayNum()));
+                CalendarDay remarkDay = CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
+                        remark.getDayNum());
+                if (!highlightedDates.containsKey(remarkDay)) {
+                    highlightedDates.put(remarkDay, 0);
+                }
+                highlightedDates.put(remarkDay, highlightedDates.get(remarkDay) + 1);
             } else {
-                calendarView.setDateSelected(CalendarDay.from(remark.getYearNum(),
-                        remark.getMonthNum(), remark.getDayNum()), true);
-
                 // adding remark's date to the set of highlighted dates
-                highlightedDates.add(CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
-                        remark.getDayNum()));
+                CalendarDay remarkDay = CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
+                        remark.getDayNum());
+                if (!highlightedDates.containsKey(remarkDay)) {
+                    highlightedDates.put(remarkDay, 0);
+                }
+                highlightedDates.put(remarkDay, highlightedDates.get(remarkDay) + 1);
+                calendarView.setDateSelected(remarkDay, true);
             }
         }
 
@@ -287,7 +295,7 @@ public class RemarksActivity extends Fragment {
         remarksLayout.addView(tranLayout);
 
         // highlight the current date if it has a remark.
-        if (highlightedDates.contains(CalendarDay.today())) {
+        if (highlightedDates.keySet().contains(CalendarDay.today())) {
             calendarView.setDateSelected(CalendarDay.today(), true);
         }
     }
@@ -342,17 +350,15 @@ public class RemarksActivity extends Fragment {
 
             // adding the assignment to the database
             Executor insertingEx = Executors.newSingleThreadExecutor();
-            insertingEx.execute(() -> repository.addRemark(addedRemark));
+            insertingEx.execute(() -> {
+                repository.addRemark(addedRemark);
+                activityMain.runOnUiThread(() -> {
+                    // reopen this fragment
+                    this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new RemarksActivity()).commit();
+                });
+            });
 
-            this.onCreate(this.getArguments());
-            activityMain.recreate();
-            // views are removed to create a new sorted remark view.
-            remarksLayout.removeAllViews();
-            Calendar todayDate = Calendar.getInstance();
-            int year = todayDate.get(Calendar.YEAR);
-            int month = todayDate.get(Calendar.MONTH);
-            int day = todayDate.get(Calendar.DAY_OF_MONTH);
-            createRemarksView(retreivedREmarks, year, month, day);
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // updating the textview's info of the edited remark
             Gson gson = new Gson();
@@ -378,7 +384,14 @@ public class RemarksActivity extends Fragment {
 
             // update it the database
             Executor databaseThread = Executors.newSingleThreadExecutor();
-            databaseThread.execute(() -> repository.updateRemark(updatedRemark));
+            databaseThread.execute(() -> {
+                repository.updateRemark(updatedRemark);
+                activityMain.runOnUiThread(() -> {
+                    // reopen this fragment
+                    this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new RemarksActivity()).commit();
+                });
+            });
         }
     }
 
@@ -419,11 +432,25 @@ public class RemarksActivity extends Fragment {
                     deleteBtn.setLayoutParams(layoutParamsBtn);
                     deleteBtn.setBackgroundResource(R.drawable.delete_icon);
                     deleteBtn.setOnClickListener((deletingBtn) -> {
+                        // removing from remarksView
                         remarksLayout.removeView(oneRemarkLayouts.
                                 get(remark.getRemarkID()));
+                        // removing from the database
                         Executor deletionThread = Executors.newSingleThreadExecutor();
                         deletionThread.execute(() -> repository.deleteRemark(remark));
+                        // removing from retrievedRemarks
                         retreivedREmarks.removeRemark(remark);
+                        // removing from the calendar's highlighted dates if that date has one remark
+                        CalendarDay remarkDay = CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
+                                remark.getDayNum());
+                        System.out.println(highlightedDates.get(remarkDay) + "Testing ttt");
+                        if (highlightedDates.get(remarkDay) == 1) {
+                            highlightedDates.remove(remarkDay);
+                            calendarView.setDateSelected(remarkDay, false);
+                            System.out.println(highlightedDates.containsKey(remarkDay) + " Test");
+                        } else {
+                            highlightedDates.put(remarkDay, highlightedDates.get(remarkDay) - 1);
+                        }
                     });
 
                     // setting the layout by replacing check button with change and delete

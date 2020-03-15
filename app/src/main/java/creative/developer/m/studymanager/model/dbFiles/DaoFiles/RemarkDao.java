@@ -31,14 +31,14 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 public interface RemarkDao {
 
     @Query("SELECT * FROM RemarkEntity")
-    List<creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity> getAllRemarks();
+    List<RemarkEntity> getAllRemarks();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void addRemark(creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity... RemarkEntity);
+    void addRemark(RemarkEntity... RemarkEntity);
 
     @Update
-    void updateRemark(creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity obj);
+    void updateRemark(RemarkEntity obj);
 
     @Delete
-    void deleteRemark(creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity obj);
+    void deleteRemark(RemarkEntity obj);
 }

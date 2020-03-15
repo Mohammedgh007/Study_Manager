@@ -1,10 +1,10 @@
 /*
 ###############################################################################
 Class name : HomeActivity
-purpose: This is model view class that is responsible for home activity
+purpose: This is model view class that is responsible for home fragment.
   interaction with the user.
 Methods:
-  onCreate() -> It encapsulates/manages all the interaction.
+  onCreateView() -> It encapsulates/manages all the interaction.
   onActivityResult() -> It receives the intent from gellary to save the image.
   onRequestPermissionsResult() -> this method handles the response of the user when the user is
     prompted for gaining an external memory permission.

@@ -1,10 +1,13 @@
 /*
 ###############################################################################
 Class name : AlarmManagement
-Implemented Interfaces:
 purpose: This is a view class that handles creating and showing notifications
 Methods:
-
+    - setAlarm(context) -> it creates and shows the notification on the given time and date.
+    - getNotificationTime(assignment) -> this method determines the notification
+    time based on the AssignmentEntity field.
+Inner class:
+    - AlramReciever: It is used to receive the service(alarm) from the background.
 ###############################################################################
  */
 package creative.developer.m.studymanager.view;
@@ -94,6 +97,7 @@ public class AlarmManagement {
     }
 
 
+    // It handles the event of service(alarm) receiving.
     public static class AlarmReceiver extends BroadcastReceiver{
         /*
         It is called when the alarm time is elapsed.
@@ -112,22 +116,11 @@ public class AlarmManagement {
 
 
         /*
-    this method is called to when onReceive is called for booting
-    @param: context is the context from onReceive()
-     */
+        this method is called to when onReceive is called for booting
+        @param: context is the context from onReceive()
+        */
         private void handleBooting(Context context) {
-            Intent alarmIntent = new Intent(context, AlarmManagement.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
 
-            AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, 7);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 1);
-
-            manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
         }
 
 
