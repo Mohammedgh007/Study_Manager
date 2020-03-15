@@ -67,31 +67,31 @@ NotesActivity/ It is responsible for notes activity interaction with the user. <
 RemarksActivity/ It is responsible for remark activity interaction with the user. <br />
 
 # Features to be added ():
-update 1:
-improve assignemts view
-calender view for remarks.
-show bigger picture for the schedule.
-organize how to select a lesson.
-fragment layout to improve browsing.
-notification for assignments.
+update 1: <br />
+improve assignemts view. <br />
+calender view for remarks. <br />
+show bigger picture for the schedule. <br />
+organize how to select a lesson. <br />
+fragment layout to improve browsing. <br />
+notification for assignments. <br />
 
 update 2:
-making ModelManager for each section, so that model view intract with one object instead of two.
-study reminders .
+making ModelManager for each section, so that model view intract with one object instead of two. <br />
+study reminders . <br />
 
 update 3: 
-adding pictures to lessons notess.
-animation of fliping a card.
-adding sounds and visual effects.
+adding pictures to lessons notess. <br />
+animation of fliping a card. <br />
+adding sounds and visual effects. <br />
 
 update 4:
-import + share notes and flash cards
-user input all courses at once.
+import + share notes and flash cards <br />
+user input all courses at once. <br />
 
 Later on:
-ability to change lesson and a course
-Making courseActivity into two files. FlashCardActivity courses can be edited from coursesActivity
-Selecting a course from drop-down list on adding/editing rather than typing it.
-make the phone silent during the classes.
+ability to change lesson and a course <br />
+Making courseActivity into two files. FlashCardActivity courses can be edited from coursesActivity. <br />
+Selecting a course from drop-down list on adding/editing rather than typing it. <br />
+make the phone silent during the classes. <br />
 
 
