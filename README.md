@@ -1,12 +1,17 @@
 # Study_Manager
 Author/ Mohammed Alghamdi<br />
 Framework: Android Studio is used with Java 8 as a front-end language, so it is native app.<br />
-Libraries: Room Resistance is utilized to help writing the code for the RDBS.<br />
-Application's link at Google Play:  https://cutt.ly/MwHJypX
+Libraries: 
+1- Room Resistance is utilized to help writing the code for the RDBS.<br />
+2- CalendarView material Deisgn is used for remarks' calendar.
+https://github.com/prolificinteractive/material-calendarview/blob/master/LICENSE
+<br />
+Application's link at Google Play:  https://play.google.com/store/apps/details?id=creative.developer.m.studymanager
 
 # Genreal notes: 
 1- Editing is not allowed for this repository because it is a personal project.<br />
 2- The project uses MVVM software archaticture.<br />
+3- This repository represents the first update's version.
 
 # Model files
 Model classes are on dpFile, which includes class that is related directly to managing the database or managing the 
@@ -43,7 +48,8 @@ NoteList/ It handles storing notes objects as a data structure and manipulate th
 RemarksList/ It handles storing remarks objects in a data structure and manipulate them.<br />
 
 
-# View files (.xml files at layout folder)
+# View files (.xml files at layout folder) with one class
+AlarmManagement/ It manages creating and showing a notification for the user.
 
 # ModelView files
 classes: <br />
@@ -60,20 +66,32 @@ HomeActivity/ It is responsible for home activity interaction with the user. <br
 NotesActivity/ It is responsible for notes activity interaction with the user. <br />
 RemarksActivity/ It is responsible for remark activity interaction with the user. <br />
 
-# Features to be added (the list is not Not ordered):
-- improve assignemts and remarks view. <br />
-- abstract/interface to capture redundancy on EntityList. <br />
-- ability to change lesson and a course. <br />
-- animation of fliping a card. <br />
-- adding sounds and visual effects. <br />
-- adding calender view for Remarks. <br />
-- adding pictures to lessons notess. <br />
-- Create SortedList class to store list of AssignmentEntity. <br />
-- cut the intended part of courses' photo. <br />
-- Making courseActivity into two files. FlashCardActivity courses can be edited from coursesActivity. <br />
-- making AssignmentObj class that handles the database as well. <br />
-- Create a set of class that control communicate with repository and EntityLists. <br />
-- Selecting a course from drop-down list on adding/editing rather than typing it.<br />
-- Adding notification feature for reminding the assignments. <br />
+# Features to be added ():
+update 1: <br />
+improve assignemts view. <br />
+calender view for remarks. <br />
+show bigger picture for the schedule. <br />
+organize how to select a lesson. <br />
+fragment layout to improve browsing. <br />
+notification for assignments. <br />
+
+update 2:
+making ModelManager for each section, so that model view intract with one object instead of two. <br />
+study reminders . <br />
+
+update 3: 
+adding pictures to lessons notess. <br />
+animation of fliping a card. <br />
+adding sounds and visual effects. <br />
+
+update 4:
+import + share notes and flash cards <br />
+user input all courses at once. <br />
+
+Later on:
+ability to change lesson and a course <br />
+Making courseActivity into two files. FlashCardActivity courses can be edited from coursesActivity. <br />
+Selecting a course from drop-down list on adding/editing rather than typing it. <br />
+make the phone silent during the classes. <br />
 
 
