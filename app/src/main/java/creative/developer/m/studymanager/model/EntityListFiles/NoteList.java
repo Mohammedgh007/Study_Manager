@@ -4,15 +4,13 @@ Author: Mohammed Alghamdi
 Class name : NoteList
 purpose: This is a model class that handles storing notes objects as a data structure.
 Methods:
-    setNotesList(recievedNotesList) -> assign the value of notesMap, which is the data structure
-      that stores notes' objects
     containLesson(course, lesson) -> it returns true if the lesson exist.
-    getCoursesSet() -> it returns strings that are courses' names.
     getLessonsCourse(course) -> it returns string of the course.
     getNote(course, lesson) -> returns a NoteEntity object
     removeNote(course, lesson) -> remove a note object from notesMap.
     addNote(added) -> adds added object to notesMap
     updateNote(updated) -> updates the value of updated on noteMaps.
+    getLastID() -> getter for the field lastID.
 ###############################################################################
  */
 
@@ -26,40 +24,29 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 
 public class NoteList{
 
     private TreeMap<String, List<NoteEntity>> notesMap;
-    private Context context;
-    private DataRepository repository; // used to access database
-    private static NoteList instance; // to avoid sending heavy object between activities
+    private int lastID;
 
-    public NoteList (Context context) {
-        this.context = context;
-    }
-
-    public static NoteList getInstance() {
-        return instance;
-    }
-
-    public void setNotesList(List<NoteEntity> notesList) {
+    public NoteList (List<NoteEntity> receivedList) {
         notesMap = new TreeMap<>();
-        for (NoteEntity note : notesList) {
+        for (NoteEntity note : receivedList) {
             if (!notesMap.containsKey(note.getCourse())){
                 notesMap.put(note.getCourse(), new ArrayList<>());
             }
             notesMap.get(note.getCourse()).add(note);
+            lastID = Math.max(lastID, note.getNoteID());
         }
-        instance = this;
-        System.out.println(instance + "testing");
     }
+
+
+    // this is a getter for the field lastID
+    public int getLastID() {return lastID;}
+
 
     // this returns the list of lesson for the inputted course
     public List<String> getLessonsCourse (String course) {
@@ -71,12 +58,6 @@ public class NoteList{
         }
         return lessonsList;
     }
-
-    // this returns the set of courses
-    public Set<String> getCoursesSet() {
-        return this.notesMap.keySet();
-    }
-
 
 
     // this returns a particular note object depending on the lesson and the course
@@ -108,19 +89,20 @@ public class NoteList{
     this method removes NoteEntity object from this class structure and from the database
     @PARAM: course is the course of the removed note
     @PARAM: lesson is the lesson of the removed note
+    @return the removed note.
      */
-    public void removeNote(String course, String lesson) {
+    public NoteEntity removeNote(String course, String lesson) {
         // removing from this class structure
         int i = 0;
-        boolean isRemoved = false;
-        while (i < notesMap.get(course).size() && !isRemoved) {
+        NoteEntity removed = null;
+        while (i < notesMap.get(course).size()) {
             if (lesson.equalsIgnoreCase(notesMap.get(course).get(i).getLesson())) {
-                notesMap.get(course).remove(i);
-                isRemoved = true;
+                removed = notesMap.get(course).remove(i);
+                return removed;
             }
             i++;
         }
-        instance = this;
+        return removed;
     }
 
     /*
@@ -133,7 +115,6 @@ public class NoteList{
             notesMap.put(added.getCourse(), new ArrayList<>());
         }
         notesMap.get(added.getCourse()).add(added);
-        instance = this;
     }
 
 
@@ -152,6 +133,5 @@ public class NoteList{
                 isUpdated = true;
             }
         }
-        instance = this;
     }
 }

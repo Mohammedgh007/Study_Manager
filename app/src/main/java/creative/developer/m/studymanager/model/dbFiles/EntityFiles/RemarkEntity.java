@@ -28,7 +28,7 @@ public class RemarkEntity  implements Comparable{
 
 
     // fields as a obj or columns on the database
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private int remarkID;
     private String title;
     private String disc;
@@ -36,7 +36,8 @@ public class RemarkEntity  implements Comparable{
     private String date; // yyyy:mm;dd I used : with ; to facilitate using substring.
 
 
-    public RemarkEntity (String title, String disc, String time, String date) {
+    public RemarkEntity (int remarkID, String title, String disc, String time, String date) {
+        this.remarkID = remarkID;
         this.title = title;
         this.disc = disc;
         this.time = time;

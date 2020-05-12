@@ -26,16 +26,16 @@ import creative.developer.m.studymanager.model.dbFiles.DaoFiles.FlashCardsDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.LessonDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.NoteDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.RemarkDao;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 
-@Database(entities = {AssignmentsEntity.class, RemarkEntity.class, CourseEntity.class,
+@Database(entities = {AssignmentEntity.class, RemarkEntity.class, CourseEntity.class,
         NoteEntity.class, LessonEntity.class, FlashCardEntity.class},
-        version = 3, exportSchema = false)
+        version = 6, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "StudyManagerDB00";
     private static AppDatabase sInstance;

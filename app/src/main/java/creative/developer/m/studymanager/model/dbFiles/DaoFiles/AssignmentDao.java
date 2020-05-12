@@ -26,27 +26,27 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 
 
 @Dao
 public interface AssignmentDao {
 
-    @Query("SELECT * FROM AssignmentsEntity")
-    List<AssignmentsEntity> getAllAssignments();
+    @Query("SELECT * FROM AssignmentEntity")
+    List<AssignmentEntity> getAllAssignments();
 
-    @Query("SELECT * FROM AssignmentsEntity WHERE notificationID == :notifyID")
-    AssignmentsEntity getAssginmentByNotifyID(String notifyID);
+    @Query("SELECT * FROM AssignmentEntity WHERE notificationID == :notifyID")
+    AssignmentEntity getAssginmentByNotifyID(String notifyID);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void InsertAssignments(AssignmentsEntity... assignmentObjects);
+    void InsertAssignments(AssignmentEntity... assignmentObjects);
 
     @Update
-    void updateAssignment(AssignmentsEntity updated);
+    void updateAssignment(AssignmentEntity updated);
 
     @Delete
-    void deleteAssignment(AssignmentsEntity delted);
+    void deleteAssignment(AssignmentEntity delted);
 
-    @Query("DELETE FROM AssignmentsEntity")
+    @Query("DELETE FROM AssignmentEntity")
     void clearAll();
 }

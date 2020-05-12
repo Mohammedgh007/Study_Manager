@@ -2,7 +2,7 @@
 ###############################################################################
 Author: Mohammed Alghamdi
 Class name : NoteEntity
-purpose: This is a model class that is used to represent a single notes' class
+purpose: This is a model class that is used to represent a single note
     as an object and as a row on a database table called NoteEntity
 ###############################################################################
  */
@@ -19,13 +19,14 @@ import androidx.room.PrimaryKey;
 public class NoteEntity{
 
     // fields as a obj or columns on the database
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private int noteID;
     private String course;
     private String lesson;
     private String notes;
 
-    public NoteEntity (String course, String lesson, String notes) {
+    public NoteEntity (int noteID, String course, String lesson, String notes) {
+        this.noteID = noteID;
         this.course = course;
         this.lesson = lesson;
         this.notes = notes;

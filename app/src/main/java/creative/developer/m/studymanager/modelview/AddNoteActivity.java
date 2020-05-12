@@ -22,13 +22,16 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.util.List;
+
 import creative.developer.m.studymanager.model.EntityListFiles.NoteList;
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.NoteCoordinator;
 
 public class AddNoteActivity extends Activity {
 
-    private NoteList existedNotes;
+    private List<String> existedNotes; // names of the existed lessons on the selected course.
     private Button addNoteBtn;
     private Button cancelBtn;
     private TextView courseET;
@@ -52,7 +55,8 @@ public class AddNoteActivity extends Activity {
 
         // initializing existedNotes to repesent the stored notes, so that the user do not input
         // two identical lessons' name for same course
-        existedNotes = NoteList.getInstance();
+        NoteCoordinator model = NoteCoordinator.getInstance(this);
+        existedNotes = model.getLessonsList(courseName);
 
         // click eventing handling for cancelBtn, which is cancelling adding the note
         cancelBtn.setOnClickListener((btn) -> {
@@ -69,14 +73,10 @@ public class AddNoteActivity extends Activity {
                 System.out.println("in Adding");
                 Intent intent = new Intent(AddNoteActivity.this,
                         CoursesActivity.class);
-                NoteEntity added = new NoteEntity(courseET.getText().toString().toUpperCase().trim(),
+                model.addNote(courseET.getText().toString().toUpperCase().trim(),
                         lessonET.getText().toString().toUpperCase().trim(),
                         recoredNoteET.getText().toString());
-                Gson gson = new Gson();
-                String addedJson = gson.toJson(added);
-                intent.putExtra("addedObjNote", addedJson);
                 setResult(Activity.RESULT_OK, intent);
-                System.out.println("in AddNoteActivity");
                 finish();
             }
         });
@@ -91,7 +91,7 @@ public class AddNoteActivity extends Activity {
         System.out.println("in valid 1");
         if (!lesson.equals("") && !note.equals("")) {
             System.out.println("in valid 2");
-            if (existedNotes.containLesson(course, lesson)) {
+            if (existedNotes.contains(lesson)) {
                 Toast.makeText(this, "This lesson has been already added, please select" +
                         "another name for the lesson", Toast.LENGTH_LONG).show();
             } else {

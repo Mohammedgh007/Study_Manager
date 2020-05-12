@@ -9,11 +9,6 @@ Methods:
   storeCard() -> It stores the question's and the answer's field for on cards field.
   showCardData(currBtn) -> It fills question's and answer's with the data of the selected card.
   isInputValid() -> It returns boolean value about whether the user have given valid inputs or not.
-  getCreatedCards() -> this method is used to send cards to CourseActivity because it is
-     a heavy object.
-  getCreatedCards(useless) -> same as above but with different return type, it is used to send
-     to FlashCardsActivity.
-  getDeletedCards() -> It is used to send deletedCards to FlashCardsActivity.
 ###############################################################################
  */
 
@@ -32,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +35,7 @@ import java.util.List;
 import creative.developer.m.studymanager.model.EntityListFiles.FlashCardsList;
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.FlashCardCoordinator;
 
 
 public class AddFlashCardActivity extends Activity {
@@ -59,10 +56,10 @@ public class AddFlashCardActivity extends Activity {
     private Button clicked; // it is used to access the last clicked button.
 
     // it is used to store all cards' questions and answers. the key is the button text
-    private static HashMap<String, FlashCardEntity> cards;
-    private static List<FlashCardEntity> deletedCards; // used for sending to FlashCardsActivity
+    private HashMap<String, FlashCardEntity> cards;
     private static int lastAddedIndex; // it is used to keep track of the last added card number
     private int cardsNum; // the number of added cards so far
+
 
 
     @Override
@@ -71,7 +68,11 @@ public class AddFlashCardActivity extends Activity {
         setContentView(R.layout.add_flash_cards);
 
         String purpose = this.getIntent().getStringExtra("purpose");
-        String courseName = this.getIntent().getStringExtra("courseStr");
+        String courseName = this.getIntent().getStringExtra("course");
+        String lessonName = null;
+        if (!purpose.equals("adding")) {
+            lessonName = this.getIntent().getStringExtra("lesson");
+        }
 
         // initializing views
         scrollViewCards = findViewById(R.id.scroll_view_card_add_flash);
@@ -88,38 +89,34 @@ public class AddFlashCardActivity extends Activity {
         cancelBtn = findViewById(R.id.cancel_add_flash);
         clicked = card1Btn;
 
+        // initializing the model's instance
+        FlashCardCoordinator model = FlashCardCoordinator.getInstance(this);
+
         // initializing cards with the view appearance.
         cards = new HashMap<>();
         lastAddedIndex = 1;
         if (purpose.equals("adding")) { // adding a lesson
-            cards.put("Card 1", new FlashCardEntity("", "", "", ""));
+            cards.put("Card 1", model.addCard("", "", "", ""));
             cardsNum = 1;
         } else { // editing a lesson
-            deletedCards = new LinkedList<>();
-
             // preparing cards and buttons for recieving the data from FlashCardsActivity
             String cardStr = "Card ";
-            FlashCardEntity[] FlashCardsArr;
-            if (FlashCardsActivity.recievedCards != null) { // opened by FlashCardsActivity
-                FlashCardsArr = FlashCardsActivity.recievedCards.clone();
-            } else {
-                FlashCardsArr = CoursesActivity.getSentCards();
-            }
-            cardsNum = FlashCardsArr.length;
-            cards.put(cardStr + lastAddedIndex, FlashCardsArr[0]);
+            List<FlashCardEntity> cardsList = model.getLessonCards(courseName, lessonName);
+            cardsNum = cardsList.size();
+            cards.put(cardStr + lastAddedIndex, cardsList.get(0));
             showCardData(card1Btn);
             for (int i = 1; i < cardsNum; i++) {
                 lastAddedIndex++;
-                cards.put(cardStr + lastAddedIndex, FlashCardsArr[i]);
+                cards.put(cardStr + lastAddedIndex, cardsList.get(i));
                 addCardBtn();
             }
 
-            // changing the view a bit to editing
+            // changing the view for editing to disable editing the lesson's name
             finishLessonBtn.setText("Finish Editing");
             courseET.setEnabled(false);
-            courseET.setText(FlashCardsArr[0].getCourse());
+            courseET.setText(courseName);
             lessonET.setEnabled(false);
-            lessonET.setText(FlashCardsArr[0].getLesson());
+            lessonET.setText(lessonName);
         }
 
         // click event handling which is adding a button view with its FlashCardEntity
@@ -128,7 +125,7 @@ public class AddFlashCardActivity extends Activity {
             lastAddedIndex++;
             cardsNum++;
             String id = "Card " + lastAddedIndex;
-            cards.put(id, new FlashCardEntity("", "", "", ""));
+            cards.put(id, model.addCard("", "", "", ""));
             addCardBtn();
         });
 
@@ -153,9 +150,8 @@ public class AddFlashCardActivity extends Activity {
 
             if (cardsNum >= 2 && clicked != null) { // if the remaining cards are more than 1
                 cardsNum--;
-                // removing from the view and cards with adding to deletedCards
-                deletedCards.add(cards.get(clicked.getText().toString()));
-                cards.remove(clicked.getText().toString());
+                // removing from the view and the model
+                model.removecard(cards.remove(clicked.getText().toString()));
                 cardSetLayout.removeView(clicked);
                 // selecting a current card
                 clicked = (Button) cardSetLayout.getChildAt(1);
@@ -189,28 +185,22 @@ public class AddFlashCardActivity extends Activity {
 
         // click event handling which is finish adding or editing the lesson
         finishLessonBtn.setOnClickListener((btn) -> {
-            if (!purpose.equals("adding") || isInputValid()) {
+            // if the user is editing cards, or the input is valid for adding cards.
+            if (!purpose.equals("adding") || isInputValid(model.getLessonsList(courseName))) {
+                storeCard();// store data of the shown card
+
                 // assigning course and lesson fields for cards
-                String course = courseET.getText().toString().toUpperCase().trim();
                 String lesson = lessonET.getText().toString().toUpperCase().trim();
                 for (FlashCardEntity card : cards.values()) {
-                    card.setCourse(course);
+                    card.setCourse(courseName);
                     card.setLesson(lesson);
                 }
 
-                // sending the lesson
-                Intent intent;
-                storeCard();
-                if (purpose.equals("adding")) {
-                    intent = new Intent(AddFlashCardActivity.this,
-                            CoursesActivity.class);
-                } else {
-                    intent = new Intent(AddFlashCardActivity.this,
-                            FlashCardsActivity.class);
-                    Toast.makeText(getBaseContext(), "the lesson has been edited",
-                            Toast.LENGTH_SHORT).show();
-                }
-                setResult(Activity.RESULT_OK, intent);
+                // updating the model
+                model.updateLesson(new ArrayList<>(cards.values()));
+
+                // closing the activity
+                setResult(Activity.RESULT_OK);
                 finish();
             }
         });
@@ -264,7 +254,8 @@ public class AddFlashCardActivity extends Activity {
 
     // this method returns true if the user types a valid input on this activity's fields.
     // Also, it provides a feedback for the user in order for providing a valid input
-    private boolean isInputValid(){
+    // @param: lessons stores all lessons' names of the given course.
+    private boolean isInputValid(List<String> lessons){
         // check if lesson and course fields are filled
         String course = courseET.getText().toString().toUpperCase().trim();
         String lesson = lessonET.getText().toString().toUpperCase().trim();
@@ -274,7 +265,7 @@ public class AddFlashCardActivity extends Activity {
             return false;
         }
         // check if the lesson already exist or not
-        if (FlashCardsList.getInstance().containLesson(course, lesson)) {
+        if (lessons.contains(lesson)) {
             Toast.makeText(this, "This lesson's name already exist, please select another name",
                     Toast.LENGTH_LONG).show();
             return false;
@@ -282,33 +273,5 @@ public class AddFlashCardActivity extends Activity {
         return true;
     }
 
-    // this method is used to send cards to CourseActivity because it is a heavy object
-    public static List<FlashCardEntity> getCreatedCards() {
-        List<FlashCardEntity> createdCards = new ArrayList<>();
-        for (FlashCardEntity card : cards.values()) {
-            createdCards.add(card);
-        }
-        return createdCards;
-    }
-    // same as above but with different return type, it is used to send to FlashCardsActivity
-    public static FlashCardEntity[] getCreatedCards(Object useless) {
-        FlashCardEntity[] edited = new FlashCardEntity[cards.size()];
-        int i =0;
-        for (FlashCardEntity card : cards.values()) {
-            edited[i] = card;
-            i++;
-        }
-        return edited;
-    }
 
-    // It is used to send deletedCards to FlashCardsActivity
-    public static FlashCardEntity[] getDeletedCards() {
-        FlashCardEntity[] deleted = new FlashCardEntity[deletedCards.size()];
-        int i =0;
-        for (FlashCardEntity card : deletedCards) {
-            deleted[i] = card;
-            i++;
-        }
-        return deleted;
-    }
 }

@@ -9,13 +9,10 @@ Methods:
   onActivityResult() -> It receives the intent from FlashCardsActivity or NotesActivity that
      holds the data of the added or modified flash cards or notes..
   createCoursesView() -> It creates the view that show the courses and the lessons..
-  getSentCards() -> this method return sentCards, so that it can send FlashCardEntity array to
-     FlashCardsActivity.
-  updateSentCards() -> this method change the value of sentCards in case the user edit them after
-     it is sent to FlashCardsActivity
   getExistingCourses() -> this method returns the set of existing courses.
   handleHoldBtn(selectedLesson, selectedCourse, selectedBtn) -> this method is used as button's hold
     click for a lesson's button. It shows a popup drop list for either deleting a lesson or editing the lesson.
+  handleClickingLesson() -> This method handle the event of clicking a lesson's button.
 ###############################################################################
  */
 
@@ -45,6 +42,8 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -56,13 +55,15 @@ import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.FlashCardCoordinator;
+import creative.developer.m.studymanager.model.modelCoordinators.NoteCoordinator;
 
 import static android.app.Activity.RESULT_OK;
 
-public class CoursesActivity extends Fragment {
+public class CoursesActivity extends Fragment implements Observer {
 
-    // used to access database; static to access editing it from FlashCardsActivity
-    private static DataRepository repository;
+    private NoteCoordinator noteModel;
+    private FlashCardCoordinator cardModel;
     private final int ADDING_CODE_NOTE = 55; // used as requestCode for startActivityForResult()
     private final int ENTER_CODE_NOTE = 57; // used as requestCode for startActivityForResult()
     private final int ADD_COURSSE_CODE = 59; // used as requestCode for startActivityForResult()
@@ -70,13 +71,9 @@ public class CoursesActivity extends Fragment {
     private final int EDIT_CARDS_CODE = 60; // used as requestCode for startActivityForResult()
     private String selectedCourse; // used to recognize the selected course.
     private String distination; // it is used to distinquish whether the activity will use notes or cards
-    private NoteList retreivedNotes; // the retrieved notes stored in the phone
-    // the retrieved cards stored in the phone,; static to access editing it from FlashCardsActivity
-    private static FlashCardsList retreivedCards;
-    private static FlashCardEntity[] sentCards; // to send the selected lesson's cards to FlashCardActivity
-    private static Set<String> coursesSet; // names of the courses
     private Activity activityMain;
     public static int count = 0;
+    private static Set<String> coursesSet;
 
     // views
     Button addLessonBtn;
@@ -104,25 +101,8 @@ public class CoursesActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              Bundle savedInstanceState) {
         distination = MainActivity.getCoursesDistination();
-        coursesSet = new HashSet<>();
         clickedCourse = new Button[1];
 
-        // Accessing database to retrieve the data then show on the view
-        repository = DataRepository.getInstance(
-                AppDatabase.getInstance(activityMain.getBaseContext()));
-        Executor dbThread = Executors.newSingleThreadExecutor();
-        dbThread.execute(() -> {
-            // Initializing courses set depending on this activity is opened for notes or flash cards
-            coursesSet = repository.getCoursesStr();
-            System.out.println("the count in exe is" + (++count));
-            if (distination.equals("notes activity")) {
-                retreivedNotes = repository.getNotes(activityMain.getBaseContext());;
-                activityMain.runOnUiThread(() -> createCoursesView());
-            } else {
-                retreivedCards = repository.getCards(activityMain.getBaseContext());
-                activityMain.runOnUiThread(() -> createCoursesView());
-            }
-        });
 
         // initializing views
         View root = inflater.inflate(R.layout.courses, container, false);
@@ -130,6 +110,25 @@ public class CoursesActivity extends Fragment {
         courseBtnLayout = root.findViewById(R.id.coursesBtnLayout);
         addLessonBtn = root.findViewById(R.id.add_lesson_courses);
         lessonsBtnLayout = root.findViewById(R.id.lessonsBtnLayout_courses);
+
+        // Accessing model to retrieve the data then show on the view
+        if (distination.equals("notes activity")) {
+            noteModel = NoteCoordinator.getInstance(activityMain.getBaseContext());
+            noteModel.addObserver(this);
+            cardModel = null;
+            if (noteModel.getCoursesNames() != null) {
+                // to avoid race condition; it will be called on update() otherwise.
+                createCoursesView();
+            }
+        } else {
+            cardModel = FlashCardCoordinator.getInstance(activityMain.getBaseContext());
+            cardModel.addObserver(this);
+            noteModel = null;
+            if (cardModel.getCoursesNames() != null) {
+                // to avoid race condition; it will be called on update() otherwise.
+                createCoursesView();
+            }
+        }
 
 
         // handling the event of adding a course
@@ -161,7 +160,7 @@ public class CoursesActivity extends Fragment {
             } else { // for flashcards
                 Intent addIntent = new Intent(activityMain, AddFlashCardActivity.class);
                 addIntent.putExtra("purpose", "adding");
-                addIntent.putExtra("courseStr", selectedCourse);
+                addIntent.putExtra("course", selectedCourse);
                 startActivityForResult(addIntent, ADDING_CODE_CARD);
             }
 
@@ -191,6 +190,7 @@ public class CoursesActivity extends Fragment {
         lessonsBtnLayout.addView(tempTV);
         lessonsBtnLayout.addView(tempAddCourse);
 
+
         for (String course : coursesSet) {
             // creating the button for each course
             courseBtn = new Button(activityMain.getBaseContext());
@@ -217,13 +217,13 @@ public class CoursesActivity extends Fragment {
                 clickedCourse[0] = (Button) btn;
                 selectedCourse = course;
 
-                //controlling the content of the spinner
+                //controlling the content of the lessons' list
                 lessonsBtnLayout.setVisibility(View.VISIBLE);
                 List<String> lessonsList;
                 if (distination.equals("notes activity")) {
-                    lessonsList = retreivedNotes.getLessonsCourse(course);
+                    lessonsList = noteModel.getLessonsList(course);
                 } else {
-                    lessonsList = retreivedCards.getCourseLessons(course);
+                    lessonsList = cardModel.getLessonsList(course);
                 }
 
                 // adding buttons for each lesson that belongs to the selected course
@@ -254,66 +254,31 @@ public class CoursesActivity extends Fragment {
     public void onActivityResult (int requestCode, int resultCode, Intent data) {
         Gson gson = new Gson();
         if (requestCode == ADDING_CODE_NOTE && resultCode == RESULT_OK) { // for adding notes
-            NoteEntity added = gson.fromJson(data.getExtras().getString("addedObjNote")
-                    , NoteEntity.class);
-            retreivedNotes.addNote(added);
-            Executor dbThread = Executors.newSingleThreadExecutor();
-            dbThread.execute(() -> repository.addNote(added));
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The note has been added", Toast.LENGTH_LONG).show();
             createCoursesView();
         } else if (requestCode == ENTER_CODE_NOTE && resultCode == RESULT_OK) { // for viewing notes
-            String updatedNoteJson = data.getExtras().getString("updatedNote");
-            NoteEntity updatedNote = gson.fromJson(updatedNoteJson, NoteEntity.class);
-            // updating on the retreivedNotes
-            retreivedNotes.updateNote(updatedNote);
-            // updating on the database
-            Executor dbThread = Executors.newSingleThreadExecutor();
-            dbThread.execute(() -> repository.updateNote(updatedNote));
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The lesson's notes have been updated", Toast.LENGTH_LONG).show();
         } else if (requestCode == ADDING_CODE_CARD && resultCode == RESULT_OK) { // for adding cards
-            retreivedCards.addLesson(AddFlashCardActivity.getCreatedCards());
-            Executor dbThread = Executors.newSingleThreadExecutor();
-            dbThread.execute(() -> {
-                for (FlashCardEntity card : AddFlashCardActivity.getCreatedCards()) {
-                    repository.addCards(card);
-                }
-            });
-            retreivedCards.addLesson(AddFlashCardActivity.getCreatedCards());
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The flash cards have been added", Toast.LENGTH_LONG).show();
             createCoursesView();
         } else if (requestCode == ADD_COURSSE_CODE && resultCode == RESULT_OK) {
-            Executor addDBThread = Executors.newSingleThreadExecutor();
-            System.out.println(data + "testing ");
-            addDBThread.execute(() -> repository.addCourse(data.getStringExtra("added course")));
-            coursesSet.add(data.getStringExtra("added course"));
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The course has been added", Toast.LENGTH_LONG).show();
+            String addedCourse = data.getExtras().getString("added course");
+            coursesSet.add(addedCourse);
+            if (distination.equals("notes activity")) {
+                noteModel.addCourse(addedCourse);
+            } else {
+                cardModel.addCourse(addedCourse);
+            }
             createCoursesView();
         } else if (requestCode == EDIT_CARDS_CODE && resultCode == RESULT_OK) {
-            // editing in database
-            FlashCardEntity[] editedCards = AddFlashCardActivity.getCreatedCards(null);
-            CoursesActivity.updateSentCards(editedCards, AddFlashCardActivity.getDeletedCards());
-            // in retreivedCards
-            String course = editedCards[0].getCourse();
-            String lesson = editedCards[0].getLesson();
-            retreivedCards.removeLesson(course, lesson);
-            ArrayList<FlashCardEntity> cardsList = new ArrayList<>();
-            for (FlashCardEntity card : editedCards) {
-                cardsList.add(card);
-            }
-            retreivedCards.addLesson(cardsList);
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The flash cards have been added", Toast.LENGTH_LONG).show();
         }
-    }
-
-    // this method return sentCards, so that it can send FlashCardEntity array to FlashCardsActivity
-    public static FlashCardEntity[] getSentCards() {
-        return sentCards;
-    }
-
-    // this method change the value of sentCards in case the user edit them after it is sent to
-    // FlashCardsActivity
-    public static void updateSentCards(FlashCardEntity[] updatedCards,
-                                       FlashCardEntity[] deletedCards) {
-        Executor dbThread = Executors.newSingleThreadExecutor();
-        dbThread.execute(() -> {
-            repository.addCards(updatedCards);
-            repository.deleteCards(deletedCards);
-        });
     }
 
 
@@ -326,14 +291,13 @@ public class CoursesActivity extends Fragment {
         //preparing for showing the lesson on either FlashCardsActivity or NotesActivity
         if (distination.equals("notes activity")) {
             Intent enterIntent = new Intent(activityMain, NotesActivity.class);
-            Gson lessonGson = new Gson();
-            String lessonJson = lessonGson.toJson(retreivedNotes.getNote(selectedCourse,
-                    lessonStr));
-            enterIntent.putExtra("lessonNote", lessonJson);
+            enterIntent.putExtra("lesson", lessonStr);
+            enterIntent.putExtra("course", courseStr);
             startActivityForResult(enterIntent, ENTER_CODE_NOTE);
         } else {
             Intent enterIntent = new Intent(activityMain, FlashCardsActivity.class);
-            sentCards = retreivedCards.getLessonCards(selectedCourse, lessonStr);
+            enterIntent.putExtra("lesson", lessonStr);
+            enterIntent.putExtra("course", courseStr);
             startActivity(enterIntent);
             activityMain.finish();
         }
@@ -373,16 +337,9 @@ public class CoursesActivity extends Fragment {
             // removing the data from the model
             Executor dbThread = Executors.newSingleThreadExecutor();
             if (distination.equals("notes activity")) {
-                dbThread.execute(() -> {
-                    NoteEntity removed = retreivedNotes.getNote(courseStr, lessonStr);
-                    retreivedNotes.removeNote(courseStr, lessonStr);
-                    repository.deleteNote(removed);
-                });
+                noteModel.removeNote(courseStr, lessonStr);
             } else {
-                dbThread.execute(() -> {
-                    repository.deleteCards(retreivedCards.getLessonCards(courseStr, lessonStr));
-                    retreivedCards.removeLesson(courseStr, lessonStr);
-                });
+                cardModel.removeLesson(courseStr, lessonStr);
             }
 
             return true;
@@ -395,7 +352,8 @@ public class CoursesActivity extends Fragment {
             } else {
                 Intent editIntent = new Intent(activityMain, AddFlashCardActivity.class);
                 editIntent.putExtra("purpose", "editing");
-                sentCards = retreivedCards.getLessonCards(selectedCourse, lessonStr);
+                editIntent.putExtra("course", courseStr);
+                editIntent.putExtra("lesson", lessonStr);
                 startActivityForResult(editIntent, EDIT_CARDS_CODE);
             }
             return true;
@@ -403,4 +361,14 @@ public class CoursesActivity extends Fragment {
         return true;
     }
 
+    @Override
+    public void update(Observable o, Object arg) {
+        if (o instanceof FlashCardCoordinator) {
+            coursesSet = ((FlashCardCoordinator) o).getCoursesNames();
+        } else {
+            coursesSet = ((NoteCoordinator) o).getCoursesNames();
+        }
+        System.out.println("course is" + coursesSet);
+        activityMain.runOnUiThread(() -> createCoursesView());
+    }
 }

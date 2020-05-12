@@ -36,15 +36,18 @@ package creative.developer.m.studymanager.model.dbFiles;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import creative.developer.m.studymanager.model.EntityListFiles.AssignmentsList;
 import creative.developer.m.studymanager.model.EntityListFiles.FlashCardsList;
 import creative.developer.m.studymanager.model.EntityListFiles.NoteList;
 import creative.developer.m.studymanager.model.EntityListFiles.RemarksList;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
@@ -75,49 +78,72 @@ public class DataRepository {
 
     /////////////////////////////// Assignments
 
-    public AssignmentsList getAssignments(Context context){
-        System.out.println("start assignment");
-        AssignmentsList assignments = new AssignmentsList(context);
-        List<AssignmentsEntity> retrivedData = database.assignmentDao().getAllAssignments();
-        System.out.println("finish assignment");
+    public List<AssignmentEntity> getAssignments(){
+        List<AssignmentEntity> retrivedData = database.assignmentDao().getAllAssignments();
         if (retrivedData != null) {
             System.out.println("retrived = "+retrivedData);
-            assignments.setAssignments(retrivedData);
+            retrivedData = filterOutdated(retrivedData);
         } else {
             System.out.println("retrived is null = "+retrivedData);
-            assignments.setAssignments(new ArrayList<>());
         }
-        return assignments;
+        return retrivedData;
     }
 
-    public AssignmentsEntity getAssignmentByNotifyID(String notifyID) {
+    /*
+    * This method filters out the assignemnts whose deadline has passed.
+    * @param assignments is the assignment list
+    */
+    private List<AssignmentEntity> filterOutdated(List<AssignmentEntity> assignments) {
+        List<AssignmentEntity> filtered = new ArrayList<>();
+        Calendar today = Calendar.getInstance();
+        Calendar assignmentDate = Calendar.getInstance();
+        int i = 0;
+        AssignmentEntity assignment;
+        while (i < assignments.size()) {
+            assignment = assignments.get(i);
+
+            // months starts from 0
+            assignmentDate.set(assignment.getYearNum(), assignment.getMonthNum() - 1,
+                    assignment.getDayNum());
+            if (today.after(assignmentDate)){
+                System.out.println("in if");
+                this.deleteAssignment(assignment);
+                assignments.remove(i);
+            } else {
+                System.out.println("in else");
+                filtered.add(assignment);
+                i++;
+            }
+        }
+        return filtered;
+    }
+
+    public AssignmentEntity getAssignmentByNotifyID(String notifyID) {
         return database.assignmentDao().getAssginmentByNotifyID(notifyID);
     }
 
-    public void addAssignment(AssignmentsEntity added) {
+    public void addAssignment(AssignmentEntity added) {
         database.assignmentDao().InsertAssignments(added);
     }
 
-    public void updateAssignment (AssignmentsEntity updated) {
+    public void updateAssignment (AssignmentEntity updated) {
         database.assignmentDao().updateAssignment(updated);
     }
 
-    public void deleteAssignment (AssignmentsEntity deleted) {
+    public void deleteAssignment (AssignmentEntity deleted) {
         database.assignmentDao().deleteAssignment(deleted);
     }
 
     /////////////////////////// Remark
 
     // get all remarks from the database
-    public RemarksList getRemarks(Context context) {
-        List<RemarkEntity> tempList = database.remarkDao().getAllRemarks();
-        RemarksList finalList = new RemarksList(context);
-        if (! tempList.isEmpty()) {
-            finalList.setRemarksList(tempList);
+    public List<RemarkEntity> getRemarks() {
+        List<RemarkEntity> retrievedList = database.remarkDao().getAllRemarks();
+        if (! retrievedList.isEmpty()) {
+            return  retrievedList;
         } else {
-            finalList.setRemarksList(new ArrayList<>());
+            return new ArrayList<>();
         }
-        return finalList;
     }
 
     public void addRemark(RemarkEntity added) {
@@ -137,15 +163,13 @@ public class DataRepository {
     ///////////////////////// Note
 
     // get all notes from the database
-    public NoteList getNotes(Context context) {
-        List<NoteEntity> tempList = database.noteDao().getAllNotes();
-        NoteList finalList = new NoteList(context);
-        if (! tempList.isEmpty()) {
-            finalList.setNotesList(tempList);
+    public List<NoteEntity> getNotes(Context context) {
+        List<NoteEntity> resultList = database.noteDao().getAllNotes();
+        if (! resultList.isEmpty()) {
+            return resultList;
         } else {
-            finalList.setNotesList(new ArrayList<>());
+            return new ArrayList<>();
         }
-        return finalList;
     }
 
     public void addNote(NoteEntity added) {
@@ -163,22 +187,27 @@ public class DataRepository {
     //////////////////// FlashCards
 
     // get all flash cards from the database
-    public FlashCardsList getCards(Context context) {
-        List<FlashCardEntity> tempList = database.flashCardsDao().getAllCards();
-        FlashCardsList finalList = new FlashCardsList(context);
-        if (! tempList.isEmpty()) {
-            finalList.setList(tempList);
+    public List<FlashCardEntity> getCards() {
+        List<FlashCardEntity> resultList = database.flashCardsDao().getAllCards();
+        if (! resultList.isEmpty()) {
+            return resultList;
         } else {
-            finalList.setList(new ArrayList<>());
+             return new ArrayList<>();
         }
-        return finalList;
     }
 
 
     public void addCards(FlashCardEntity... added) {
+        database.lessonDao().insertLesson(new LessonEntity(added[0].getLesson()));
         for (FlashCardEntity card : added) {
-            database.lessonDao().insertLesson(new LessonEntity(card.getLesson()));
             database.flashCardsDao().insertCards(card);
+        }
+    }
+
+    public void updateCards(FlashCardEntity... updated) {
+        database.lessonDao().insertLesson(new LessonEntity(updated[0].getLesson()));
+        for (FlashCardEntity card : updated) {
+            database.flashCardsDao().updateCards(card);
         }
     }
 

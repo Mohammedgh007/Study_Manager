@@ -28,9 +28,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.FlashCardCoordinator;
 
 public class FlashCardsActivity extends AppCompatActivity {
 
@@ -47,7 +49,9 @@ public class FlashCardsActivity extends AppCompatActivity {
     private final int EDIT_CODE = 42; // used for startActivityForResult()
     private int currCardIndex = 0; // the index of the card
     private boolean isQuestion = true; // it is true when the card is showing the question side.
-    static FlashCardEntity[] recievedCards;
+    private List<FlashCardEntity> recievedCards;
+    private String courseName;
+    private String lessonName;
 
 
     @Override
@@ -65,9 +69,13 @@ public class FlashCardsActivity extends AppCompatActivity {
         finishBtn = findViewById(R.id.finish_flash_cards);
         restartBtn = findViewById(R.id.restart_flash_card);
 
-        // recieving cards from another CoursesActivity
-        recievedCards = CoursesActivity.getSentCards();
-        Collections.shuffle(Arrays.asList(recievedCards)); // to shuffle cards
+        // accessing the model to get the cards
+        Intent recvIntent = this.getIntent();
+        courseName = recvIntent.getStringExtra("course");
+        lessonName = recvIntent.getStringExtra("lesson");
+        FlashCardCoordinator model = FlashCardCoordinator.getInstance(this);
+        recievedCards = model.getLessonCards(courseName, lessonName);
+        Collections.shuffle(recievedCards); // to shuffle cards
 
 
         // filling cardTV with the text of the first question.
@@ -79,7 +87,7 @@ public class FlashCardsActivity extends AppCompatActivity {
             btn.setClickable(false);
 
             // determining the next card number if current is not the last.
-            if (currCardIndex + 1 != recievedCards.length) {
+            if (currCardIndex + 1 != recievedCards.size()) {
                 currCardIndex++;
             } else {
                 Toast.makeText(getBaseContext(), "This is the last card; you can press restart"
@@ -116,9 +124,9 @@ public class FlashCardsActivity extends AppCompatActivity {
                 backgroundCard.setBackgroundResource(R.color.card_answer);
 
                 // creating the shown text
-                String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.length
+                String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.size()
                         + "\n\n";
-                showedText += recievedCards[currCardIndex].getAnswer();
+                showedText += recievedCards.get(currCardIndex).getAnswer();
                 cardTV.setText(showedText);
                 isQuestion = false;
             } else {
@@ -149,6 +157,8 @@ public class FlashCardsActivity extends AppCompatActivity {
             Intent editIntent = new Intent(FlashCardsActivity.this,
                     AddFlashCardActivity.class);
             editIntent.putExtra("purpose", "editing");
+            editIntent.putExtra("course", recvIntent.getStringExtra("course"));
+            editIntent.putExtra("lesson", recvIntent.getStringExtra("lesson"));
             startActivityForResult(editIntent, EDIT_CODE);
 
             btn.setClickable(true);
@@ -184,9 +194,9 @@ public class FlashCardsActivity extends AppCompatActivity {
         backgroundCard.setBackgroundResource(R.color.card_question);
 
         // creating the shown text
-        String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.length
+        String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.size()
                 + "\n\n";
-        showedText += recievedCards[currCardIndex].getQuestion();
+        showedText += recievedCards.get(currCardIndex).getQuestion();
         cardTV.setText(showedText);
 
         isQuestion = true;
@@ -197,8 +207,10 @@ public class FlashCardsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == EDIT_CODE) {
             // saving the change on lesson's flash cards
-            recievedCards = AddFlashCardActivity.getCreatedCards(null);
-            CoursesActivity.updateSentCards(recievedCards, AddFlashCardActivity.getDeletedCards());
+            Toast.makeText(getBaseContext(),
+                    "The flash cards have been modified", Toast.LENGTH_LONG).show();
+            FlashCardCoordinator model = FlashCardCoordinator.getInstance(this);
+            recievedCards = model.getLessonCards(courseName, lessonName);
             // showing the appropriate card
             currCardIndex = 0;
             showQuestion();

@@ -54,7 +54,8 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 
 import creative.developer.m.studymanager.R;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
 import creative.developer.m.studymanager.view.AlarmManagement;
 
 public class AddAssignmentActivity extends Activity implements
@@ -67,7 +68,7 @@ public class AddAssignmentActivity extends Activity implements
     private int selectedDay;
     private int selectedHour;
     private int selectedMinute;
-    AssignmentsEntity editedAssignment;
+    AssignmentEntity editedAssignment;
     // views
     private EditText editTextCourse;
     private Spinner spinnerNotifyTime;
@@ -89,6 +90,9 @@ public class AddAssignmentActivity extends Activity implements
         addBtn = findViewById(R.id.add_addassignment);
         cancelBtn = findViewById(R.id.cancel_addassignment);
 
+        // initialize the model
+        AssignmentCoordinator model = AssignmentCoordinator.getInstance(this);
+
         // if this activity is opened to edit existing assignment, then it will pre-fill
         // all the inputs
         Intent intent = getIntent();
@@ -96,7 +100,7 @@ public class AddAssignmentActivity extends Activity implements
             // getting the object from the intent
             String gsonAssignmentOld = intent.getStringExtra("assignmentObj");
             Gson gson = new Gson();
-            editedAssignment = gson.fromJson(gsonAssignmentOld, AssignmentsEntity.class);
+            editedAssignment = gson.fromJson(gsonAssignmentOld, AssignmentEntity.class);
 
             // setting variables of time and date
             selectedDay = editedAssignment.getDayNum();
@@ -138,29 +142,35 @@ public class AddAssignmentActivity extends Activity implements
                 // check first that the user has entered inputs
                 int notifyID = (intent.getExtras().get("porpuse").equals("editing")) ?
                         Integer.parseInt(editedAssignment.getNotificationID()) : getNotifyId();
+                System.out.println("hour is " + selectedHour);
                 if (isInputsValid()) {
-                    AssignmentsEntity createdAssignment = new AssignmentsEntity(
-                            editTextCourse.getText().toString(),
-                            Integer.toString(notifyID),
-                            spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
-                            editTextDisc.getText().toString(),
-                            (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
-                            getDueStr(selectedHour, ":", selectedMinute));
-                    Gson gosnAssignment = new Gson();
                     Intent intentSendback = new Intent(AddAssignmentActivity.this,
                             AssignmentActivity.class);
-
+                    AssignmentEntity assignment = null;
                     if (intent.getExtras().get("porpuse").equals("editing")) {
-                        String oldAssignmentStr = gosnAssignment.toJson(editedAssignment);
-                        intentSendback.putExtra("outdatedAssignment", oldAssignmentStr); // old version
-                        createdAssignment.setAssignmentID(editedAssignment.getAssignmentID());
-                    }
-                    String assignmentStr = gosnAssignment.toJson(createdAssignment);
-                    intentSendback.putExtra("createdAssignment", assignmentStr);
-                    createNotification(createdAssignment);
-                    setResult(RESULT_OK, intentSendback);
-                    finish();
+                        assignment = model.updateAssignment(editedAssignment, editTextCourse.getText().toString(),
+                                Integer.toString(notifyID),
+                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
+                                editTextDisc.getText().toString(),
+                                (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
+                                getDueStr(selectedHour, ":", selectedMinute));
 
+                    } else {
+                        assignment = model.addAssingment(
+                                editTextCourse.getText().toString(),
+                                Integer.toString(notifyID),
+                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
+                                editTextDisc.getText().toString(),
+                                (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
+                                getDueStr(selectedHour, ":", selectedMinute)
+                        );
+                    }
+                    setResult(RESULT_OK, intentSendback);
+                    //if the user wants to be notified
+                    if (!spinnerNotifyTime.getSelectedItem().toString().contains("N")) {
+                        createNotification(assignment);
+                    }
+                    finish();
                 }
             }
         });
@@ -355,9 +365,9 @@ public class AddAssignmentActivity extends Activity implements
 
     /*
     it setups the notification for the assignment
-    @param: assignment is the object that the notification is created/edited for.
+    @param: assignment is the assignment that the notification is created for.
      */
-    private void createNotification(AssignmentsEntity assignment) {
+    private void createNotification(AssignmentEntity assignment) {
         AlarmManagement alarm = new AlarmManagement(assignment);
         alarm.setAlarm(this);
     }

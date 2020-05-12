@@ -4,14 +4,15 @@ Author: Mohammed Alghamdi
 Class name : FlashCardsList
 purpose: This is a model class that handles storing cards objects.
 Methods:
-    setList(recievedCards) -> assign the value of cardsList then assign the value
-    of cardsMap, which will be used to manage cards' obejcts, based on it.
-    getInstance(): return the instance of the class.
-    addLesson(addedCards) -> it adds a group of cards' objects to cardsMap.
-    removeLesson(course, lesson) -> it removes a lesson's cards' objects.
+    addCard(addedCards) -> it adds a card object to cardsMap.
+    removeCard(removed) -> it removes the given card.
+    removeLesson(course, lesson) -> It removes all the cards associated with the given course and
+        lesson.
+    updatedCard(updated) -> It updates the given card on cardsMap.
     containLesson(course, lesson) -> it returns true if the lesson exist.
-    getCoursesSet() -> it returns strings that are courses' names.
     getCourseLessons(course) -> it returns string of the course.
+    getLessonCards(course, lesson) -> it returns the card objects of the given course and lesson.
+    getLastID() -> It's getter for the field lastID
 ###############################################################################
  */
 
@@ -31,27 +32,14 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEnti
 
 public class FlashCardsList {
 
-    private List<FlashCardEntity> cardsList; // used temporarily to store the incoming data from db.
     // used to manage cards. It stores as Map<courseStr, Map<LessonStr, List<FlashCardEntity> > >
     private HashMap<String, TreeMap<String, List<FlashCardEntity>>> cardsMap;
-    private Context context;
-    private DataRepository repository; // used to access database
-    private static FlashCardsList instance; // to avoid sending heavy object between activities
+    private int lastID;
 
 
-    public FlashCardsList(Context context) {
-        this.cardsList = null;
-        this.context = context;
-    }
-
-    public static FlashCardsList getInstance() {return instance;}
-
-    public void setList(List<FlashCardEntity> recievedCards) {
-        cardsList = recievedCards;
-
-        // building the map for managing the flash cards entities
+    public FlashCardsList(List<FlashCardEntity> receivedCards) {
         cardsMap = new HashMap<>();
-        for (FlashCardEntity card : cardsList) {
+        for (FlashCardEntity card : receivedCards) {
             // checking existing of the course the outter map
             if (!cardsMap.containsKey(card.getCourse())) {
                 cardsMap.put(card.getCourse(), new TreeMap<>());
@@ -62,24 +50,88 @@ public class FlashCardsList {
             }
             // adding the object
             cardsMap.get(card.getCourse()).get(card.getLesson()).add(card);
+
+            lastID = Math.max(lastID, card.getCardID());
         }
-        instance = this;
     }
 
-    public void addLesson(List<FlashCardEntity> addedCards) {
-        String course = addedCards.get(0).getCourse();
-        String lesson = addedCards.get(0).getLesson();
-        System.out.println("lesson in list" + lesson);
+    // this is a getter for the field lastID
+    public int getLastID() {return lastID;}
+
+    /*
+    * It adds a card to cardsMap
+    * @param added is the card that will be added.
+    */
+    public void addCard(FlashCardEntity added) {
+        String course = added.getCourse();
+        String lesson = added.getLesson();
         if (!cardsMap.containsKey(course)) {
             cardsMap.put(course, new TreeMap<>());
         }
-        cardsMap.get(course).put(lesson, addedCards);
+        if (!cardsMap.get(course).containsKey(lesson)) {
+            cardsMap.get(course).put(lesson, new ArrayList<>());
+        }
+        cardsMap.get(course).get(lesson).add(added);
     }
 
-    public void removeLesson(String course, String lesson) {
-        cardsMap.get(course).remove(lesson);
+    /*
+    * It removes all the flash card from cardsMap.
+    * @param course is the course's name.
+    * @param lesson is the lesson's name.
+    */
+    public void removecard(FlashCardEntity removed) {
+        String course = removed.getCourse();
+        String lesson = removed.getLesson();
+        int i = 0;
+        for (FlashCardEntity card : cardsMap.get(course).get(lesson)) {
+            if (card.getCardID() == removed.getCardID()) {
+                break;
+            }
+            i++;
+        }
+        cardsMap.get(course).get(lesson).remove(i);
     }
 
+    /*
+    * It removes all the cards associated with the given lesson from cardsMap.
+    * @param course is the course's name.
+    * @param lesson is the lesson's name.
+    * @return the removed cards.
+    */
+    public List<FlashCardEntity> removeLesson(String course, String lesson) {
+        return cardsMap.get(course).remove(lesson);
+    }
+
+
+    /*
+    * It updates the lesson's card on cardsMap
+    * @param updatedCards are the cards' objects after modification.
+    * @pre-condition the method assume the default value ""
+    */
+    public void updateLesson(List<FlashCardEntity> updatedCards) {
+        String course = updatedCards.get(0).getCourse();
+        String lesson = updatedCards.get(0).getLesson();
+        // removing the old version
+        if (cardsMap.get(course) == null) {
+            cardsMap.remove("");
+        } else if (cardsMap.get(course).get(lesson) == null ) {
+            cardsMap.get(course).remove("");
+        } else {
+            cardsMap.get(course).remove(lesson);
+        }
+
+        // adding the updated version.
+        for (FlashCardEntity card : updatedCards) {
+            addCard(card);
+        }
+    }
+
+
+    /*
+    * It returns true if the lesson exist for the given course.
+    * @param course is the course's name.
+    * @param lesson is the lesson's name.
+    */
     public boolean containLesson(String course, String lesson) {
         if (cardsMap.containsKey(course)) {
             return cardsMap.get(course).containsKey(lesson);
@@ -87,20 +139,21 @@ public class FlashCardsList {
         return false;
     }
 
-    public Set<String> getCoursesSet() {
-        return cardsMap.keySet();
+
+    /*
+    * It returns the card objects of the given lesson and course.
+    * @param course is the course's name.
+    * @param lesson is the lesson's name.
+    */
+    public List<FlashCardEntity> getLessonCards (String course, String lesson) {
+        return cardsMap.get(course).get(lesson);
     }
 
-    public FlashCardEntity[] getLessonCards (String course, String lesson) {
-        FlashCardEntity[] cards = new FlashCardEntity[cardsMap.get(course).get(lesson).size()];
-        int i = 0;
-        for (FlashCardEntity card : cardsMap.get(course).get(lesson)) {
-            cards[i] = card;
-            i++;
-        }
-        return cards;
-    }
 
+    /*
+    * It returns the lessons' names of the given course.
+    * @param course is the course's name.
+    */
     public List<String> getCourseLessons (String course) {
         List<String> lessons = new ArrayList<>();
         if (cardsMap.get(course) != null) {

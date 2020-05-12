@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.NoteCoordinator;
 
 public class NotesActivity extends Activity {
 
@@ -45,10 +46,11 @@ public class NotesActivity extends Activity {
         closeNoSaveBtn = findViewById(R.id.close_notsave_note);
 
 
-        // filling text views and edit text from the sent intent after initializing NoteEntity's obj
+        // filling text views and edit text.
         Intent received = this.getIntent();
-        Gson gson = new Gson();
-        lessonNoteObj = gson.fromJson(received.getExtras().getString("lessonNote"), NoteEntity.class);
+        NoteCoordinator model = NoteCoordinator.getInstance(this);
+        lessonNoteObj = model.getLessonNote(received.getStringExtra("course"),
+                received.getStringExtra("lesson"));
         courseTV.setText(lessonNoteObj.getCourse());
         lessonTV.setText(lessonNoteObj.getLesson());
         noteET.setText(lessonNoteObj.getNotes());
@@ -69,8 +71,7 @@ public class NotesActivity extends Activity {
             Intent sent = new Intent(NotesActivity.this, CoursesActivity.class);
             setResult(Activity.RESULT_OK, sent); // to enable saving the editing
             lessonNoteObj.setNotes(noteET.getText().toString());
-            String updatedLessonJson = gson.toJson(lessonNoteObj);
-            sent.putExtra("updatedNote", updatedLessonJson);
+            model.updateNote(lessonNoteObj);
             finish();
         });
 

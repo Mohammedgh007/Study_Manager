@@ -42,6 +42,7 @@ import java.util.Locale;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.RemarkCoordinator;
 
 public class AddRemarkActivity extends Activity implements
         DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
@@ -61,10 +62,14 @@ public class AddRemarkActivity extends Activity implements
     private Button addBtn;
     private Button cancelBtn;
 
+    // It's used to access the model
+    private RemarkCoordinator model;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_remark);
+        model = RemarkCoordinator.getInstance(this);
 
         // initialize views
         editTextTitle = findViewById(R.id.title_addremark);
@@ -122,22 +127,22 @@ public class AddRemarkActivity extends Activity implements
             public void onClick(View v) {
                 // check first that the user has entered inputs
                 if (isInputsValid()) {
-                    RemarkEntity createdRemark = new RemarkEntity(
-                            editTextTitle.getText().toString(),
-                            editTextDisc.getText().toString(),
-                            getdateTimeStr(selectedHour, ":", selectedMinute),
-                            (selectedYear + ":" + getdateTimeStr(selectedMonth, ";", selectedDay)));
-                    Gson gosnRemark = new Gson();
+                    if (intent.getExtras().get("porpuse").equals("editing")) {
+                        editedRemark.setTitle(editTextTitle.getText().toString());
+                        editedRemark.setDisc(editTextDisc.getText().toString());
+                        editedRemark.setTime(getdateTimeStr(selectedHour, ":", selectedMinute));
+                        editedRemark.setDate((selectedYear + ":" + getdateTimeStr(selectedMonth, ";", selectedDay)));
+                        model.updateRemark(editedRemark);
+                    } else {
+                        model.addRemark(
+                                editTextTitle.getText().toString(),
+                                editTextDisc.getText().toString(),
+                                getdateTimeStr(selectedHour, ":", selectedMinute),
+                                (selectedYear + ":" + getdateTimeStr(selectedMonth, ";", selectedDay))
+                        );
+                    }
                     Intent intentSendback = new Intent(AddRemarkActivity.this,
                             RemarksActivity.class);
-
-                    if (intent.getExtras().get("porpuse").equals("editing")) {
-                        String oldRemarkStr = gosnRemark.toJson(editedRemark);
-                        intentSendback.putExtra("outdatedRemark", oldRemarkStr); // old version
-                        createdRemark.setRemarkID(editedRemark.getRemarkID());
-                    }
-                    String remarkStr = gosnRemark.toJson(createdRemark);
-                    intentSendback.putExtra("createdRemark", remarkStr);
                     setResult(RESULT_OK, intentSendback);
                     finish();
 

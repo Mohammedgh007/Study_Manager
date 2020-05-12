@@ -33,21 +33,19 @@ import java.util.concurrent.Executors;
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
 
 public class AlarmManagement {
 
     private String notifyID;
-    private Calendar dateTime;
+    private Calendar dateTime; // the time and date of the notification.
 
     /*
     it creates an instance that has a special id for the notification with its time of notifying.
-    @param: notifyID is the the unique identifier for the notification.
-    @param: dateTime stores the date and the time of the notification.
-    @param: title is the tile of the notification shown to the user.
-    @param: disc is the discribtion of the notification shown to the user.
+    @param: assignment is the object for that needs to utilize notification service.
     */
-    public AlarmManagement(AssignmentsEntity assignment) {
+    public AlarmManagement(AssignmentEntity assignment) {
         this.notifyID = assignment.getNotificationID();
         this.dateTime = getNotifyTime(assignment);
     }
@@ -67,14 +65,16 @@ public class AlarmManagement {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, Integer.valueOf(notifyID),
                 alarmIntent, 0);
         AlarmManager alaramManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        System.out.println("the dateTime is " + dateTime);
         alaramManager.set(AlarmManager.RTC_WAKEUP, dateTime.getTimeInMillis(), pendingIntent);
+        System.out.println("in set");
     }
 
     /*
     this method determines the notification time based on the AssignmentEntity field.
     @param assignment is the AssignmentEntity
     */
-    private static Calendar getNotifyTime(AssignmentsEntity assignment) {
+    private static Calendar getNotifyTime(AssignmentEntity assignment) {
         Calendar cal = Calendar.getInstance();
         // month - 1 because months start from zero at Calendar.
         cal.set(assignment.getYearNum(), assignment.getMonthNum() - 1, assignment.getDayNum(),
@@ -104,6 +104,7 @@ public class AlarmManagement {
         */
         @Override
         public void onReceive(Context context, Intent intent) {
+            System.out.println("in receiver");
             if (intent.getAction() != null &&
                     intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
                 // on device boot completed, reset the alarm
@@ -133,12 +134,12 @@ public class AlarmManagement {
         private void handleReceiveNormal(Context context, Intent intent) {
             // getting the assignment that correspondence to the  notification.
             String notifyID = intent.getStringExtra("notifyID");
-            DataRepository repository = DataRepository.getInstance(
-                    AppDatabase.getInstance(context));
-            AssignmentsEntity notifyAss = repository.getAssignmentByNotifyID(notifyID);
-
+            AssignmentCoordinator model = AssignmentCoordinator.getInstance(context);
+            AssignmentEntity notifyAss = model.getAssignmentbyNotifyID(notifyID);
+            System.out.println("in receive");
             // checking if the user has deleted the assignment or not
             if (notifyAss == null) {
+                System.out.println("in null");
                 return;
             }
 
@@ -151,11 +152,13 @@ public class AlarmManagement {
                     notifyTime.get(Calendar.HOUR_OF_DAY) != currTime.get(Calendar.HOUR_OF_DAY) &&
                     notifyTime.get(Calendar.MINUTE) != currTime.get(Calendar.MINUTE) &&
                     notifyTime.get(Calendar.YEAR) != currTime.get(Calendar.YEAR)) {
+                System.out.println("in if");
                 return;
             }
 
             // making sure that the notification is done for unchecked assignment.
             if (notifyAss.getIsMarked()) {
+                System.out.println("is market");
                 return;
             }
 

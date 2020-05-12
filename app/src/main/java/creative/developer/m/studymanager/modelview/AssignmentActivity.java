@@ -7,7 +7,7 @@ purpose: This is model view class that is responsible for assignment fragment
 Methods:
   onCreateView() -> It encapsulates/manages all the interaction.
   onActivityResult() -> It receives the intent from AddAssignmentActivity that
-     holds the data of the added assignment.
+     tell weather the user has edited/added or not.
   createAssignemntsView() -> It creates the view that show all assignments.
   getViewedTime() -> It returns the string that is used to output the time to the user.
   getDueDateStrView(year, mont, day) -> it returns the string that will outputted on the peach
@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -37,10 +38,15 @@ import androidx.fragment.app.Fragment;
 import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -48,16 +54,16 @@ import creative.developer.m.studymanager.model.EntityListFiles.AssignmentsList;
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentsEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
+import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AssignmentActivity extends Fragment {
+public class AssignmentActivity extends Fragment implements Observer {
 
-    private DataRepository repository; // used to access database
+    private AssignmentCoordinator model;
     private final int ADDING_CODE = 55; // used as requestCode for startActivityForResult()
     private final int EDITING_CODE = 66; // used as requestCode for startActivityForResult()
-    private AssignmentsList retreivedAssignemnts; // the retrieved assignments stored in the phone
     boolean isEditing = false; // true when the user click on edit button
     // declaring views; the first two map depends on assignmentId as a key while the third dueDate
     private LinearLayout assignmentsLayout; // Layout that's holds all added assignments
@@ -84,19 +90,18 @@ public class AssignmentActivity extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                             Bundle savedInstanceState) {
-        // Accessing database to retrieve the data then show it in the view.
-        repository = DataRepository.getInstance(
-                AppDatabase.getInstance(activityMain.getBaseContext()));
-        Executor dbThread = Executors.newSingleThreadExecutor();
-        dbThread.execute(() -> {
-            retreivedAssignemnts = repository.getAssignments(activityMain.getBaseContext());
-            activityMain.runOnUiThread(() -> createAssignemntsView(retreivedAssignemnts));
-        });
-
         // initializing views
         View root = inflater.inflate(R.layout.assignment, container, false);
         assignmentsLayout = root.findViewById(R.id.assignemt_layout);
         addBtn = root.findViewById(R.id.add_assignment);
+
+        // Accessing database to retrieve the data then show it in the view.
+        model = AssignmentCoordinator.getInstance(activityMain.getBaseContext());
+        model.addObserver(this);
+        if (model.getAssignments() != null) {
+            // to avoid race condition; it will be called on update() otherwise.
+            createAssignemntsView(model.getAssignments());
+        }
 
 
         // taking user to AddAssignmentActivity to input details of an added assignment.
@@ -119,51 +124,20 @@ public class AssignmentActivity extends Fragment {
     }
 
 
-    // this method receives intent from AddAssignmentActivity that store details of an added
-    // assignemnt.
+    // this method receives intent from AddAssignmentActivity that store details of weather the user
+    // have added/edited or not.
     @Override
     public void onActivityResult (int requestCode, int resultCode, Intent data) {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
-            // creating object for the added assignment
-            String recievedAssignmentStr = data.getExtras().getString("createdAssignment");
-            Gson gson = new Gson();
-            AssignmentsEntity addedAssignment = gson.fromJson(recievedAssignmentStr,
-                    AssignmentsEntity.class);
-
-            // adding the assignment to the database
-            Executor insertingEx = Executors.newSingleThreadExecutor();
-            insertingEx.execute(() -> {
-                repository.addAssignment(addedAssignment);
-                // reopen this fragment
-                this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new AssignmentActivity()).commit();
-            });
-
+            // telling the user that the assignment has been added
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The assignment has been added", Toast.LENGTH_LONG).show();
+            createAssignemntsView(model.getAssignments());
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
-            // updating the textview's info of the edited assignment
-            Gson gson = new Gson();
-            String updatedAssignmentStr = data.getExtras().getString("createdAssignment");
-            AssignmentsEntity updatedAssignment = gson.fromJson(updatedAssignmentStr,
-                    AssignmentsEntity.class);
-            String oldAssignmentStr = data.getExtras().getString("outdatedAssignment");
-            AssignmentsEntity oldAssignment = gson.fromJson(oldAssignmentStr, AssignmentsEntity.class);
-
-            String course = updatedAssignment.getCourse();
-            String disc = updatedAssignment.getDisc();
-
-            String info = course + "\n";
-            info += "Due time: " + getViewedTime(updatedAssignment.getHourNum(),
-                    updatedAssignment.getMinuteNum()) + "\n";
-            info += "description: " + disc;
-            ((TextView)((LinearLayout) oneAssignmentLayouts.get(oldAssignment.getAssignmentID())
-                    .getChildAt(0)).getChildAt(0)).setText(info);
-
-            // updating assignments list's reference
-            retreivedAssignemnts.updateAsssignment(oldAssignment, updatedAssignment);
-
-            // update it the database
-            Executor databaseThread = Executors.newSingleThreadExecutor();
-            databaseThread.execute(() -> repository.updateAssignment(updatedAssignment));
+            // telling the user that the assignment has been edited
+            Toast.makeText(activityMain.getBaseContext(),
+                    "The assignment has been edited", Toast.LENGTH_LONG).show();
+            createAssignemntsView(model.getAssignments());
         }
     }
 
@@ -172,7 +146,7 @@ public class AssignmentActivity extends Fragment {
     This function create the view for assignments
     @PARAM: assignments is an object that contains all retrieved assignment from the database.
      */
-    private void createAssignemntsView (AssignmentsList assignments) {
+    private void createAssignemntsView (TreeMap<String, ArrayList<AssignmentEntity>> assignments) {
         TextView assignmentIfno;
         String info;
         Button markedBtn;
@@ -186,6 +160,8 @@ public class AssignmentActivity extends Fragment {
         oneAssignmentLayouts = new HashMap<>();
         buttonsLayouts = new HashMap<>();
         dueDateViews = new HashMap<>();
+
+        assignmentsLayout.removeAllViews(); // clearing the layout from previous use.
 
         // this is used for the layout of text view
         LinearLayout.LayoutParams layoutParamsInfo = new LinearLayout.LayoutParams(
@@ -210,7 +186,7 @@ public class AssignmentActivity extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT);
         layoutParamsAssignment.setLayoutDirection(LinearLayout.HORIZONTAL);
         layoutParamsAssignment.setMargins(20, 20, 20, 0);
-        for (List<AssignmentsEntity> dayList: assignments.getAssignments().values()) {
+        for (List<AssignmentEntity> dayList: assignments.values()) {
             // creating textview that shows the due day date
             dueDateSingleView = new TextView(activityMain.getBaseContext());
             assignmentsLayout.addView(dueDateSingleView);
@@ -222,7 +198,7 @@ public class AssignmentActivity extends Fragment {
             dueDateSingleView.setText(getDueDateStrView(dayList.get(0).getYearNum(),
                     dayList.get(0).getMonthNum(), dayList.get(0).getDayNum()));
 
-            for (AssignmentsEntity assignment : dayList) {
+            for (AssignmentEntity assignment : dayList) {
                 // setting text
                 info = assignment.getCourse() + "\n";
                 info += "Due time: " + getViewedTime(assignment.getHourNum(),
@@ -266,8 +242,9 @@ public class AssignmentActivity extends Fragment {
                     btn.setClickable(false);
                     Executor btnExecutor = Executors.newSingleThreadExecutor();
                     btnExecutor.execute(() -> {
+                        AssignmentEntity outdated = assignment;
                         assignment.setIsMarked(!assignment.getIsMarked());
-                        repository.updateAssignment(assignment);
+                        model.updateAssignment(outdated, assignment);
                     });
                     if (btn.getBackground().getConstantState() == getResources().
                             getDrawable(R.drawable.check_mark_icon).getConstantState()) {
@@ -360,9 +337,9 @@ public class AssignmentActivity extends Fragment {
             LinearLayout.LayoutParams layoutParamsBtn = new LinearLayout.LayoutParams(
                     (int) getResources().getDimension(R.dimen.size_edit_btn) ,// for buttons
                     (int) getResources().getDimension(R.dimen.size_edit_btn));
-            for (List<AssignmentsEntity> assignmentList :
-                    retreivedAssignemnts.getAssignments().values()) {
-                for (AssignmentsEntity assignment : assignmentList) {
+            for (List<AssignmentEntity> assignmentList :
+                    model.getAssignments().values()) {
+                for (AssignmentEntity assignment : assignmentList) {
                     // setting change button; on the left
                     layoutParamsBtn.leftMargin = 0;
                     changeBtn = new Button(activityMain.getBaseContext());
@@ -386,9 +363,7 @@ public class AssignmentActivity extends Fragment {
                     deleteBtn.setOnClickListener((deletingBtn) -> {
                         assignmentsLayout.removeView(oneAssignmentLayouts.
                                 get(assignment.getAssignmentID()));
-                        Executor deletionThread = Executors.newSingleThreadExecutor();
-                        deletionThread.execute(() -> repository.deleteAssignment(assignment));
-                        retreivedAssignemnts.removeAssignment(assignment);
+                        model.removeAssingment(assignment);
                     });
 
                     // setting the layout by replacing check button with change and delete
@@ -408,8 +383,13 @@ public class AssignmentActivity extends Fragment {
 
             // recreating assignments view so that they are sorted
             assignmentsLayout.removeAllViews();
-            createAssignemntsView(retreivedAssignemnts);
+            createAssignemntsView(model.getAssignments());
         }
 
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        activityMain.runOnUiThread(() ->createAssignemntsView(model.getAssignments()));
     }
 }

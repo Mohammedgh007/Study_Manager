@@ -20,14 +20,15 @@ import androidx.room.PrimaryKey;
 public class FlashCardEntity {
 
     // fields as a obj or columns on the database
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     private int cardID;
     private String course;
     private String lesson;
     private String question;
     private String answer;
 
-    public FlashCardEntity(String course, String lesson, String question, String answer) {
+    public FlashCardEntity(int cardID, String course, String lesson, String question, String answer) {
+        this.cardID = cardID;
         this.course = course;
         this.lesson = lesson;
         this.question = question;

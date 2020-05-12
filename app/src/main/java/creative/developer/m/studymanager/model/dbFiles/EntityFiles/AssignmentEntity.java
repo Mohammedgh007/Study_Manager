@@ -23,26 +23,28 @@ import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity
-public class AssignmentsEntity implements Comparable {
+@Entity(indices = {@Index(value = "notificationID", unique = true)})
+public class AssignmentEntity implements Comparable {
 
 
     // fields as a obj or columns on the database
-    @PrimaryKey (autoGenerate = true)
+    @PrimaryKey
     private int assignmentID;
     private String course;
     private String notificationID;
-    private String notificationTime; // # d/h ; d for day and h for hour
+    private String notificationTime; // num d OR num h ; d for day and h for hour
     private String disc;
     private String dueTime; // hh:mm like 14:20
     private String dueDate; // yyyy:mm;dd I used : with ; to facilitate using substring.
     private boolean isMarked;
 
 
-    public AssignmentsEntity(String course, String notificationID, String notificationTime,
+    public AssignmentEntity(int assignmentID, String course, String notificationID, String notificationTime,
                              String disc, String dueDate, String dueTime) {
+        this.assignmentID = assignmentID;
         this.course = course;
         this.notificationID = notificationID;
         this.notificationTime = notificationTime;
@@ -166,7 +168,7 @@ public class AssignmentsEntity implements Comparable {
 
     @Override // the sooner in terms of time, regardless of date, is smaller.
     public int compareTo(Object o) {
-        AssignmentsEntity compared = (AssignmentsEntity) o;
+        AssignmentEntity compared = (AssignmentEntity) o;
         return Integer.compare(this.getTimeVal(), compared.getTimeVal());
     }
 }
