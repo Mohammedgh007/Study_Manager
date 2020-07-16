@@ -259,14 +259,8 @@ public class AddRemarkActivity extends Activity implements
             Toast.makeText(getBaseContext(),
                     "Please enter the date and the time field",Toast.LENGTH_SHORT).show();
             return false;
-        } else if (!pickTimeDate.getText().toString().equals(R.string.selectTimeDate)) {
-            if (today.after(inputDate)) {
-                Toast.makeText(getBaseContext(),
-                        "Please enter the date and the time field correctly",Toast.LENGTH_SHORT).
-                        show();
-                return false;
-            }
         }
+
         // checking for the name and the description
         if (editTextTitle.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(),

@@ -9,7 +9,7 @@ Methods:
       DataRepositiory object.
       that will be executed after activities fully retrieve the data from the data base.
     - getAssignments(context) -> retrieve all the assignments from the database.
-    - getAssignmentByNotifyID(notifyID) -> searches and gets an assignment by notifyID.
+    - getAssignmentByID(notifidyID) -> searches and gets an assignment by id.
     - addAssignment(added) -> adds an assignment to the data base.
     - updateAssignment(updated) -> updates an assignment on the data base.
     - deleteAssignment(deleted) -> removes an assignment from the data base.
@@ -27,6 +27,11 @@ Methods:
     - deleteCards(removed) -> removes card/s from the database
     - addCourse(name) -> adds a row to CourseEntity table
     - getCoursesStr() -> returns the set of courses' names from CourseEntity table.
+    - getAllReminders() -> retrieves all reminders from database
+    - getReminder() -> retrieves a particular reminder.
+    - addReminder(added) -> adds added to the database.
+    - updateReminder(updated) -> updates updated on the database.
+    - deleteReminder(removed) -> removes removed from the database.
 ###############################################################################
  */
 
@@ -40,19 +45,14 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-import creative.developer.m.studymanager.model.EntityListFiles.AssignmentsList;
-import creative.developer.m.studymanager.model.EntityListFiles.FlashCardsList;
-import creative.developer.m.studymanager.model.EntityListFiles.NoteList;
-import creative.developer.m.studymanager.model.EntityListFiles.RemarksList;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntity;
 
 public class DataRepository {
 
@@ -118,8 +118,8 @@ public class DataRepository {
         return filtered;
     }
 
-    public AssignmentEntity getAssignmentByNotifyID(String notifyID) {
-        return database.assignmentDao().getAssginmentByNotifyID(notifyID);
+    public AssignmentEntity getAssignmentByID(int id) {
+        return database.assignmentDao().getAssginmentByID(id);
     }
 
     public void addAssignment(AssignmentEntity added) {
@@ -230,6 +230,32 @@ public class DataRepository {
             coursesStr.add(entity.getName());
         }
         return coursesStr;
+    }
+
+
+    ///// Reminders
+    public List<ReminderEntity> getAllReminders() {
+        List<ReminderEntity> retrievedData = database.reminderDao().getAllReminders();
+        if (retrievedData != null)
+            return retrievedData;
+        else
+            return new ArrayList<>();
+    }
+
+    public ReminderEntity getReminder(String reminderID) {
+        return database.reminderDao().getReminderByID(reminderID);
+    }
+
+    public void addReminder(ReminderEntity... added) {
+        database.reminderDao().insertReminders(added);
+    }
+
+    public void updateReminder(ReminderEntity... updated) {
+        database.reminderDao().updateReminders(updated);
+    }
+
+    public void deleteReminder(ReminderEntity... deleted) {
+        database.reminderDao().deleteReminders(deleted);
     }
 
 }

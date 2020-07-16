@@ -22,14 +22,14 @@
         <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Course's name: "
+            android:text="Title: "
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:textStyle="bold"
             android:padding="15dp"/>
 
         <EditText
-            android:id="@+id/name_addassignment"
+            android:id="@+id/title_addreminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -50,18 +50,46 @@
         <TextView
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="notifying time"
             android:layout_marginRight="5dp"
             android:background="@color/peach"
-            android:textStyle="bold"
-            android:padding="15dp"/>
+            android:padding="15dp"
+            android:text="Reminder's repeat"
+            android:textStyle="bold" />
 
         <Spinner
-            android:id="@+id/notify_time_add_assignment"
+            android:id="@+id/repeat_addreminder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/notification_times"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:entries="@array/repeating_options" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:background="@color/peach"
+            android:padding="15dp"
+            android:text="reminder's time"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/time_addreminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Select time" />
 
 
     </LinearLayout>
@@ -81,17 +109,16 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Due at day, hour : "
+            android:text="reminder's day/s"
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/datetime_addassignment"
+            android:id="@+id/days_addreminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="datetime"
-            android:text="@string/selectTimeDate" />
+            android:text="@string/selectDays" />
 
     </LinearLayout>
 
@@ -115,7 +142,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/disc_addassignment"
+            android:id="@+id/disc_addreminder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -134,22 +161,22 @@
         android:layout_marginHorizontal="10dp"
         android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/cancel_addassignment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/orange_button"
-        android:layout_marginRight="5dp"
-        android:text="Cancel"/>
-    <Button
-        android:id="@+id/add_addassignment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:background="@drawable/orange_button"
-        android:layout_marginLeft="5dp"
-        android:text="Add"/>
+        <Button
+            android:id="@+id/cancel_addreminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:layout_marginRight="5dp"
+            android:text="Cancel"/>
+        <Button
+            android:id="@+id/add_addreminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:layout_marginLeft="5dp"
+            android:text="Add"/>
 
     </LinearLayout>
 </android.widget.LinearLayout>

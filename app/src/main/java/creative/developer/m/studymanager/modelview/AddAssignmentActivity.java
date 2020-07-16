@@ -16,7 +16,6 @@ Methods:
      false otherwise.
   isNotificationTimeValid(notifyTimeStr) -> this method checks if the input notification time is
     valid or not by checking if it is in between the current time and the deadline time.
-  getNotifyId() -> this method gets a unique id for notifications.
   createNotification(assignment) -> it setups the notification for the assignment.
 ###############################################################################
  */
@@ -25,15 +24,12 @@ package creative.developer.m.studymanager.modelview;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
@@ -45,30 +41,33 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.prefs.Preferences;
 
 import creative.developer.m.studymanager.R;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
-import creative.developer.m.studymanager.view.AlarmManagement;
+import creative.developer.m.studymanager.view.NotificationManagement;
 
 public class AddAssignmentActivity extends Activity implements
         DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
-    private final int PROMPT_PERMISSION_CODE = 1;
     // variables that store date and time values
     private int selectedYear;
     private int selectedMonth;
     private int selectedDay;
     private int selectedHour;
     private int selectedMinute;
+    // for editing assignment that has been added previously only.
     AssignmentEntity editedAssignment;
+    // for creating the notification onDestroy
+    AssignmentEntity notifyAssignment;
     // views
     private EditText editTextCourse;
     private Spinner spinnerNotifyTime;
@@ -92,6 +91,7 @@ public class AddAssignmentActivity extends Activity implements
 
         // initialize the model
         AssignmentCoordinator model = AssignmentCoordinator.getInstance(this);
+
 
         // if this activity is opened to edit existing assignment, then it will pre-fill
         // all the inputs
@@ -140,35 +140,31 @@ public class AddAssignmentActivity extends Activity implements
             @Override
             public void onClick(View v) {
                 // check first that the user has entered inputs
-                int notifyID = (intent.getExtras().get("porpuse").equals("editing")) ?
-                        Integer.parseInt(editedAssignment.getNotificationID()) : getNotifyId();
                 System.out.println("hour is " + selectedHour);
                 if (isInputsValid()) {
                     Intent intentSendback = new Intent(AddAssignmentActivity.this,
                             AssignmentActivity.class);
-                    AssignmentEntity assignment = null;
                     if (intent.getExtras().get("porpuse").equals("editing")) {
-                        assignment = model.updateAssignment(editedAssignment, editTextCourse.getText().toString(),
-                                Integer.toString(notifyID),
+                        notifyAssignment = model.updateAssignment(editedAssignment, editTextCourse.getText().toString(),
                                 spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
                                 editTextDisc.getText().toString(),
                                 (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
                                 getDueStr(selectedHour, ":", selectedMinute));
 
                     } else {
-                        assignment = model.addAssingment(
+                        notifyAssignment = model.addAssingment(
                                 editTextCourse.getText().toString(),
-                                Integer.toString(notifyID),
                                 spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
                                 editTextDisc.getText().toString(),
                                 (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
                                 getDueStr(selectedHour, ":", selectedMinute)
                         );
                     }
+
+
                     setResult(RESULT_OK, intentSendback);
-                    //if the user wants to be notified
                     if (!spinnerNotifyTime.getSelectedItem().toString().contains("N")) {
-                        createNotification(assignment);
+                        createNotification(notifyAssignment);
                     }
                     finish();
                 }
@@ -216,7 +212,6 @@ public class AddAssignmentActivity extends Activity implements
         selectedHour = hourOfDay;
         selectedMinute = minute;
         // showing user's inputs
-        Calendar cal = Calendar.getInstance();
         // Showing ->    Month day, hour:minute. example, May 5, 13:15
         pickTimeDate.setText(timeAndDateStringView());
     }
@@ -258,12 +253,12 @@ public class AddAssignmentActivity extends Activity implements
     */
     private String getDueStr(int num1, String separator, int num2) {
         String hourMonth, minuteDay; // the first represent hour or month.
-       if (num1 < 10) { // making sure hours or month have to 2 digits as a string
+       if (num1 < 10) { // making sure hours or month have 2 digits as a string
             hourMonth  = "0" + num1;
         } else {
             hourMonth = Integer.toString(num1);
         }
-        if (num2 < 10) { // making sure minutes or days have to 2 digits as a string
+        if (num2 < 10) { // making sure minutes or days have 2 digits as a string
             minuteDay = "0" + num2;
         } else {
             minuteDay = Integer.toString(num2);
@@ -348,28 +343,14 @@ public class AddAssignmentActivity extends Activity implements
 
 
     /*
-    this method gets a unique id for notifications
-     */
-    private int getNotifyId() {
-        SharedPreferences nofiyIdCounterRef = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor notifyIdEditor = nofiyIdCounterRef.edit();
-        if (!nofiyIdCounterRef.contains("notifyIDCounter")) {
-            notifyIdEditor.putInt("notifyIDCounter", 1);
-        }
-        int notifyId = nofiyIdCounterRef.getInt("notifyIDCounter", 0);
-        notifyIdEditor.putInt("notifyIDCounter",
-                nofiyIdCounterRef.getInt("notifyIDCounter", 0) + 1);
-        notifyIdEditor.apply();
-        return notifyId;
-    }
-
-    /*
     it setups the notification for the assignment
     @param: assignment is the assignment that the notification is created for.
      */
     private void createNotification(AssignmentEntity assignment) {
-        AlarmManagement alarm = new AlarmManagement(assignment);
-        alarm.setAlarm(this);
+        NotificationManagement alarm = new NotificationManagement(assignment);
+        alarm.setNotify(this);
     }
+
+
 
 }

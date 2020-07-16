@@ -17,5 +17,8 @@
         <item
             android:id="@+id/nav_flash"
             android:title="Flash Cards" />
+        <item
+            android:id="@+id/nav_reminder"
+            android:title="Weekly Study's Reminders" />
     </group>
 </menu>

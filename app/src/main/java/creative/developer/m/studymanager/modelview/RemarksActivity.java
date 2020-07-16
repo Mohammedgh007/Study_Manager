@@ -195,6 +195,7 @@ public class RemarksActivity extends Fragment implements Observer {
         TextView RemarkIfno;
         String info;
         remarksLayout.removeAllViews(); // clear the previous views.
+        calendarView.clearSelection();
         int lastHeight = 120; // used to leave an empty at the the bottom of the remarks layout
 
         // each remark is in a single layout that is oneRemarkLayout, and it has 2
@@ -228,11 +229,8 @@ public class RemarksActivity extends Fragment implements Observer {
         for (RemarkEntity remark : remarks) {
             // adding a remark only if its date is the same as the user's input
             // otherwise: highlight its date
-            System.out.println("Testing ----- " + remark.getMonthNum() + " " + month);
-            System.out.println("Day " + remark.getDayNum() + " " + day);
             if (remark.getDayNum() == day && remark.getMonthNum() == month &&
             remark.getYearNum() == year) {
-                System.out.println("testing " + remark.getRemarkID());
                 // setting text
                 info = remark.getTitle() + "\n";
                 info += "time: " + getViewedTime(remark.getHourNum(),
@@ -276,6 +274,7 @@ public class RemarksActivity extends Fragment implements Observer {
                     highlightedDates.put(remarkDay, 0);
                 }
                 highlightedDates.put(remarkDay, highlightedDates.get(remarkDay) + 1);
+                calendarView.setDateSelected(remarkDay, true);
             } else {
                 // adding remark's date to the set of highlighted dates
                 CalendarDay remarkDay = CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
@@ -336,14 +335,16 @@ public class RemarksActivity extends Fragment implements Observer {
             Toast.makeText(activityMain.getBaseContext(),
                     "The remark has been added", Toast.LENGTH_LONG).show();
             Calendar cal = Calendar.getInstance();
-            createRemarksView(model.getRemarks(), cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
-                    cal.get(Calendar.DAY_OF_MONTH));
+            selectedDay = cal.get(Calendar.DAY_OF_MONTH);
+            selectedMonth =  cal.get(Calendar.MONTH) + 1;
+            selectedYear = cal.get(Calendar.YEAR);
+            createRemarksView(model.getRemarks(), selectedYear, selectedMonth, selectedDay);
+            updateDateText( cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
                     "The remark has been updated", Toast.LENGTH_LONG).show();
-            // reopen this fragment
-            this.getFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                    new RemarksActivity()).commit();
+            createRemarksView(model.getRemarks(), selectedYear, selectedMonth, selectedDay);
+            updateDateText( selectedMonth, selectedDay);
         }
     }
 
@@ -391,18 +392,15 @@ public class RemarksActivity extends Fragment implements Observer {
                         // removing from the calendar's highlighted dates if that date has one remark
                         CalendarDay remarkDay = CalendarDay.from(remark.getYearNum(), remark.getMonthNum(),
                                 remark.getDayNum());
-                        System.out.println(highlightedDates.get(remarkDay) + "Testing ttt");
                         if (highlightedDates.get(remarkDay) == 1) {
                             highlightedDates.remove(remarkDay);
                             calendarView.setDateSelected(remarkDay, false);
-                            System.out.println(highlightedDates.containsKey(remarkDay) + " Test");
                         } else {
                             highlightedDates.put(remarkDay, highlightedDates.get(remarkDay) - 1);
                         }
                     });
 
                     // setting the layout by replacing check button with change and delete
-                    System.out.println("testing " + remark.getRemarkID());
                     buttonsLayouts.get(remark.getRemarkID()).addView(changeBtn, 0);
                     buttonsLayouts.get(remark.getRemarkID()).addView(deleteBtn, 1);
                 }

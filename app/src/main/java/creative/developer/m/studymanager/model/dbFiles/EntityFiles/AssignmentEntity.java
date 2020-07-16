@@ -26,7 +26,7 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(indices = {@Index(value = "notificationID", unique = true)})
+@Entity
 public class AssignmentEntity implements Comparable {
 
 
@@ -34,7 +34,6 @@ public class AssignmentEntity implements Comparable {
     @PrimaryKey
     private int assignmentID;
     private String course;
-    private String notificationID;
     private String notificationTime; // num d OR num h ; d for day and h for hour
     private String disc;
     private String dueTime; // hh:mm like 14:20
@@ -42,11 +41,10 @@ public class AssignmentEntity implements Comparable {
     private boolean isMarked;
 
 
-    public AssignmentEntity(int assignmentID, String course, String notificationID, String notificationTime,
+    public AssignmentEntity(int assignmentID, String course, String notificationTime,
                              String disc, String dueDate, String dueTime) {
         this.assignmentID = assignmentID;
         this.course = course;
-        this.notificationID = notificationID;
         this.notificationTime = notificationTime;
         this.disc = disc;
         this.dueDate = dueDate;
@@ -61,10 +59,6 @@ public class AssignmentEntity implements Comparable {
 
     public String getCourse (){
         return this.course;
-    }
-
-    public String getNotificationID(){
-        return this.notificationID;
     }
 
     public String getDisc(){
@@ -142,10 +136,6 @@ public class AssignmentEntity implements Comparable {
         this.course = course;
     }
 
-    public void setNotificationID(String notificationID) {
-        this.notificationID = notificationID;
-    }
-
     public void setDisc(String disc) {
         this.disc = disc;
     }
@@ -163,7 +153,7 @@ public class AssignmentEntity implements Comparable {
     }
 
     public void setNotificationTime(String notificationTime) {
-        notificationTime = notificationTime;
+        this.notificationTime = notificationTime;
     }
 
     @Override // the sooner in terms of time, regardless of date, is smaller.

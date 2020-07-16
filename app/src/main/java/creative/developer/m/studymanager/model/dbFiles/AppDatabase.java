@@ -26,20 +26,21 @@ import creative.developer.m.studymanager.model.dbFiles.DaoFiles.FlashCardsDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.LessonDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.NoteDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.RemarkDao;
+import creative.developer.m.studymanager.model.dbFiles.DaoFiles.ReminderDao;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntity;
 
 @Database(entities = {AssignmentEntity.class, RemarkEntity.class, CourseEntity.class,
-        NoteEntity.class, LessonEntity.class, FlashCardEntity.class},
-        version = 6, exportSchema = false)
+        NoteEntity.class, LessonEntity.class, FlashCardEntity.class, ReminderEntity.class},
+        version = 9, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "StudyManagerDB00";
     private static AppDatabase sInstance;
-    private Context context;
 
     public abstract AssignmentDao assignmentDao();
     public abstract RemarkDao remarkDao();
@@ -47,6 +48,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract NoteDao noteDao();
     public abstract LessonDao lessonDao();
     public abstract FlashCardsDao flashCardsDao();
+    public abstract ReminderDao reminderDao();
 
     public static AppDatabase getInstance(Context context) {
         if (sInstance == null) {

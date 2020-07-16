@@ -3,17 +3,31 @@
     <string name="schedulePhotoIdMemory">scheduleId1232223</string>
     <string name="selectTimeDate">Select Date and Time</string>
     <string name="title_activity_main">Study Manager</string>
+    <string name="selectDays"> Select day/s</string>
     <string name="open_navigation_drawer">Open navigation drawer</string>
     <string name="close_navigation_drawer">Close navigation drawer</string>
     <array name="notification_times">
-        <item> 3 hours before the deadline</item>
-        <item> 5 hours before the deadline</item>
-        <item> 7 hours before the deadline</item>
-        <item> 11 hours before the deadline</item>
-        <item> 1 day before the deadline</item>
-        <item> 2 days before the deadline</item>
-        <item> 3 days before the deadline</item>
-        <item> 4 days before the deadline</item>
-        <item> No notification</item>
+        <item>3 hours before the deadline</item>
+        <item>5 hours before the deadline</item>
+        <item>7 hours before the deadline</item>
+        <item>11 hours before the deadline</item>
+        <item>1 day before the deadline</item>
+        <item>2 days before the deadline</item>
+        <item>3 days before the deadline</item>
+        <item>4 days before the deadline</item>
+        <item>No notification</item>
     </array>
+    <array name="repeating_options">
+        <item>Remind me every week</item>
+        <item>Remind me this week only</item>
+    </array>
+    <string name="title_activity_add_reminder">AddReminderActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

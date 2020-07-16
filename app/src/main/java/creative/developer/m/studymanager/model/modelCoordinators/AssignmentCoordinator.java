@@ -9,7 +9,7 @@ Precondition: getAssignmentByID() need to be called within another thread.
 Methods:
     getInstance() -> returns the only instance of this class. This class implements Singleton.
     getAssignments() -> returns the assignments as a tree map that sorts data based datetime.
-    getAssignmentByNotifyID(id) -> returns the assignment based on the given id.
+    getAssignmentByID(id) -> returns the assignment based on the given id.
     addAssignment() -> it adds the assignment to the database and the assignmentsList.
     updateAssignment() -> it updates the assignment on the database and the assignmentsList.
     removeAssignment() -> it remove the assignment from the database and the assignmentsList
@@ -85,27 +85,26 @@ public class AssignmentCoordinator extends Observable {
     }
 
     /*
-    * It returns the assignment based on the given notifyID.
+    * It returns the assignment based on the given ID.
     * @pre-condition: It needs to be called within non-main thread.
     */
-    public AssignmentEntity getAssignmentbyNotifyID(String notifyID) {
-        return repository.getAssignmentByNotifyID(notifyID);
+    public AssignmentEntity getAssignmentbyID(int id) {
+        return repository.getAssignmentByID(id);
     }
 
     /*
     * It creates assignment object then adds it to the database and assignmentList.
     * @param course is the course's name.
-    * @param notificationID is string number that 's used with managing notifications.
     * @param notificationTime has this format "num d" OR "num h" ; d for day and h for hour
     * @param disc is the user's description for the assignment.
     * @param dueDate has the following format yyyy:mm;dd I used : with ; to facilitate using substring.
     * @param dueTime has the following format "hh:mm" like 14:20
     * @return the created object of the assignment.
     */
-    public AssignmentEntity addAssingment(String course, String notificationID, String notificationTime,
+    public AssignmentEntity addAssingment(String course, String notificationTime,
                               String disc, String dueDate, String dueTime) {
         lastId++;
-        AssignmentEntity added = new AssignmentEntity(lastId, course, notificationID,
+        AssignmentEntity added = new AssignmentEntity(lastId, course,
                                                    notificationTime, disc, dueDate, dueTime);
         assignmentsList.add(added);
         Executor executor = Executors.newSingleThreadExecutor();
@@ -130,18 +129,17 @@ public class AssignmentCoordinator extends Observable {
     * It updates the given assignment object with the given fields.
     * @param outdated is the outdated version of the object.
     * @param course is the course's name.
-    * @param notificationID is string number that 's used with managing notifications.
     * @param notificationTime has this format "num d" OR "num h" ; d for day and h for hour.
     * @param disc is the user's description for the assignment.
     * @param dueDate has the following format yyyy:mm;dd I used : with ; to facilitate using substring.
     * @param dueTime has the following format "hh:mm" like 14:20.
     * @return the updated version of the assignment
     */
-    public AssignmentEntity updateAssignment(AssignmentEntity outdated, String course, String notificationID,
+    public AssignmentEntity updateAssignment(AssignmentEntity outdated, String course,
                                  String notificationTime,
                                  String disc, String dueDate, String dueTime) {
         AssignmentEntity updated = new AssignmentEntity(outdated.getAssignmentID(), course,
-                notificationID, notificationTime, disc, dueDate, dueTime);
+                notificationTime, disc, dueDate, dueTime);
         updateAssignment(outdated, updated);
         return  updated;
     }

@@ -12,21 +12,17 @@ Methods:
 
 package creative.developer.m.studymanager.modelview;
 
-import android.app.Activity;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
+
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 
-import android.view.View;
 
 import creative.developer.m.studymanager.R;
 
@@ -35,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     // Notes and Flash Cards depends on the same Fragment to determine the lesson.
     private static String coursesDistination;
-    private static Toolbar tool;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
                     coursesDistination = "flash cards activity";
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new CoursesActivity()).commit();
+                    break;
+                case R.id.nav_reminder:
+                    toolbar.setTitle("Reminders");
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new RemindersActivity()).commit();
                     break;
             }
             drawer.closeDrawer(GravityCompat.START);
