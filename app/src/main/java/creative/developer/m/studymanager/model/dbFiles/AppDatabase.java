@@ -25,6 +25,7 @@ import creative.developer.m.studymanager.model.dbFiles.DaoFiles.CourseDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.FlashCardsDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.LessonDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.NoteDao;
+import creative.developer.m.studymanager.model.dbFiles.DaoFiles.PhotoNoteDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.RemarkDao;
 import creative.developer.m.studymanager.model.dbFiles.DaoFiles.ReminderDao;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
@@ -32,12 +33,14 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.PhotoNoteEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntity;
 
 @Database(entities = {AssignmentEntity.class, RemarkEntity.class, CourseEntity.class,
-        NoteEntity.class, LessonEntity.class, FlashCardEntity.class, ReminderEntity.class},
-        version = 9, exportSchema = false)
+        NoteEntity.class, LessonEntity.class, FlashCardEntity.class, ReminderEntity.class,
+        PhotoNoteEntity.class},
+        version = 10, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "StudyManagerDB00";
     private static AppDatabase sInstance;
@@ -49,6 +52,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract LessonDao lessonDao();
     public abstract FlashCardsDao flashCardsDao();
     public abstract ReminderDao reminderDao();
+    public abstract PhotoNoteDao photoNoteDao();
 
     public static AppDatabase getInstance(Context context) {
         if (sInstance == null) {

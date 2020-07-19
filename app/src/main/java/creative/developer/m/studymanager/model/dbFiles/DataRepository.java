@@ -17,13 +17,18 @@ Methods:
     - addRemark(added) -> adds a remark to the database.
     - updateRemark(updated) -> updates a remark on the database
     - removeRemark(removed) -> removes a remark from the data base.
-    - getNotes(context) -> retrieves all notes from the data base.
-    - addNote(added) -> adds a note to the databse.
+    - getNotes() -> retrieves all notes from the data base.
+    - getPhotos(lastID) -> retrives all the photos' note from the database and returns the last id
+        number used.
+    - addNote(added, photoEntities) -> adds a note to the databse with photoEntities.
+    - addPhotoNote(added) -> It adds the photo note to the table PhotoNoteEntity.
     - removeNote(removed) -> removes a note from the data base.
+    - removePhotoNote(removed) -> It removes the photo note from the table PhotoNoteEntity.
     - updatesNote(updated) -> updates a note on the data base.
     - getCards(context) -> retrieves all the cards from the database.
     - addCard(added) -> adds a card to the database if it is not added yet; otherwise,
       it updates its value.
+    - deletePhotoNote(deleted) -> it deletes a card from the table PhotoNoteCard.
     - deleteCards(removed) -> removes card/s from the database
     - addCourse(name) -> adds a row to CourseEntity table
     - getCoursesStr() -> returns the set of courses' names from CourseEntity table.
@@ -42,6 +47,7 @@ import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +57,7 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.CourseEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.LessonEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
+import creative.developer.m.studymanager.model.dbFiles.EntityFiles.PhotoNoteEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntity;
 
@@ -163,7 +170,7 @@ public class DataRepository {
     ///////////////////////// Note
 
     // get all notes from the database
-    public List<NoteEntity> getNotes(Context context) {
+    public List<NoteEntity> getNotes() {
         List<NoteEntity> resultList = database.noteDao().getAllNotes();
         if (! resultList.isEmpty()) {
             return resultList;
@@ -172,8 +179,37 @@ public class DataRepository {
         }
     }
 
-    public void addNote(NoteEntity added) {
+    // get all photos from the database
+    public HashMap<Integer, List<PhotoNoteEntity>> getPhotos(int[] lastID){
+        List<PhotoNoteEntity> resultList = database.photoNoteDao().getAllPhotos();
+        if (! resultList.isEmpty()) {
+            HashMap<Integer, List<PhotoNoteEntity>> photos = new HashMap<>();
+            for (PhotoNoteEntity photo : resultList) {
+                if (!photos.containsKey(photo.getNoteID())) {
+                    photos.put(photo.getNoteID(), new ArrayList<>());
+                }
+                photos.get(photo.getNoteID()).add(photo);
+                lastID[0] = Math.max(lastID[0], photo.getPhotoID());
+            }
+            return photos;
+        } else {
+            return new HashMap<>();
+        }
+    }
+
+    public void addNote(NoteEntity added, List<PhotoNoteEntity> photoEntities) {
         database.noteDao().addNote(added);
+        for (PhotoNoteEntity photo : photoEntities) {
+            database.photoNoteDao().addPhoto(photo);
+        }
+    }
+
+    public void addPhotoNote(PhotoNoteEntity added) {
+        database.photoNoteDao().addPhoto(added);
+    }
+
+    public void deletePhotoNote (PhotoNoteEntity deleted) {
+        database.photoNoteDao().deletePhoto(deleted);
     }
 
     public void updateNote (NoteEntity updated) {

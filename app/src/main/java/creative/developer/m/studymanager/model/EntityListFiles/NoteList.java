@@ -131,6 +131,8 @@ public class NoteList{
             if (searchedList.get(i).getNoteID() == updated.getNoteID()) {
                 searchedList.set(i, updated);
                 isUpdated = true;
+            } else {
+                i++;
             }
         }
     }

@@ -13,7 +13,7 @@ Application's link at Google Play:  https://play.google.com/store/apps/details?i
 2- The project uses MVVM software archaticture.<br />
 3- This repository represents the first update's version.
 
-# Model files
+# Model files 
 Model classes are on dpFile, which includes class that is related directly to managing the database or managing the 
 retirieved data as object, and EntityListFiles, which includes classes that have the data structures to manage the data 
 that is retreived from the data base.

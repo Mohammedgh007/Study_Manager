@@ -88,8 +88,8 @@ public class HomeActivity extends Fragment {
             // if the user has choose a picture.
             if (imageRef.contains(getString(R.string.schedulePhotoIdMemory))) {
                 String uriStr = imageRef.getString(getString(R.string.schedulePhotoIdMemory), "");
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
+                Intent intent = new Intent(Intent.ACTION_PICK,
+                        MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 intent.setDataAndType(Uri.parse(uriStr), "image/*");
                 startActivity(intent);
             }
@@ -136,7 +136,7 @@ public class HomeActivity extends Fragment {
                 scheduleImg.setImageURI(Uri.parse(uriStr));
             } else { // if it is not granted, then show a message
                 Toast.makeText(getActivity(), "Please allow the app to access the memory, " +
-                        "so that the app can show the selected photo", Toast.LENGTH_LONG).show();
+                        "so that the app can show photos", Toast.LENGTH_LONG).show();
             }
         }
     }
