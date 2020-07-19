@@ -129,12 +129,12 @@ public class NoteCoordinator extends Observable {
     */
     public void addNote(String course, String lesson, String notes, List<String> photosUris) {
         lastIDNotes++;
-        lastIDPhotos++;
         NoteEntity addedNote = new NoteEntity(lastIDNotes, course, lesson, notes);
         notesList.addNote(addedNote);
 
         List<PhotoNoteEntity> photos = new ArrayList<>();
         for(String url: photosUris) {
+            lastIDPhotos++;
             photos.add(new PhotoNoteEntity(lastIDPhotos, url, lastIDNotes));
         }
         notePhotos.put(lastIDNotes, new ArrayList<>());
