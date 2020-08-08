@@ -131,12 +131,12 @@ public class AssignmentActivity extends Fragment implements Observer {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
             // telling the user that the assignment has been added
             Toast.makeText(activityMain.getBaseContext(),
-                    "The assignment has been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.assignmentAdded), Toast.LENGTH_LONG).show();
             createAssignemntsView(model.getAssignments());
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // telling the user that the assignment has been edited
             Toast.makeText(activityMain.getBaseContext(),
-                    "The assignment has been edited", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.assignmentEdited), Toast.LENGTH_LONG).show();
             createAssignemntsView(model.getAssignments());
         }
     }
@@ -201,9 +201,9 @@ public class AssignmentActivity extends Fragment implements Observer {
             for (AssignmentEntity assignment : dayList) {
                 // setting text
                 info = assignment.getCourse() + "\n";
-                info += "Due time: " + getViewedTime(assignment.getHourNum(),
+                info += getResources().getString(R.string.dueTime) + " " + getViewedTime(assignment.getHourNum(),
                         assignment.getMinuteNum()) + "\n";
-                info += "description: " + assignment.getDisc();
+                info += getResources().getString(R.string.discText) + " " + assignment.getDisc();
 
                 // setting the assignment layout
                 oneAssignmentLayout = new LinearLayout(activityMain.getBaseContext());
@@ -311,14 +311,19 @@ public class AssignmentActivity extends Fragment implements Observer {
         Calendar date = Calendar.getInstance();
         Calendar dueDate = Calendar.getInstance();
         dueDate.set(year, month - 1, day); // month starts from 0
-        String viewStr = "Due ";
+        String viewStr = getResources().getString(R.string.dueDate) + " ";
         if (date.equals(dueDate)) {
-            viewStr += "today";
+            viewStr += getResources().getString(R.string.today);
         } else if (dueDate.get(Calendar.DAY_OF_YEAR) - date.get(Calendar.DAY_OF_YEAR) == 1) {
-            viewStr += "tomorrow";
+            viewStr += getResources().getString(R.string.tomorrow);
         } else { // January is 0 not 1 at getMonths()
-            viewStr += new DateFormatSymbols(Locale.getDefault()).getMonths()[month - 1] +
-                    " " + day;
+            if(getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+                // for RTL languages only
+                viewStr += day + " " + new DateFormatSymbols(Locale.getDefault()).getMonths()[month - 1];
+            } else {
+                viewStr += new DateFormatSymbols(Locale.getDefault()).getMonths()[month - 1] +
+                        " " + day;
+            }
         }
         return viewStr;
     }

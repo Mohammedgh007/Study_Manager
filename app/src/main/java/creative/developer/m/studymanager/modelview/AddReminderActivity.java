@@ -6,7 +6,7 @@ purpose: This is model view class that is responsible for adding an reminder or 
    an existing one
 Methods:
   onCreate() -> It encapsulates/manages most the interaction.
-  onTimeSet() -> same ^^ but for selecting the time
+  onTimeSet() -> It assigns the fields of time when the user sets the time on the dialog.
   getDisplayedTimeText() -> return the text that's used to show the time on the time's button.
   getDisplayedDaysText() -> return the text that's used to show the days on the days' button.
   getTime() -> returns the time as a string that the model can use.
@@ -101,7 +101,7 @@ public class AddReminderActivity extends Activity implements
             pickTimeBtn.setText(getDisplayedTimeText());
             pickDaysBtn.setText(getDisplayedDaysText());
             editTextDisc.setText(editedReminder.getDisc());
-            addBtn.setText("Finish");
+            addBtn.setText(R.string.finishEdit);
         }
 
         // showing a dialog to select the time
@@ -125,6 +125,7 @@ public class AddReminderActivity extends Activity implements
             // check first that the user has entered inputs
             // alarmID is different from reminder id.
             System.out.println("hour is " + selectedHour);
+            System.out.println(getTime());
             if (isInputsValid()) {
                 Intent intentSendback = new Intent(AddReminderActivity.this,
                         RemindersActivity.class);
@@ -220,19 +221,24 @@ public class AddReminderActivity extends Activity implements
     * It returns the time as a string that the model can utilize to create a reminder object.
     */
     private String getTime() {
-        String time = "";
+        String hour = "";
         if (selectedHour < 10) { // making sure hours have 2 digits as a string
-            time  += "0" + selectedHour;
+            hour  += "0" + selectedHour;
         } else {
-            time += Integer.toString(selectedHour);
+            hour += Integer.toString(selectedHour);
         }
-        time += ":";
+
+        String minute = "";
         if (selectedMinute < 10) { // making sure minutes have 2 digits as a string
-            time += "0" + selectedMinute;
+            minute += "0" + selectedMinute;
         } else {
-            time += Integer.toString(selectedMinute);
+            minute += Integer.toString(selectedMinute);
         }
-        return time;
+
+        if (Locale.getDefault().getDisplayLanguage().equals("ar")) { // RTL language
+            return selectedMinute + ":" + selectedHour;
+        }
+        return selectedHour + ":" + selectedMinute;
     }
 
 
@@ -249,7 +255,7 @@ public class AddReminderActivity extends Activity implements
             return false;
         }
         // checking if the user has selected the time
-        if (pickTimeBtn.getText().toString().equals("Select time")) {
+        if (pickTimeBtn.getText().toString().equals(getResources().getString(R.string.selectTime))) {
             Toast.makeText(this, "Please select the time", Toast.LENGTH_LONG).show();
             return false;
         }
@@ -264,7 +270,7 @@ public class AddReminderActivity extends Activity implements
         Calendar inputTime = Calendar.getInstance();
         inputTime.set(Calendar.MINUTE, selectedMinute);
         inputTime.set(Calendar.HOUR_OF_DAY, selectedHour);
-        if (spinnerRepeat.getSelectedItem().toString().contains("only") &&
+        if (spinnerRepeat.getSelectedItem().toString().equals(getResources().getString(R.string.once)) &&
                 !inputTime.after(currTime) && currTime.getDisplayName(Calendar.DAY_OF_WEEK,
                 Calendar.SHORT, Locale.getDefault()).toLowerCase().equals(selectedDays.get(0))) {
             Toast.makeText(this, "Please select proper time and date", Toast.LENGTH_LONG).show();

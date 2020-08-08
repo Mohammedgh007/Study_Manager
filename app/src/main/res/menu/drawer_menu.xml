@@ -4,21 +4,21 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:title="Home" />
+            android:title= "@string/homeTitle" />
         <item
             android:id="@+id/nav_assignment"
-            android:title="Assignments" />
+            android:title="@string/assignmentsTitle" />
         <item
             android:id="@+id/nav_remark"
-            android:title="Remarks" />
+            android:title="@string/remarksTitle" />
         <item
             android:id="@+id/nav_notes"
-            android:title="Notes" />
+            android:title= "@string/notesTitle" />
         <item
             android:id="@+id/nav_flash"
-            android:title="Flash Cards" />
+            android:title= "@string/flashcardsTitles" />
         <item
             android:id="@+id/nav_reminder"
-            android:title="Weekly Study's Reminders" />
+            android:title= "@string/remindersTitle" />
     </group>
 </menu>

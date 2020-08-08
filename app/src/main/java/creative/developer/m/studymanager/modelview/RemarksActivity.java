@@ -175,10 +175,18 @@ public class RemarksActivity extends Fragment implements Observer {
     @param: month is the month in the selected date.
     */
     private void updateDateText(int month, int day) {
-        remarkDate.setText(" Remarks for the date " +
-                new DateFormatSymbols(Locale.getDefault()).
-                        getShortMonths()[month - 1] // January = 1 as month, but it indexes 0
-                + " " + day);
+        // for RTL languages
+        if(getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+            remarkDate.setText(getResources().getString(R.string.remarkForDate) + " " + day + " " +
+                    new DateFormatSymbols(Locale.getDefault()).
+                            getShortMonths()[month - 1] // January = 1 as month, but it indexes 0
+                     );
+        } else {
+            remarkDate.setText(getResources().getString(R.string.remarkForDate) + " " +
+                    new DateFormatSymbols(Locale.getDefault()).
+                            getShortMonths()[month - 1] // January = 1 as month, but it indexes 0
+                    + " " + day);
+        }
     }
 
 
@@ -233,9 +241,9 @@ public class RemarksActivity extends Fragment implements Observer {
             remark.getYearNum() == year) {
                 // setting text
                 info = remark.getTitle() + "\n";
-                info += "time: " + getViewedTime(remark.getHourNum(),
+                info += getResources().getString(R.string.dueTime) + " " + getViewedTime(remark.getHourNum(),
                         remark.getMinuteNum()) + "\n";
-                info += "description: " + remark.getDisc();
+                info += getResources().getString(R.string.discText) + " " + remark.getDisc();
 
                 // setting the remark layout
                 oneRemarkLayout = new LinearLayout(activityMain.getBaseContext());
@@ -333,7 +341,7 @@ public class RemarksActivity extends Fragment implements Observer {
     public void onActivityResult (int requestCode, int resultCode, Intent data) {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
-                    "The remark has been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.remarkAdded), Toast.LENGTH_LONG).show();
             Calendar cal = Calendar.getInstance();
             selectedDay = cal.get(Calendar.DAY_OF_MONTH);
             selectedMonth =  cal.get(Calendar.MONTH) + 1;
@@ -342,7 +350,7 @@ public class RemarksActivity extends Fragment implements Observer {
             updateDateText( cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
-                    "The remark has been updated", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.remarkEdited), Toast.LENGTH_LONG).show();
             createRemarksView(model.getRemarks(), selectedYear, selectedMonth, selectedDay);
             updateDateText( selectedMonth, selectedDay);
         }

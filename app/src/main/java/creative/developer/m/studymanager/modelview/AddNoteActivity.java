@@ -135,13 +135,13 @@ public class AddNoteActivity extends Activity {
         if (!lesson.equals("") && !note.equals("")) {
             System.out.println("in valid 2");
             if (existedNotes.contains(lesson)) {
-                Toast.makeText(this, "This lesson has been already added, please select" +
-                        "another name for the lesson", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.lessonNameRepeated),
+                        Toast.LENGTH_LONG).show();
             } else {
                 return true;
             }
         } else {
-            Toast.makeText(this, "please fill all the blanks", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.fillAllFields), Toast.LENGTH_LONG).show();
         }
         return false;
     }
@@ -218,8 +218,8 @@ public class AddNoteActivity extends Activity {
     private Boolean handleLongClick(String photoUrl, View holdBtn) {
         // showing popup list
         PopupMenu menu = new PopupMenu(this, holdBtn);
-        menu.getMenu().add("Show the photo");
-        menu.getMenu().add("Remove the photo");
+        menu.getMenu().add(R.string.showPhoto);
+        menu.getMenu().add(R.string.removePhoto);
         menu.show();
 
         menu.getMenu().getItem(0).setOnMenuItemClickListener((item) -> {

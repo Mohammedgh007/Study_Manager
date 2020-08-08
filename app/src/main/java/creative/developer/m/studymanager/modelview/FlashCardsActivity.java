@@ -134,7 +134,8 @@ public class FlashCardsActivity extends AppCompatActivity {
                 backgroundCard.setBackgroundResource(R.color.card_answer);
 
                 // creating the shown text
-                String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.size()
+                String showedText = getResources().getString(R.string.card) + " " + (currCardIndex + 1) + " " +
+                        getResources().getString(R.string.outOf) + " " + recievedCards.size()
                         + "\n\n" + recievedCards.get(currCardIndex).getAnswer();
 
                 //preparing animations.
@@ -221,7 +222,8 @@ public class FlashCardsActivity extends AppCompatActivity {
         backgroundCard.setBackgroundResource(R.color.card_question);
 
         // creating the shown text
-        String showedText = "card " + (currCardIndex + 1) + " out of " + recievedCards.size()
+        String showedText = getResources().getString(R.string.card) + " " + (currCardIndex + 1) + " " +
+                getResources().getString(R.string.outOf) + " " + recievedCards.size()
                 + "\n\n" + recievedCards.get(currCardIndex).getQuestion();
 
         //preparing animations
@@ -297,7 +299,7 @@ public class FlashCardsActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == EDIT_CODE) {
             // saving the change on lesson's flash cards
             Toast.makeText(getBaseContext(),
-                    "The flash cards have been modified", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.cardEdited), Toast.LENGTH_LONG).show();
             FlashCardCoordinator model = FlashCardCoordinator.getInstance(this);
             recievedCards = model.getLessonCards(courseName, lessonName);
             // showing the appropriate card

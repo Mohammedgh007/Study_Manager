@@ -25,7 +25,7 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Course: "
+            android:text="@string/courseName"
             android:textStyle="bold" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Lesson: "
+            android:text="@string/lesson"
             android:textStyle="bold" />
 
         <EditText
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Type Here" />
+            android:hint="@string/typeHere" />
 
     </LinearLayout>
 
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/orange_button"
-                android:text="add a photo"/>
+                android:text="@string/addPhoto"/>
         </LinearLayout>
     </HorizontalScrollView>
 
@@ -98,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Here is the class notes. You can type here."
+            android:hint="@string/typeNote"
             android:inputType="textMultiLine" />
     </ScrollView>
 
@@ -115,19 +115,19 @@
             android:id="@+id/cancel_addnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
+            android:layout_marginHorizontal="3dp"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
-            android:text="Cancel" />
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/add_addnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginHorizontal="3dp"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
-            android:text="Add" />
+            android:text="@string/add" />
 
     </LinearLayout>
 </android.widget.LinearLayout>

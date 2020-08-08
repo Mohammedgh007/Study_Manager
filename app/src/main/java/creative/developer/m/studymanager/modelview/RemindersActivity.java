@@ -104,12 +104,12 @@ public class RemindersActivity extends Fragment implements Observer {
         if (requestCode == ADDING_CODE && resultCode == RESULT_OK) {
             // telling the user that the assignment has been added
             Toast.makeText(activityMain.getBaseContext(),
-                    "The reminder has been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.reminderAdded), Toast.LENGTH_LONG).show();
             createReminderssView(model.getReminders());
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             // telling the user that the assignment has been edited
             Toast.makeText(activityMain.getBaseContext(),
-                    "The reminder has been edited", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.reminderUpdated), Toast.LENGTH_LONG).show();
             createReminderssView(model.getReminders());
         }
     }
@@ -157,11 +157,14 @@ public class RemindersActivity extends Fragment implements Observer {
         for (ReminderEntity reminder : reminders) {
             // setting text
             info = reminder.getTitle() + "\n";
-            info += "time: " + getViewedTime(reminder.getHourNum(),
+            info += getResources().getString(R.string.timeText) + " " + getViewedTime(reminder.getHourNum(),
                     reminder.getMinuteNum()) + "\n";
-            info += "days: " + reminder.getDaysList() + '\n';
-            info += "repeating: " + (reminder.getIsRepeated() ? "weekly" : "once") + "\n";
-            info += "description: " + reminder.getDisc();
+            info += getResources().getString(R.string.daysText) + " " + reminder.getDaysList() + '\n';
+            info += getResources().getString(R.string.repeatText) + " " +
+                    (reminder.getIsRepeated() ?
+                            getResources().getString(R.string.weekly) :
+                            getResources().getString(R.string.once)) + "\n";
+            info += getResources().getString(R.string.discText) + reminder.getDisc();
 
             // setting the reminder layout
             oneReminderLayout = new LinearLayout(activityMain.getBaseContext());

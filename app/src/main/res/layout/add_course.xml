@@ -12,7 +12,7 @@
         android:id="@+id/course_name_add_courses"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="Please type the name of the course"/>
+        android:hint="@string/typeCourseName"/>
 
     <Button
         android:id="@+id/finish_add_course"
@@ -20,12 +20,12 @@
         android:layout_height="wrap_content"
         android:background="@drawable/orange_button"
         android:layout_marginVertical="15dp"
-        android:text="Finish"/>
+        android:text="@string/done"/>
 
     <Button
         android:id="@+id/cancel_add_course"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/orange_button"
-        android:text="Cancel"/>
+        android:text="@string/cancel"/>
 </LinearLayout>

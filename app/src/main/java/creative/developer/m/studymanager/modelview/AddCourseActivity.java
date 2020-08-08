@@ -55,10 +55,10 @@ public class AddCourseActivity extends AppCompatActivity {
                 finish();
             } else if (CoursesActivity.getExistingCourses().contains(inputtedStr)) {
                 Toast.makeText(getBaseContext(),
-                        "Please input non-used course's name", Toast.LENGTH_LONG).show();
+                        R.string.inputNonUsedCourse, Toast.LENGTH_LONG).show();
             } else {
                 Toast.makeText(getBaseContext(),
-                        "Please input the course name first", Toast.LENGTH_LONG).show();
+                        R.string.inputCourseNameFirst, Toast.LENGTH_LONG).show();
             }
         });
 

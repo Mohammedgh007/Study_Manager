@@ -96,11 +96,11 @@ public class AddFlashCardActivity extends Activity {
         cards = new HashMap<>();
         lastAddedIndex = 1;
         if (purpose.equals("adding")) { // adding a lesson
-            cards.put("Card 1", model.addCard("", "", "", ""));
+            cards.put(getResources().getString(R.string.card1), model.addCard("", "", "", ""));
             cardsNum = 1;
         } else { // editing a lesson
             // preparing cards and buttons for recieving the data from FlashCardsActivity
-            String cardStr = "Card ";
+            String cardStr = getResources().getString(R.string.card) + " ";
             List<FlashCardEntity> cardsList = model.getLessonCards(courseName, lessonName);
             cardsNum = cardsList.size();
             cards.put(cardStr + lastAddedIndex, cardsList.get(0));
@@ -112,7 +112,7 @@ public class AddFlashCardActivity extends Activity {
             }
 
             // changing the view for editing to disable editing the lesson's name
-            finishLessonBtn.setText("Finish Editing");
+            finishLessonBtn.setText(getResources().getString(R.string.finishEdit));
             courseET.setEnabled(false);
             courseET.setText(courseName);
             lessonET.setEnabled(false);
@@ -124,7 +124,7 @@ public class AddFlashCardActivity extends Activity {
             // creating an empty FlashCardEntity
             lastAddedIndex++;
             cardsNum++;
-            String id = "Card " + lastAddedIndex;
+            String id = getResources().getString(R.string.card) + " " + lastAddedIndex;
             cards.put(id, model.addCard("", "", "", ""));
             addCardBtn();
         });
@@ -158,7 +158,7 @@ public class AddFlashCardActivity extends Activity {
                 showCardData(clicked);
                 clicked.setTextColor(getResources().getColor(R.color.peach));
             } else {
-                Toast.makeText(getBaseContext(), "This is the last card that you can't delete",
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.cantDeleteLastCard),
                         Toast.LENGTH_LONG).show();
             }
 
@@ -175,7 +175,7 @@ public class AddFlashCardActivity extends Activity {
             } else {
                 intent = new Intent(AddFlashCardActivity.this,
                         FlashCardsActivity.class);
-                Toast.makeText(getBaseContext(), "the lesson has not been edited",
+                Toast.makeText(getBaseContext(), getResources().getString(R.string.lessonNotedited),
                         Toast.LENGTH_SHORT).show();
             }
             setResult(Activity.RESULT_CANCELED, intent);
@@ -214,7 +214,7 @@ public class AddFlashCardActivity extends Activity {
         layoutParams.leftMargin = 10;
         Button newBtn = new Button(this);
         newBtn.setLayoutParams(layoutParams);
-        String text = "Card " + lastAddedIndex;
+        String text = getResources().getString(R.string.card) + " " + lastAddedIndex;
         newBtn.setText(text);
 
         // adding it to the view
@@ -260,13 +260,13 @@ public class AddFlashCardActivity extends Activity {
         String course = courseET.getText().toString().toUpperCase().trim();
         String lesson = lessonET.getText().toString().toUpperCase().trim();
         if (lesson.equals("")) {
-            Toast.makeText(this, "Please fill lesson's field",
+            Toast.makeText(this, getResources().getString(R.string.fillLessonField),
                     Toast.LENGTH_LONG).show();
             return false;
         }
         // check if the lesson already exist or not
         if (lessons.contains(lesson)) {
-            Toast.makeText(this, "This lesson's name already exist, please select another name",
+            Toast.makeText(this, getResources().getString(R.string.lessonNameRepeated),
                     Toast.LENGTH_LONG).show();
             return false;
         }

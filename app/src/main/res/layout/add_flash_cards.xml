@@ -25,7 +25,7 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Course: "
+            android:text="@string/courseName"
             android:textStyle="bold" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_marginRight="5dp"
             android:background="@color/peach"
             android:padding="15dp"
-            android:text="Lesson: "
+            android:text="@string/lesson"
             android:textStyle="bold" />
 
         <EditText
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Type Here" />
+            android:hint="@string/typeHere" />
 
     </LinearLayout>
 
@@ -83,13 +83,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
-                android:text="Add Card" />
+                android:text="@string/addCard" />
 
             <Button
                 android:id="@+id/card1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Card 1"
+                android:text="@string/card1"
                 android:textColor="@color/peach"/>
 
         </LinearLayout>
@@ -121,7 +121,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="The Question:"
+                android:text="@string/theQuestion"
                 android:textSize="32sp"/>
 
             <EditText
@@ -129,13 +129,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Type the question here"
+                android:hint="@string/typeQuestion"
                 android:inputType="textMultiLine" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="The Answer:"
+                android:text="@string/theAnswer"
                 android:textSize="32sp"/>
 
             <EditText
@@ -143,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Type the answer here"
+                android:hint="@string/typeAnswer"
                 android:inputType="textMultiLine" />
 
         </LinearLayout>
@@ -162,19 +162,19 @@
             android:id="@+id/cancel_add_flash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
-            android:text="Cancel" />
+            android:layout_marginHorizontal="3dp"
+            android:text="@string/cancel" />
 
         <Button
             android:id="@+id/add_add_flash"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:background="@drawable/orange_button"
-            android:text="Finish adding" />
+            android:layout_marginHorizontal="3dp"
+            android:text="@string/finishAdding" />
 
     </LinearLayout>
 </android.widget.LinearLayout>

@@ -45,39 +45,39 @@ public class MainActivity extends AppCompatActivity {
         drawer = findViewById(R.id.drawer_layout);
 
         // setting up the left side menu
-        toolbar.setTitle("Home");
+        toolbar.setTitle(R.string.homeTitle);
         setSupportActionBar(toolbar);
         navView.setNavigationItemSelectedListener((item) -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    toolbar.setTitle("Home");
+                    toolbar.setTitle(R.string.homeTitle);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new HomeActivity()).commit();
                     break;
                 case R.id.nav_assignment:
-                    toolbar.setTitle("Assignments");
+                    toolbar.setTitle(R.string.assignmentsTitle);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new AssignmentActivity()).commit();
                     break;
-                case R.id.nav_remark:
-                    toolbar.setTitle("Remarks");
+                case R.id.nav_remark: // remarks = calendar
+                    toolbar.setTitle(R.string.remarksTitle);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new RemarksActivity()).commit();
                     break;
                 case R.id.nav_notes:
-                    toolbar.setTitle("Notes");
+                    toolbar.setTitle(R.string.notesTitle);
                     coursesDistination = "notes activity";
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new CoursesActivity()).commit();
                     break;
                 case R.id.nav_flash:
-                    toolbar.setTitle("Flash Cards");
+                    toolbar.setTitle(R.string.flashcardsTitles);
                     coursesDistination = "flash cards activity";
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new CoursesActivity()).commit();
                     break;
                 case R.id.nav_reminder:
-                    toolbar.setTitle("Reminders");
+                    toolbar.setTitle(R.string.remindersTitle);
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new RemindersActivity()).commit();
                     break;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         // set home Activity as the default.
         if (savedInstanceState == null) {
-            toolbar.setTitle("Home");
+            toolbar.setTitle(R.string.homeTitle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeActivity()).commit();
             navView.setCheckedItem(R.id.nav_home);
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         // checking if this activity is opened by FlashCardsActivity, if so then MainActivity
         // will launch directly CourseActivity
         if (this.getIntent() != null && this.getIntent().hasExtra("finalDistanation")) {
-            getSupportActionBar().setTitle("Flash Cards");
+            getSupportActionBar().setTitle(R.string.flashcardsTitles);
             coursesDistination = "flash cards activity";
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new CoursesActivity()).commit();

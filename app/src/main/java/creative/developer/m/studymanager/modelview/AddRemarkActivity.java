@@ -101,7 +101,7 @@ public class AddRemarkActivity extends Activity implements
             editTextTitle.setText(editedRemark.getTitle());
             pickTimeDate.setText(timeAndDateStringView());
             editTextDisc.setText(editedRemark.getDisc());
-            addBtn.setText("Finish");
+            addBtn.setText(R.string.finishEdit);
         }
 
         // controlling recieving the inputs of time and date
@@ -214,6 +214,14 @@ public class AddRemarkActivity extends Activity implements
             hourStr = Integer.toString(selectedHour - 12);;
         }
 
+        // for RTL languages only
+        if(getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+            return selectedDay + " " + new DateFormatSymbols(Locale.getDefault()).
+                    getShortMonths()[selectedMonth - 1] + // month counting start from 0
+                    " , " +
+                    selectedMinute + ":" +
+                    hourStr + " " + period;
+        }
         return new DateFormatSymbols(Locale.getDefault()).
                 getShortMonths()[selectedMonth - 1] + " " + // month counting start from 0
                 selectedDay + " , " +
@@ -257,18 +265,18 @@ public class AddRemarkActivity extends Activity implements
         if ( pickTimeDate.getText().toString().equals(getResources().
                 getString(R.string.selectTimeDate))) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the date and the time field",Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.enterDateTimeField),Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // checking for the name and the description
         if (editTextTitle.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the name", Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.inputCourseNameFirst), Toast.LENGTH_SHORT).show();
             return false;
         } else if (editTextDisc.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the description", Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.inputDesc), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;

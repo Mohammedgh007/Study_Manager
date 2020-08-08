@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Study Manager</string>
+    <string name="schedulePhotoIdMemory">scheduleId1232223</string>
+    <string name="title_activity_main">Study Manager</string>
+    <string name="open_navigation_drawer">افتح القائمة الجانبية</string>
+    <string name="close_navigation_drawer">اغلق القائمة الجانبية</string>
+    <array name="notification_times">
+        <item>3 ساعات قبل موعد التسليم</item>
+        <item>5 ساعات قبل موعد التسليم</item>
+        <item>7 ساعات قبل موعد التسليم</item>
+        <item>11 ساعات قبل موعد التسليم</item>
+        <item>يوم واحد قبل موعد التسليم</item>
+        <item>يومان قبل موعد التسليم</item>
+        <item>3 ايام قبل موعد التسليم</item>
+        <item>4 ايام قبل موعد التسليم</item>
+        <item>بدون تنبيه</item>
+    </array>
+    <array name="repeating_options">
+        <item>ذكرني في كل اسبوع</item>
+        <item>ذكرني في هذا لاسبوع فقط</item>
+    </array>
+    <string name="title_activity_add_reminder">AddReminderActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">التالي</string>
+    <string name="previous">السابق</string>
+    <string name="homeTitle">الواجهة الرئيسة</string>
+    <string name="assignmentsTitle">الواجبات</string>
+    <string name="remarksTitle">التقويم</string>
+    <string name="notesTitle">ملاحظات الدروس</string>
+    <string name="flashcardsTitles">بطاقات الفلاش</string>
+    <string name="remindersTitle">تذكيرات المذاكرة</string>
+    <string name="title">العنوان</string>
+    <string name="typeHere">أكتب هنا</string>
+    <string name="reminderRepeat">تكرار التذكير</string>
+    <string name="reminderTime">وقت التذكير</string>
+    <string name="selectTime">اختر الوقت</string>
+    <string name="reminderDays">أيام التذكير</string>
+    <string name="selectDays">اختر الايام</string>
+    <string name="describtion">الوصف</string>\
+    <string name="cancel">الغاء</string>
+    <string name="add">اضافة</string>
+    <string name="done">اتمام</string>
+    <string name="courseName">اسم المادة</string>
+    <string name="notifyingTime">وقت التنبيه</string>
+    <string name="dueAtTimeDate">يسلم بحلول التاريخ</string>
+    <string name="selectTimeDate">اختر التاريخ والوقت</string>
+    <string name="typeCourseName">اكتب اسم المادة</string>
+    <string name="lesson">الدرس</string>
+    <string name="addCard">أضف بطاقة</string>
+    <string name="card1">بطاقة 1</string>
+    <string name="theQuestion">السؤال</string>
+    <string name="typeQuestion">أكتب السؤال هنا</string>
+    <string name="theAnswer">الاجابة</string>
+    <string name="typeAnswer">اكتب الاجابة هنا</string>
+    <string name="finishAdding">اتمام الاضافة</string>
+    <string name="addPhoto">اضف صورة</string>
+    <string name="typeNote">هنا ملاحظات المحاضرة . يمكنك الكتابة هنا</string>
+    <string name="dateAndTime">التاريخ والوقت</string>
+    <string name="selectCourse">اختر مادة</string>
+    <string name="selectLesson">التالي ، اختر درس او اضف درسا</string>
+    <string name="prevCard">البطاقة السابقة</string>
+    <string name="flipCard">اقلب البطاقة</string>
+    <string name="nextCard">البطاقة التالية</string>
+    <string name="edit">تعديل</string>
+    <string name="finish">انهاء</string>
+    <string name="restart">اعادة بدء</string>
+    <string name="closeWSave">اغلاق مع حفظ التغييرات</string>
+    <string name="closeWOSave">اغلاق بدون حفظ</string>
+    <string name="inputNonUsedCourse">الرجاء ادخال اسم غير مستخدم للمادة</string>
+    <string name="inputCourseNameFirst">الرجاء ادخال اسم المادة</string>
+    <string name="card">بطاقة</string>
+    <string name="finishEdit">اتمام التعديل</string>
+    <string name="cantDeleteLastCard">هذه البطاقة الاخيره ولا يمكن ازالها</string>
+    <string name="lessonNotedited">لم يتم تعديل الدرس</string>
+    <string name="fillLessonField">الرجاء ادخال النص في خانة الدرس</string>
+    <string name="lessonNameRepeated">الرجاء اختيار اسم للدرس لم يتم أختياره</string>
+    <string name="fillAllFields">الرجاء الكتابة في كل الخانات</string>
+    <string name="showPhoto">اظهار الصورة</string>
+    <string name="removePhoto">ازالة الصورة</string>
+    <string name="enterDateTimeField">الرجاء تحديد الوقت والتاريخ</string>
+    <string name="enterValidNotifyTime">الرجاء اختيار وقت تنبيه صحيح او اختيار بدون تنبيه</string>
+    <string name ="enterdateTimeafter">الرجاء ادخال وقت لا يكون قبل الوقت الحالي</string>
+    <string name="enterName">الرجاء ادخال الاسم</string>
+    <string name="inputDesc">الرجاء كتابة الوصف</string>
+    <string name="assignmentAdded">تم اضافة الواجب</string>
+    <string name="assignmentEdited">تم تعديل الواجب</string>
+    <string name="dueTime">وقت التسليم:</string>
+    <string name="dueDate">تاريخ التسليم</string>
+    <string name="discText">الوصف:</string>
+    <string name="today">اليوم</string>
+    <string name="tomorrow">غدا</string>
+    <string name="selectCourseBefore">الرجاء اختيار المادة اولا</string>
+    <string name="noteAdded">ملاحظات الدرس تمت اضافتها</string>
+    <string name="noteUpdated">ملاحظات الدروس تم تعديلها</string>
+    <string name="cardsAdded">تمت اضافة بطاقات الفلاش</string>
+    <string name="cardEdited">تم تعديل بطاقات الفلاش</string>
+    <string name="courseAdded">تمت اضافة المادة</string>
+    <string name="deleteLesson">ازالة الدرس</string>
+    <string name="editLesson">تعديل الدرس</string>
+    <string name="lessonRemoved">تمت ازالة الدرس</string>
+    <string name="outOf">من</string>
+    <string name="permissionExternalStorage">الرجاء السماح للتطبيق للحصول على الاذن لامكانية عرض الصور</string>
+    <string name="remarkForDate">أحداث مهمة للتاريخ</string>
+    <string name="remarkAdded">تمت اضافة الحدث المهم</string>
+    <string name="remarkEdited">تمت تعديل الحدث المهم</string>
+    <string name="reminderAdded">تمت اضافة التذكير</string>
+    <string name="reminderUpdated">تمت تعديل التذكير</string>
+    <string name="timeText">الوقت:</string>
+    <string name="daysText">الايام:</string>
+    <string name="repeatText">التكرار:</string>
+    <string name="weekly">اسبوعي</string>
+    <string name="once">مره واحدة</string>
+    <string name="pleaseCheckDays">الرجاء اختيار الايام</string>
+</resources>

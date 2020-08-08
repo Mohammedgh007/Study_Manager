@@ -93,8 +93,8 @@ public class NotesActivity extends Activity {
                 imagesLayout.addView(getImageView(uri));
             }
         } else {
-            Toast.makeText(this, "please allow the app to read external storage in" +
-                    "order to show the images", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.permissionExternalStorage),
+                    Toast.LENGTH_LONG).show();
         }
 
 
@@ -179,8 +179,8 @@ public class NotesActivity extends Activity {
     private Boolean handleLongClick(String photoUrl, View holdBtn) {
         // showing popup list
         PopupMenu menu = new PopupMenu(this, holdBtn);
-        menu.getMenu().add("Show the photo");
-        menu.getMenu().add("Remove the photo");
+        menu.getMenu().add(R.string.showPhoto);
+        menu.getMenu().add(R.string.removePhoto);
         menu.show();
 
         menu.getMenu().getItem(0).setOnMenuItemClickListener((item) -> {

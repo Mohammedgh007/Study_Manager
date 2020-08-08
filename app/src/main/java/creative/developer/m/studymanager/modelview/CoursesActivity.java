@@ -142,8 +142,8 @@ public class CoursesActivity extends Fragment implements Observer {
             // make sure that there is a selected course
             if (clickedCourse[0] == null || clickedCourse[0].getBackground().getConstantState()
                     != getResources().getDrawable(R.color.peach).getConstantState()) {
-                Toast.makeText(activityMain.getBaseContext(), "Please select a course first in order" +
-                        " to add a lesson", Toast.LENGTH_LONG).show();
+                Toast.makeText(activityMain.getBaseContext(), getResources().getString(R.string.selectCourseBefore)
+                        , Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -255,18 +255,18 @@ public class CoursesActivity extends Fragment implements Observer {
         Gson gson = new Gson();
         if (requestCode == ADDING_CODE_NOTE && resultCode == RESULT_OK) { // for adding notes
             Toast.makeText(activityMain.getBaseContext(),
-                    "The note has been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.noteAdded), Toast.LENGTH_LONG).show();
             createCoursesView();
         } else if (requestCode == ENTER_CODE_NOTE && resultCode == RESULT_OK) { // for viewing notes
             Toast.makeText(activityMain.getBaseContext(),
-                    "The lesson's notes have been updated", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.noteUpdated), Toast.LENGTH_LONG).show();
         } else if (requestCode == ADDING_CODE_CARD && resultCode == RESULT_OK) { // for adding cards
             Toast.makeText(activityMain.getBaseContext(),
-                    "The flash cards have been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.cardsAdded), Toast.LENGTH_LONG).show();
             createCoursesView();
         } else if (requestCode == ADD_COURSSE_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
-                    "The course has been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.courseAdded), Toast.LENGTH_LONG).show();
             String addedCourse = data.getExtras().getString("added course");
             coursesSet.add(addedCourse);
             if (distination.equals("notes activity")) {
@@ -277,7 +277,7 @@ public class CoursesActivity extends Fragment implements Observer {
             createCoursesView();
         } else if (requestCode == EDIT_CARDS_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
-                    "The flash cards have been added", Toast.LENGTH_LONG).show();
+                    getResources().getString(R.string.cardEdited), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -323,14 +323,14 @@ public class CoursesActivity extends Fragment implements Observer {
     private boolean handleHoldBtn(String courseStr, String lessonStr, Button selectedBtn) {
         // showing popup list
         PopupMenu menu = new PopupMenu(activityMain.getBaseContext(), selectedBtn);
-        menu.getMenu().add("Delete the lesson");
-        menu.getMenu().add("Edit the lesson");
+        menu.getMenu().add(R.string.deleteLesson);
+        menu.getMenu().add(R.string.editLesson);
         menu.show();
 
         // handling deleting the lesson
         menu.getMenu().getItem(0).setOnMenuItemClickListener((view) -> {
             // removing from the view
-            Toast.makeText(activityMain.getBaseContext(), "The lesson been removed",
+            Toast.makeText(activityMain.getBaseContext(), getResources().getString(R.string.lessonRemoved),
                     Toast.LENGTH_LONG).show();
             lessonsBtnLayout.removeView(selectedBtn);
 

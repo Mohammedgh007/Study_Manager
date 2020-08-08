@@ -115,7 +115,7 @@ public class AddAssignmentActivity extends Activity implements
             editTextCourse.setText(editedAssignment.getCourse());
             pickTimeDate.setText(timeAndDateStringView());
             editTextDisc.setText(editedAssignment.getDisc());
-            addBtn.setText("Finish");
+            addBtn.setText(R.string.finishEdit);
         }
 
         pickTimeDate.setOnClickListener(new View.OnClickListener() {
@@ -140,13 +140,14 @@ public class AddAssignmentActivity extends Activity implements
             @Override
             public void onClick(View v) {
                 // check first that the user has entered inputs
-                System.out.println("hour is " + selectedHour);
+                System.out.println("due date " + getDueStr(selectedMonth, ";", selectedDay));
+                System.out.println("due time " + getDueStr(selectedMonth, ";", selectedDay));
                 if (isInputsValid()) {
                     Intent intentSendback = new Intent(AddAssignmentActivity.this,
                             AssignmentActivity.class);
                     if (intent.getExtras().get("porpuse").equals("editing")) {
                         notifyAssignment = model.updateAssignment(editedAssignment, editTextCourse.getText().toString(),
-                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
+                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 10),
                                 editTextDisc.getText().toString(),
                                 (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
                                 getDueStr(selectedHour, ":", selectedMinute));
@@ -154,7 +155,7 @@ public class AddAssignmentActivity extends Activity implements
                     } else {
                         notifyAssignment = model.addAssingment(
                                 editTextCourse.getText().toString(),
-                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 5),
+                                spinnerNotifyTime.getSelectedItem().toString().substring(0, 10),
                                 editTextDisc.getText().toString(),
                                 (selectedYear + ":" + getDueStr(selectedMonth, ";", selectedDay)),
                                 getDueStr(selectedHour, ":", selectedMinute)
@@ -163,7 +164,8 @@ public class AddAssignmentActivity extends Activity implements
 
 
                     setResult(RESULT_OK, intentSendback);
-                    if (!spinnerNotifyTime.getSelectedItem().toString().contains("N")) {
+                    if (!spinnerNotifyTime.getSelectedItem().toString().equals(getResources()
+                            .getStringArray(R.array.notification_times)[8])) {
                         createNotification(notifyAssignment);
                     }
                     finish();
@@ -234,7 +236,15 @@ public class AddAssignmentActivity extends Activity implements
         } else {
             hourStr = Integer.toString(selectedHour - 12);;
         }
-
+        // output for RTL languages
+        if(getResources().getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL) {
+            return selectedDay + " " + new DateFormatSymbols(Locale.getDefault()).
+                    getShortMonths()[selectedMonth - 1] + " " + // month counting start from 0
+                    " , " +
+                    selectedMinute + " : " +
+                    hourStr + " " + period;
+        }
+        // output for LTR languages
         return new DateFormatSymbols(Locale.getDefault()).
                 getShortMonths()[selectedMonth - 1] + " " + // month counting start from 0
                 selectedDay + " , " +
@@ -254,7 +264,7 @@ public class AddAssignmentActivity extends Activity implements
     private String getDueStr(int num1, String separator, int num2) {
         String hourMonth, minuteDay; // the first represent hour or month.
        if (num1 < 10) { // making sure hours or month have 2 digits as a string
-            hourMonth  = "0" + num1;
+           hourMonth  = "0" + num1;
         } else {
             hourMonth = Integer.toString(num1);
         }
@@ -263,6 +273,7 @@ public class AddAssignmentActivity extends Activity implements
         } else {
             minuteDay = Integer.toString(num2);
         }
+
         return hourMonth + separator + minuteDay;
     }
 
@@ -282,12 +293,12 @@ public class AddAssignmentActivity extends Activity implements
         if ( pickTimeDate.getText().toString().equals(getResources().
                 getString(R.string.selectTimeDate))) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the date and the time field",Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.enterDateTimeField),Toast.LENGTH_SHORT).show();
             return false;
         } else if (!pickTimeDate.getText().toString().equals(R.string.selectTimeDate)) {
             if (today.after(inputDate)) {
                 Toast.makeText(getBaseContext(),
-                        "Please enter the date and the time field correctly",Toast.LENGTH_SHORT).
+                        getResources().getString(R.string.enterdateTimeafter),Toast.LENGTH_SHORT).
                         show();
                 return false;
             }
@@ -295,18 +306,18 @@ public class AddAssignmentActivity extends Activity implements
         // checking for the name and the description
         if (editTextCourse.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the name", Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.enterName), Toast.LENGTH_SHORT).show();
             return false;
         } else if (editTextDisc.getText().toString().isEmpty()) {
             Toast.makeText(getBaseContext(),
-                    "Please enter the description", Toast.LENGTH_SHORT).show();
+                    getResources().getString(R.string.inputDesc), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         // checking if the notification time is between the current time and the deadline
         if(!isNotificationTimeValid(spinnerNotifyTime.getSelectedItem().toString().substring(0, 5))) {
             Toast.makeText(getBaseContext(),
-                    "Please change the notification time to either none or a proper time",
+                    getResources().getString(R.string.enterValidNotifyTime),
                     Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -325,16 +336,33 @@ public class AddAssignmentActivity extends Activity implements
         deadlineTime.set(selectedYear, selectedMonth - 1, selectedDay, selectedHour, selectedMinute);
 
         Calendar notifyTime = (Calendar) deadlineTime.clone();
-        if (notifyStr.contains("N")) { // when the user does not want to be notified.
+        // when the user does not want to be notified.
+        if (getResources().getStringArray(R.array.notification_times)[8].contains(notifyStr)) {
             return true;
-        } else if(notifyStr.contains("d")) { // d for days
-            String days = notifyStr.substring(0, notifyStr.indexOf(" "));
-            int daysNum = 0 - Integer.parseInt(days);
-            notifyTime.add(Calendar.DAY_OF_MONTH, daysNum);
-        } else {
-            String hours = notifyStr.substring(0, notifyStr.indexOf(" "));
-            int hoursNum = 0 - Integer.parseInt(hours);
-            notifyTime.add(Calendar.HOUR_OF_DAY, hoursNum);
+        // for 3 hours prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[0].contains(notifyStr)) {
+            notifyTime.add(Calendar.HOUR_OF_DAY, -3);
+        // for 5 hours prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[1].contains(notifyStr)) {
+            notifyTime.add(Calendar.HOUR_OF_DAY, -5);
+        // for 7 hours prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[2].contains(notifyStr)) {
+            notifyTime.add(Calendar.HOUR_OF_DAY, -7);
+        // for 11 hours prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[3].contains(notifyStr)) {
+            notifyTime.add(Calendar.HOUR_OF_DAY, -11);
+        // for 1 day prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[4].contains(notifyStr)) {
+            notifyTime.add(Calendar.DAY_OF_MONTH, -1);
+        // for 2 days prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[5].contains(notifyStr)) {
+            notifyTime.add(Calendar.DAY_OF_MONTH, -2);
+        // for 3 days prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[6].contains(notifyStr)) {
+            notifyTime.add(Calendar.DAY_OF_MONTH, -3);
+        // for 4 days prior deadline
+        } else if(getResources().getStringArray(R.array.notification_times)[7].contains(notifyStr)) {
+            notifyTime.add(Calendar.DAY_OF_MONTH, -4);
         }
         System.out.println("currTime is " + currTime);
         System.out.println("notify is " + notifyTime);
@@ -347,7 +375,7 @@ public class AddAssignmentActivity extends Activity implements
     @param: assignment is the assignment that the notification is created for.
      */
     private void createNotification(AssignmentEntity assignment) {
-        NotificationManagement alarm = new NotificationManagement(assignment);
+        NotificationManagement alarm = new NotificationManagement(assignment, this);
         alarm.setNotify(this);
     }
 

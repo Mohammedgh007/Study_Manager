@@ -82,8 +82,8 @@ public class SelectDaysActivity extends AppCompatActivity {
             // closing this activity if the user has selected days; otherwise, tell the user to
             // select some days.
             if (selectedDays.size() == 0) {
-                Toast.makeText(SelectDaysActivity.this, "Please check on the days that" +
-                        " you would like to select first", Toast.LENGTH_LONG).show();
+                Toast.makeText(SelectDaysActivity.this,
+                        getResources().getString(R.string.pleaseCheckDays), Toast.LENGTH_LONG).show();
             } else {
                 Intent sendBack = new Intent(SelectDaysActivity.this, AddReminderActivity.class);
                 setResult(RESULT_OK, sendBack);

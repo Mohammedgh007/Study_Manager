@@ -54,10 +54,11 @@ public class NotificationManagement {
     /*
     it creates an instance that has a special id and time for the timer background service..
     @param: assignment is the object for that needs to utilize notification service.
+    @param context is the Context's instance in which this constructor is used.
     */
-    public NotificationManagement(AssignmentEntity assignment) {
+    public NotificationManagement(AssignmentEntity assignment, Context context) {
         this.timerID = assignment.getAssignmentID() * -1;
-        this.dateTime = getNotifyTime(assignment);
+        this.dateTime = getNotifyTime(assignment, context);
         isNotify = true;
         isRepeating = false;
     }
@@ -80,24 +81,38 @@ public class NotificationManagement {
     /*
     this method determines the notification time based on the AssignmentEntity field.
     @param assignment is the AssignmentEntity
+    @param context is the Context's instance in which this constructor is used.
     */
-    private static Calendar getNotifyTime(AssignmentEntity assignment) {
+    private static Calendar getNotifyTime(AssignmentEntity assignment, Context context) {
         Calendar cal = Calendar.getInstance();
         // month - 1 because months start from zero at Calendar.
         cal.set(assignment.getYearNum(), assignment.getMonthNum() - 1, assignment.getDayNum(),
                 assignment.getHourNum(), assignment.getMinuteNum());
         String notifyTime = assignment.getNotificationTime();
-        if (notifyTime.contains("N")) { // when the user does not want to be notified.
-            return null;
-        } else if(notifyTime.contains("d")) { // d for days
-            String days = notifyTime.substring(0, notifyTime.indexOf(" "));
-            int daysNum = 0 - Integer.parseInt(days);
-            cal.add(Calendar.DAY_OF_MONTH, daysNum);
-        } else {
-            System.out.println("time is " + notifyTime);
-            String hours = notifyTime.substring(0, notifyTime.indexOf(" "));
-            int hoursNum = 0 - Integer.parseInt(hours);
-            cal.add(Calendar.HOUR_OF_DAY, hoursNum);
+        // for 3 hours prior to the deadline
+        if(context.getResources().getStringArray(R.array.notification_times)[0].contains(notifyTime)) {
+            cal.add(Calendar.HOUR_OF_DAY, -3);
+            // for 5 hours prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[1].contains(notifyTime)) {
+            cal.add(Calendar.HOUR_OF_DAY, -5);
+            // for 7 hours prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[2].contains(notifyTime)) {
+            cal.add(Calendar.HOUR_OF_DAY, -7);
+            // for 11 hours prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[3].contains(notifyTime)) {
+            cal.add(Calendar.HOUR_OF_DAY, -11);
+            // for 1 day prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[4].contains(notifyTime)) {
+            cal.add(Calendar.DAY_OF_MONTH, -1);
+            // for 2 days prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[5].contains(notifyTime)) {
+            cal.add(Calendar.DAY_OF_MONTH, -2);
+            // for 3 days prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[6].contains(notifyTime)) {
+            cal.add(Calendar.DAY_OF_MONTH, -3);
+            // for 4 days prior deadline
+        } else if(context.getResources().getStringArray(R.array.notification_times)[7].contains(notifyTime)) {
+            cal.add(Calendar.DAY_OF_MONTH, -4);
         }
         return cal;
     }
@@ -257,7 +272,7 @@ public class NotificationManagement {
 
             // making sure that the assignment should be notified at this time to avoid the case
             // that a user has changed the notification time.
-            Calendar notifyTime = getNotifyTime(notifyAss);
+            Calendar notifyTime = getNotifyTime(notifyAss, context);
             Calendar currTime = Calendar.getInstance();
             if (notifyTime.get(Calendar.MONTH) != currTime.get(Calendar.MONTH) &&
                     notifyTime.get(Calendar.DAY_OF_MONTH) != currTime.get(Calendar.DAY_OF_MONTH) &&
