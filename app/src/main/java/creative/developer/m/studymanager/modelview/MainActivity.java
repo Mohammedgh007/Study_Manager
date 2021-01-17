@@ -23,11 +23,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import java.util.List;
 
 import creative.developer.m.studymanager.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    protected static List<String> coursesStr;
     private DrawerLayout drawer;
     // Notes and Flash Cards depends on the same Fragment to determine the lesson.
     private static String coursesDistination;

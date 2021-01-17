@@ -4,28 +4,266 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".modelview.AddCourseActivity"
     android:orientation="vertical"
-    android:background="@color/grey">
+    android:background="@color/beige">
 
-    <EditText
-        android:id="@+id/course_name_add_courses"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/typeCourseName"/>
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp">
 
-    <Button
-        android:id="@+id/finish_add_course"
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="@string/courseName"
+            android:layout_marginRight="5dp"
+            android:background="@color/peach"
+            android:textStyle="bold"
+            android:padding="15dp"/>
+
+        <EditText
+            android:id="@+id/course_name_add_courses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/typeHere"
+            android:ems="10"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/orange_button"
-        android:layout_marginVertical="15dp"
-        android:text="@string/done"/>
+        android:orientation="horizontal"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp">
 
-    <Button
-        android:id="@+id/cancel_add_course"
-        android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="@string/room"
+            android:layout_marginRight="5dp"
+            android:background="@color/peach"
+            android:textStyle="bold"
+            android:padding="15dp"/>
+
+        <EditText
+            android:id="@+id/location_name_add_courses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/typeHere"
+            android:ems="10"/>
+
+    </LinearLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
+        android:fadeScrollbars="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/selectDayTime"
+                android:textSize="22sp"/>
+
+            <CheckBox
+                android:id="@+id/checkBox_same_time_add_course"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/allDaysSameTime"
+                android:checked="true"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/sunday_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sunday"
+                    android:checked="false"
+                    android:tag="0"/>
+
+                <Button
+                    android:id="@+id/select_time_sun_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="0"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/monday_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/monday"
+                    android:checked="false"
+                    android:tag="1"/>
+
+                <Button
+                    android:id="@+id/select_time_mon_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="1"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/tue_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tuesday"
+                    android:checked="false"
+                    android:tag="2"/>
+
+                <Button
+                    android:id="@+id/select_time_tue_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="2"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/wed_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/wednesday"
+                    android:checked="false"
+                    android:tag="3"/>
+
+                <Button
+                    android:id="@+id/select_time_wed_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/thursday_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/thursday"
+                    android:checked="false"
+                    android:tag="4"/>
+
+                <Button
+                    android:id="@+id/select_time_thr_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="4"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
+
+                <CheckBox
+                    android:id="@+id/fri_checkbox_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/friday"
+                    android:checked="false"
+                    android:tag="5"/>
+
+                <Button
+                    android:id="@+id/select_time_fri_add_course"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:text="@string/selectTime"
+                    android:visibility="invisible"
+                    android:tag="5"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/orange_button"
-        android:text="@string/cancel"/>
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
+
+        <Button
+            android:id="@+id/add_add_course"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/orange_button"
+            android:layout_marginHorizontal="3dp"
+            android:text="@string/add"/>
+
+        <Button
+            android:id="@+id/cancel_add_course"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="3dp"
+            android:background="@drawable/orange_button"
+            android:text="@string/cancel"/>
+
+    </LinearLayout>
+
 </LinearLayout>

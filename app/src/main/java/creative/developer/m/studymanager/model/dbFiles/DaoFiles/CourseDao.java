@@ -19,6 +19,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -30,9 +31,12 @@ public interface CourseDao {
     @Query("SELECT * FROM CourseEntity")
     List<CourseEntity> getAllCourses();
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void InsertCourse(CourseEntity... courseEntities);
 
     @Delete
     void deleteCourse(CourseEntity... courseEntities);
+
+    @Update
+    void updateCourse(CourseEntity... courseEntities);
 }

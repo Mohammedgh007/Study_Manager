@@ -40,7 +40,7 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntit
 @Database(entities = {AssignmentEntity.class, RemarkEntity.class, CourseEntity.class,
         NoteEntity.class, LessonEntity.class, FlashCardEntity.class, ReminderEntity.class,
         PhotoNoteEntity.class},
-        version = 10, exportSchema = false)
+        version = 12, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "StudyManagerDB00";
     private static AppDatabase sInstance;

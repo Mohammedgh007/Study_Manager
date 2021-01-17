@@ -33,28 +33,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import creative.developer.m.studymanager.model.EntityListFiles.FlashCardsList;
-import creative.developer.m.studymanager.model.EntityListFiles.NoteList;
 import creative.developer.m.studymanager.R;
-import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
-import creative.developer.m.studymanager.model.dbFiles.DataRepository;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.FlashCardEntity;
-import creative.developer.m.studymanager.model.dbFiles.EntityFiles.NoteEntity;
 import creative.developer.m.studymanager.model.modelCoordinators.FlashCardCoordinator;
 import creative.developer.m.studymanager.model.modelCoordinators.NoteCoordinator;
 
@@ -73,11 +64,10 @@ public class CoursesActivity extends Fragment implements Observer {
     private String distination; // it is used to distinquish whether the activity will use notes or cards
     private Activity activityMain;
     public static int count = 0;
-    private static Set<String> coursesSet;
+    private static List<String> coursesList;
 
     // views
     Button addLessonBtn;
-    Button addCourseBtn;
     Button []clickedCourse; // it is the last clicked course, so that it would be easier to access it.
     LinearLayout courseBtnLayout; // it is a layout that contain all courses buttons
     LinearLayout lessonsBtnLayout; // it is a layout that contain all courses buttons
@@ -102,11 +92,10 @@ public class CoursesActivity extends Fragment implements Observer {
                              Bundle savedInstanceState) {
         distination = MainActivity.getCoursesDistination();
         clickedCourse = new Button[1];
-
+        coursesList = MainActivity.coursesStr;
 
         // initializing views
         View root = inflater.inflate(R.layout.courses, container, false);
-        addCourseBtn = root.findViewById(R.id.add_course_courses);
         courseBtnLayout = root.findViewById(R.id.coursesBtnLayout);
         addLessonBtn = root.findViewById(R.id.add_lesson_courses);
         lessonsBtnLayout = root.findViewById(R.id.lessonsBtnLayout_courses);
@@ -116,7 +105,7 @@ public class CoursesActivity extends Fragment implements Observer {
             noteModel = NoteCoordinator.getInstance(activityMain.getBaseContext());
             noteModel.addObserver(this);
             cardModel = null;
-            if (noteModel.getCoursesNames() != null) {
+            if (noteModel.getNotesList() != null) {
                 // to avoid race condition; it will be called on update() otherwise.
                 createCoursesView();
             }
@@ -124,18 +113,12 @@ public class CoursesActivity extends Fragment implements Observer {
             cardModel = FlashCardCoordinator.getInstance(activityMain.getBaseContext());
             cardModel.addObserver(this);
             noteModel = null;
-            if (cardModel.getCoursesNames() != null) {
+            if (cardModel.getCardsList() != null) {
                 // to avoid race condition; it will be called on update() otherwise.
                 createCoursesView();
             }
         }
 
-
-        // handling the event of adding a course
-        addCourseBtn.setOnClickListener((view -> {
-            Intent popupIntent = new Intent(activityMain, AddCourseActivity.class);
-            startActivityForResult(popupIntent, ADD_COURSSE_CODE);
-        }));
 
         // click button event handling for addLessonBtn. It will go to either AddNote or AddCard
         addLessonBtn.setOnClickListener((btn) -> {
@@ -178,9 +161,7 @@ public class CoursesActivity extends Fragment implements Observer {
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         );
         // cleanup the courses' set
-        View addCourseBtnTemp = courseBtnLayout.getChildAt(0);
         courseBtnLayout.removeAllViews();
-        courseBtnLayout.addView(addCourseBtnTemp);
 
         // clear previous view's appearance for the lessons
         TextView tempTV = (TextView) lessonsBtnLayout.getChildAt(0);
@@ -191,7 +172,7 @@ public class CoursesActivity extends Fragment implements Observer {
         lessonsBtnLayout.addView(tempAddCourse);
 
 
-        for (String course : coursesSet) {
+        for (String course : coursesList) {
             // creating the button for each course
             courseBtn = new Button(activityMain.getBaseContext());
             courseBtn.setLayoutParams(layoutParamsBtn);
@@ -264,17 +245,6 @@ public class CoursesActivity extends Fragment implements Observer {
             Toast.makeText(activityMain.getBaseContext(),
                     getResources().getString(R.string.cardsAdded), Toast.LENGTH_LONG).show();
             createCoursesView();
-        } else if (requestCode == ADD_COURSSE_CODE && resultCode == RESULT_OK) {
-            Toast.makeText(activityMain.getBaseContext(),
-                    getResources().getString(R.string.courseAdded), Toast.LENGTH_LONG).show();
-            String addedCourse = data.getExtras().getString("added course");
-            coursesSet.add(addedCourse);
-            if (distination.equals("notes activity")) {
-                noteModel.addCourse(addedCourse);
-            } else {
-                cardModel.addCourse(addedCourse);
-            }
-            createCoursesView();
         } else if (requestCode == EDIT_CARDS_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
                     getResources().getString(R.string.cardEdited), Toast.LENGTH_LONG).show();
@@ -309,7 +279,7 @@ public class CoursesActivity extends Fragment implements Observer {
     another activity
      */
     protected static Set<String> getExistingCourses() {
-        return coursesSet;
+        return new TreeSet<>(coursesList);
     }
 
 
@@ -363,12 +333,7 @@ public class CoursesActivity extends Fragment implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (o instanceof FlashCardCoordinator) {
-            coursesSet = ((FlashCardCoordinator) o).getCoursesNames();
-        } else {
-            coursesSet = ((NoteCoordinator) o).getCoursesNames();
-        }
-        System.out.println("course is" + coursesSet);
+        System.out.println("course is" + coursesList);
         activityMain.runOnUiThread(() -> createCoursesView());
     }
 }

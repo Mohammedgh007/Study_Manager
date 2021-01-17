@@ -8,8 +8,8 @@ Methods:
   onCreate() -> It encapsulates/manages all the interaction.
   onActivityResult() -> It receives the intent from AddRemarkActivity that
      holds the data of the added remark.
+  updateDateText() -> It updates the shown text that represent the selected day.
   createRemarksView() -> It creates the view that show all remarks.
-  getViewedTime(hour, minute) -> It returns the string that is used to output the time to the user.
   getViewedDate(date) -> It returns the string that is used to output the date to the user. date is
     a string on the format yyyy:mm:dd
   doEditing() -> it handles the event of editing, which is modifying the view to fit editing mode.
@@ -56,6 +56,7 @@ import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
 import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.RemarkEntity;
 import creative.developer.m.studymanager.model.modelCoordinators.RemarkCoordinator;
+import creative.developer.m.studymanager.view.StringMaker;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -241,7 +242,7 @@ public class RemarksActivity extends Fragment implements Observer {
             remark.getYearNum() == year) {
                 // setting text
                 info = remark.getTitle() + "\n";
-                info += getResources().getString(R.string.dueTime) + " " + getViewedTime(remark.getHourNum(),
+                info += getResources().getString(R.string.dueTime) + " " + StringMaker.getViewedTime(remark.getHourNum(),
                         remark.getMinuteNum()) + "\n";
                 info += getResources().getString(R.string.discText) + " " + remark.getDisc();
 
@@ -309,31 +310,6 @@ public class RemarksActivity extends Fragment implements Observer {
         }
     }
 
-    /*
-    this method creates the string that will be used to show the time for the user
-    @PARAM: hour is an intger that range between 0-23
-    @PARAM: int that represent minutes
-    @return: String for viewing time
-     */
-    private String getViewedTime (int hour, int minute) {
-        String strHour;
-        if (hour == 0) {
-            strHour = "12";
-        } else if (hour < 13) {
-            strHour = Integer.toString(hour);
-        } else { // if it is between 13-23
-            strHour = Integer.toString(hour - 12);
-        }
-        String strMinute;
-        if (minute < 10) {
-            strMinute = "0" + minute;
-        } else {
-            strMinute = Integer.toString(minute);
-        }
-        String period = (hour < 13) ? "a.m" : "p.m";
-        return strHour + ":" + strMinute + " " + period;
-    }
-
 
     // this method receives intent from AddRemarkActivity that store details of an added
     // remark.
@@ -347,7 +323,7 @@ public class RemarksActivity extends Fragment implements Observer {
             selectedMonth =  cal.get(Calendar.MONTH) + 1;
             selectedYear = cal.get(Calendar.YEAR);
             createRemarksView(model.getRemarks(), selectedYear, selectedMonth, selectedDay);
-            updateDateText( cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            updateDateText( selectedMonth, cal.get(Calendar.DAY_OF_MONTH));
         } else if (requestCode == EDITING_CODE && resultCode == RESULT_OK) {
             Toast.makeText(activityMain.getBaseContext(),
                     getResources().getString(R.string.remarkEdited), Toast.LENGTH_LONG).show();

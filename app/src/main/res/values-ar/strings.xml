@@ -24,14 +24,25 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+    <string name="editCourse">تعديل الجدول</string>
+    <string name="room">اسم القاعة/الفصل</string>
+    <string name="allDaysSameTime">الماحاضرة تبدأ وتنتهي في نفس الوقت في جميع الايام المختارة</string>
+    <string name="addCourse">اضافة مادة</string>
     <string name="next">التالي</string>
     <string name="previous">السابق</string>
+    <string name="sunday">الأحد</string>
+    <string name="monday">الأثنين</string>
+    <string name="tuesday">الثلاثاء</string>
+    <string name="wednesday">الأربعاء</string>
+    <string name="thursday">الخميس</string>
+    <string name="friday">الجمعة</string>
+    <string name="selectDayTime">اختر الايام والوقت للمادة المضافة</string>
     <string name="homeTitle">الواجهة الرئيسة</string>
     <string name="assignmentsTitle">الواجبات</string>
     <string name="remarksTitle">التقويم</string>
     <string name="notesTitle">ملاحظات الدروس</string>
     <string name="flashcardsTitles">بطاقات الفلاش</string>
-    <string name="remindersTitle">تذكيرات المذاكرة</string>
+    <string name="remindersTitle">التذكيرات</string>
     <string name="title">العنوان</string>
     <string name="typeHere">أكتب هنا</string>
     <string name="reminderRepeat">تكرار التذكير</string>
@@ -98,6 +109,9 @@
     <string name="cardsAdded">تمت اضافة بطاقات الفلاش</string>
     <string name="cardEdited">تم تعديل بطاقات الفلاش</string>
     <string name="courseAdded">تمت اضافة المادة</string>
+    <string name="theCourse">المادة</string>
+    <string name="hasBeenDeleted">تم ازالتها</string>
+    <string name="hasBeenedEdited">تم تعديلها</string>
     <string name="deleteLesson">ازالة الدرس</string>
     <string name="editLesson">تعديل الدرس</string>
     <string name="lessonRemoved">تمت ازالة الدرس</string>
@@ -114,4 +128,10 @@
     <string name="weekly">اسبوعي</string>
     <string name="once">مره واحدة</string>
     <string name="pleaseCheckDays">الرجاء اختيار الايام</string>
+    <string name="inputStartTime">بداية المحاضرة</string>
+    <string name="inputFinishTime">نهاية المحاضرة</string>
+    <string name="to">الى</string>
+    <string name="inputRoom">الرجاء ادخال اسم القاعة/الفصل</string>
+    <string name="inputTimeForDays">الرجاء اختيار الوقت للايام المختارة</string>
+    <string name="coursesSchedule">جدول المواد</string>
 </resources>

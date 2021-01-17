@@ -13,6 +13,8 @@ Methods:
     addAssignment() -> it adds the assignment to the database and the assignmentsList.
     updateAssignment() -> it updates the assignment on the database and the assignmentsList.
     removeAssignment() -> it remove the assignment from the database and the assignmentsList
+    nullifyInstance() -> It's called to make the field instance null, so that the only thing that
+     needs to be updated the database.
 ###############################################################################
  */
 
@@ -155,5 +157,13 @@ public class AssignmentCoordinator extends Observable {
         executor.execute(() -> {repository.deleteAssignment(removed);});
     }
 
+
+    /*
+     * It's called to make the instance null, which forces this class to use an updated version of
+     * data from the database
+     */
+    public static void nullifyInstance() {
+        instance = null;
+    }
 
 }

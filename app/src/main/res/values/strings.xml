@@ -23,6 +23,17 @@
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
+    <string name="addCourse">Add a course</string>
+    <string name="editCourse">Edit Schedule</string>
+    <string name="room">Room\'s name</string>
+    <string name="allDaysSameTime">The class happens at the same time at all selected days</string>
+    <string name="sunday">Sunday</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="selectDayTime">Select the days and the time for the added course</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
     <string name="homeTitle">Home</string>
@@ -97,6 +108,9 @@
     <string name="cardsAdded">The flash cards have been added</string>
     <string name="cardEdited">The flash cards have been updated</string>
     <string name="courseAdded">The course has been added</string>
+    <string name="theCourse">The course</string>
+    <string name="hasBeenDeleted">has been deleted</string>
+    <string name="hasBeenedEdited">has been edited</string>
     <string name="deleteLesson">Remove the lesson</string>
     <string name="editLesson">Edit the lesson</string>
     <string name="lessonRemoved">The lesson been removed</string>
@@ -114,6 +128,11 @@
     <string name="weekly">weekly</string>
     <string name="once">once</string>
     <string name="pleaseCheckDays">Please check on the days that you would like to select</string>
-
+    <string name="inputStartTime">The class begins at</string>
+    <string name="inputFinishTime">The class ends at</string>
+    <string name="to">to</string>
+    <string name="inputRoom">Please input the room\'s name</string>
+    <string name="inputTimeForDays">Please select the time for all selected days</string>
+    <string name="coursesSchedule">Courses\' schedule</string>
 
 </resources>

@@ -256,8 +256,8 @@ public class DataRepository {
 
 
     //// Courses
-    public void addCourse (String name) {
-        database.courseDao().InsertCourse(new CourseEntity(name));
+    public void addCourse (CourseEntity added) {
+        database.courseDao().InsertCourse(added);
     }
 
     public Set<String> getCoursesStr() {
@@ -266,6 +266,23 @@ public class DataRepository {
             coursesStr.add(entity.getName());
         }
         return coursesStr;
+    }
+
+    public List<CourseEntity> getCourses() {
+        List<CourseEntity> courses = database.courseDao().getAllCourses();
+        if (courses != null) {
+            return courses;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public void updateCourse(CourseEntity updated) {
+        database.courseDao().updateCourse(updated);
+    }
+
+    public void removeCourse(CourseEntity removed) {
+        database.courseDao().deleteCourse(removed);
     }
 
 

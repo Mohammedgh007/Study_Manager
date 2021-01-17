@@ -7,6 +7,8 @@ purpose: This is a model class that coordinates all model classes that are used 
   to both versions of the flash cards(the database and the cashed cards).
 Methods:
     getInstance() -> returns the only instance of this class. This class implements Singleton.
+    getCardsList() -> It is getter for the field cardsList. It's used to check if the instances has
+     been fully initialized, so that the race condition is avoided.
     getLessonsList(course) -> returns the lessons that belongs to the given course.
     getLessonCards(course, lesson) -> returns the cards of the given lesson and course.
     addCard(course, lesson, question, answer) -> it adds a object card to
@@ -14,10 +16,10 @@ Methods:
     updateLesson(cards) ->  It updates the given cards in cardsList and update/add the cards in the database.
     removecard(removed) -> it removes the given card from the database and the cardsList.
     removeLesson(course, lesson) -> it removes the lesson's cards.
-
+    nullifyInstance() -> It's called to make the field instance null, so that the only thing that
+     needs to be updated the database.
 Note: the following are used temporarily
     coursesNames -> names of the courses including the ones that do not have a lesson's cards. Cashed version.
-    addCourse() -> adds the course to the database and courseNames.
     containCourse() -> returns true if the course has been added already.
     getCourses() -> returns Set<string> that contain courses' names.
 Note: view model can uses "" as initial parameter value when calling addCard()
@@ -82,6 +84,13 @@ public class FlashCardCoordinator extends Observable {
         return instance;
     }
 
+    /*
+     It is getter for the field cardsList. It's used to check if the instances has
+     been fully initialized, so that the race condition is avoided.
+     */
+    public FlashCardsList getCardsList() {
+        return cardsList;
+    }
 
     /*
      * It returns the names of the lessons associated with the given course's name.
@@ -157,26 +166,12 @@ public class FlashCardCoordinator extends Observable {
         });
     }
 
-
     /*
-     * It adds a course to the database and the coursesNames
-     * @param courseStr is the course's name as a string
-     */
-    public void addCourse(String courseStr) {
-        coursesNames.add(courseStr);
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> repository.addCourse(courseStr));
+    * It's called to make the instance null, which forces this class to use an updated version of
+    * data from the database
+    */
+    public static void nullifyInstance() {
+        instance = null;
     }
-
-    /*
-     * It returns true if course has been added.
-     * @param course is the name of the course.
-     */
-    public boolean containCourse (String course) {
-        return coursesNames.contains(course);
-    }
-
-    // this is a getter for the field coursesNames
-    public Set<String> getCoursesNames() {return coursesNames;}
 
 }

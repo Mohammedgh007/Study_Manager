@@ -7,6 +7,8 @@ purpose: This is a model class that coordinates all model classes that are used 
   to both versions of the notes(the database and the cashed notes).
 Methods:
     getInstance() -> returns the only instance of this class. This class implements Singleton.
+    getNotesList() -> It is getter for the field notesList. It's used to check if the instances has
+     been fully initialized, so that the race condition is avoided.
     getLessonsList(course) -> returns the lessons that belongs to the given course.
     getLessonNote(course, lesson) -> returns the note of the given lesson and course.
     getLessonPhotosUris(course, lesson) -> returns the photos uri associated with the notes' lesson.
@@ -15,11 +17,8 @@ Methods:
     removenote() -> it remove the note from the database and the notesList.
     addPhoto(photoUri, noteID) -> It adds the given photo to the note whose id is given.
     removePhoto(photoUri, noteID) -> It removes the given photo to the note whose is is given.
-Note: the following are used temporarily
-    coursesNames -> names of the courses including the ones that do not have a lesson's note. Cashed version.
-    addCourse() -> adds the course to the database and courseNames.
-    containCourse() -> returns true if the course has been added already.
-    getCourses() -> returns Set<string> that contain courses' names.
+    nullifyInstance() -> It's called to make the field instance null, so that the only thing that
+     needs to be updated the database.
 ###############################################################################
  */
 
@@ -52,7 +51,6 @@ public class NoteCoordinator extends Observable {
     private NoteList notesList; // cashed notes
     private HashMap<Integer, List<PhotoNoteEntity>> notePhotos;
     private DataRepository repository;
-    private Set<String> coursesNames;
 
 
     /*
@@ -80,12 +78,16 @@ public class NoteCoordinator extends Observable {
             notePhotos = repository.getPhotos(lastIDPhotoTemp);
             lastIDPhotos = lastIDPhotoTemp[0];
             lastIDNotes = notesList.getLastID();
-            coursesNames = repository.getCoursesStr();
             NoteCoordinator.this.setChanged();
             NoteCoordinator.this.notifyObservers();
         });
     }
 
+
+    // getter for the field notesList that helps to avoid the race condition
+    public NoteList getNotesList() {
+        return notesList;
+    }
 
     /*
     * It returns the list of lessons' string for the given course.
@@ -206,23 +208,11 @@ public class NoteCoordinator extends Observable {
     }
 
     /*
-    * It adds a course to the database and the coursesNames
-    * @param courseStr is the course's name as a string
-    */
-    public void addCourse(String courseStr) {
-        coursesNames.add(courseStr);
-        Executor executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> repository.addCourse(courseStr));
+     * It's called to make the instance null, which forces this class to use an updated version of
+     * data from the database
+     */
+    public static void nullifyInstance() {
+        instance = null;
     }
 
-    /*
-    * It returns true if course has been added.
-    * @param course is the name of the course.
-    */
-    public boolean containCourse (String course) {
-        return coursesNames.contains(course);
-    }
-
-    // this is a getter for the field coursesNames
-    public Set<String> getCoursesNames() {return coursesNames;}
 }

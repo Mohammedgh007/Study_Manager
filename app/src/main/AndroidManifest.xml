@@ -34,6 +34,7 @@
         <activity android:name=".modelview.AddFlashCardActivity" />
         <activity android:name=".modelview.AddRemarkActivity" />
         <activity android:name=".modelview.AddCourseActivity" />
+        <activity android:name=".modelview.SelectEditedCourse"/>
         <receiver android:name=".view.NotificationManagement$AlarmReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>

@@ -9,7 +9,6 @@ Methods:
   onActivityResult() -> It receives the intent from AddAssignmentActivity that
      tell weather the user has edited/added or not.
   createAssignemntsView() -> It creates the view that show all assignments.
-  getViewedTime() -> It returns the string that is used to output the time to the user.
   getDueDateStrView(year, mont, day) -> it returns the string that will outputted on the peach
     labels that show the due date.
   doEditing() -> it handles the event of editing, which is modifying the view to fit editing mode.
@@ -46,16 +45,13 @@ import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import creative.developer.m.studymanager.model.EntityListFiles.AssignmentsList;
 import creative.developer.m.studymanager.R;
-import creative.developer.m.studymanager.model.dbFiles.AppDatabase;
-import creative.developer.m.studymanager.model.dbFiles.DataRepository;
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEntity;
 import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
+import creative.developer.m.studymanager.view.StringMaker;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -201,7 +197,7 @@ public class AssignmentActivity extends Fragment implements Observer {
             for (AssignmentEntity assignment : dayList) {
                 // setting text
                 info = assignment.getCourse() + "\n";
-                info += getResources().getString(R.string.dueTime) + " " + getViewedTime(assignment.getHourNum(),
+                info += getResources().getString(R.string.dueTime) + " " + StringMaker.getViewedTime(assignment.getHourNum(),
                         assignment.getMinuteNum()) + "\n";
                 info += getResources().getString(R.string.discText) + " " + assignment.getDisc();
 
@@ -272,32 +268,6 @@ public class AssignmentActivity extends Fragment implements Observer {
         LinearLayout tranLayout = new LinearLayout(activityMain);
         tranLayout.setLayoutParams(layoutParamsTran);
         assignmentsLayout.addView(tranLayout);
-    }
-
-
-    /*
-    this method creates the string that will be used to show the time for the user
-    @PARAM: hour is an intger that range between 0-23
-    @PARAM: int that represent minutes
-    @return: String for viewing time
-     */
-    private String getViewedTime (int hour, int minute) {
-        String strHour;
-        if (hour == 0) {
-            strHour = "12";
-        } else if (hour < 13) {
-            strHour = Integer.toString(hour);
-        } else { // if it is between 13-23
-            strHour = Integer.toString(hour - 12);
-        }
-        String strMinute;
-        if (minute < 10) {
-            strMinute = "0" + minute;
-        } else {
-            strMinute = Integer.toString(minute);
-        }
-        String period = (hour < 13) ? "a.m" : "p.m";
-        return strHour + ":" + strMinute + " " + period;
     }
 
     /*

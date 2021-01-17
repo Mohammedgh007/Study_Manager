@@ -38,12 +38,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" >
-
-                    <Button
-                        android:id="@+id/add_course_courses"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/add_btn_icon" />
                 </LinearLayout>
             </HorizontalScrollView>
 
