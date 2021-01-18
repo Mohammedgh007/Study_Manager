@@ -81,9 +81,11 @@ public class ReminderCoordinator extends Observable {
     /*
     * It returns a particular reminder based on the given reminder id.
     * @param id is the reminder id.
+    * @param context is Context's instance for class that calls this method.
     */
-    public ReminderEntity getreminderByID(String id) {
-        return repository.getReminder(id);
+    public static ReminderEntity getreminderByID(String id, Context context) {
+        DataRepository tempRepo = DataRepository.getInstance(AppDatabase.getInstance(context));
+        return tempRepo.getReminder(id);
     }
 
 

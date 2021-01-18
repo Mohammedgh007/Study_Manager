@@ -22,11 +22,16 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
+import android.os.SystemClock;
+import android.util.Log;
 
 
 import androidx.core.app.NotificationCompat;
@@ -49,7 +54,7 @@ public class NotificationManagement {
     private int timerID; // each alarm/notification needs a unique integer identifier.
     private Calendar dateTime; // the time and date of the notification.
     private boolean isNotify; // true if it's used by assignment; false for reminders.
-    private boolean isRepeating; // true for reminders that repeat weekly.
+
 
     /*
     it creates an instance that has a special id and time for the timer background service..
@@ -60,7 +65,6 @@ public class NotificationManagement {
         this.timerID = assignment.getAssignmentID() * -1;
         this.dateTime = getNotifyTime(assignment, context);
         isNotify = true;
-        isRepeating = false;
     }
 
 
@@ -74,7 +78,6 @@ public class NotificationManagement {
         this.timerID = alarmID;
         this.dateTime = getNotifyTime(reminder, day);
         isNotify = false;
-        isRepeating = reminder.getIsRepeated();
     }
 
 
@@ -154,17 +157,21 @@ public class NotificationManagement {
     @param: context is the context of the class that calls this method.
      */
     public void setNotify(Context context) {
+        // telling the OS to keep the app's service running in the background for receiving the notification
+        ComponentName receiver = new ComponentName(context, AlarmReceiver.class);
+        PackageManager pm = context.getPackageManager();
+        pm.setComponentEnabledSetting(receiver,
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                PackageManager.DONT_KILL_APP);
+
+        // set up the notification
         Intent alarmIntent = new Intent(context, AlarmReceiver.class);
         alarmIntent.putExtra("notifyID", timerID);
         alarmIntent.putExtra("isNotify", isNotify);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, timerID,  alarmIntent, 0);
         System.out.println(timerID + " the dateTime is " + dateTime);
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        if (!isRepeating) {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, dateTime.getTimeInMillis(), pendingIntent);
-        } else {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 0, dateTime.getTimeInMillis(), pendingIntent);
-        }
+        alarmManager.set(AlarmManager.RTC_WAKEUP, dateTime.getTimeInMillis(), pendingIntent);
     }
 
     // It handles the event of service(AlarmManager) receiving. Used for alarming reminders
@@ -174,7 +181,7 @@ public class NotificationManagement {
         */
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("in receive");
+            System.out.println("in receive!!!!!");
             if (intent.getAction() != null &&
                     intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
                 // on device boot completed, reset the alarm
@@ -208,9 +215,9 @@ public class NotificationManagement {
         private void handleReceiveNormalReminder(Context context, Intent intent){
             int timerID = intent.getIntExtra("notifyID", 1);
             System.out.println("in receive normal reminders " + timerID);
+            // note: Mod is used b/c each reminder has 7 ids for each day.
             int reminderID = (timerID > 6) ? timerID - (timerID % 7) : 0;
-            ReminderCoordinator model = ReminderCoordinator.getInstance(context);
-            ReminderEntity notifyReminder = model.getreminderByID(String.valueOf(reminderID));
+            ReminderEntity notifyReminder = ReminderCoordinator.getreminderByID(String.valueOf(reminderID), context);
 
             // checking if the user has deleted the reminder or not
             if (notifyReminder == null) {
@@ -245,10 +252,16 @@ public class NotificationManagement {
             }
 
 
-
             // prepare to show the notification.
             showNotificationView(reminderID, "alarm", notifyReminder.getTitle(),
                     notifyReminder.getDisc(), context);
+
+            // check if it's repeating, if so then set an alarm
+            if (notifyReminder.getIsRepeated()) {
+                NotificationManagement alarm = new NotificationManagement(notifyReminder, reminderID,
+                        currTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault()));
+                alarm.setNotify(context);
+            }
         }
 
 
@@ -260,10 +273,11 @@ public class NotificationManagement {
          */
         private void handleReceiveNormalAssignment(Context context, Intent intent) {
             // getting the assignment that correspondence to the  notification.
+            System.out.println("in receive normal assignments 1");
             int assignmentID = intent.getIntExtra("notifyID", 1) * -1;
-            AssignmentCoordinator model = AssignmentCoordinator.getInstance(context);
-            AssignmentEntity notifyAss = model.getAssignmentbyID(assignmentID);
-            System.out.println("in receive normal assignments");
+            System.out.println("in receive normal assignments 2");
+            AssignmentEntity notifyAss = AssignmentCoordinator.getAssignmentbyID(assignmentID, context);
+            System.out.println("in receive normal assignments 3");
             // checking if the user has deleted the assignment or not
             if (notifyAss == null) {
                 System.out.println("in null");

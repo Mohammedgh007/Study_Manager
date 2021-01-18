@@ -35,7 +35,8 @@
         <activity android:name=".modelview.AddRemarkActivity" />
         <activity android:name=".modelview.AddCourseActivity" />
         <activity android:name=".modelview.SelectEditedCourse"/>
-        <receiver android:name=".view.NotificationManagement$AlarmReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name=".view.NotificationManagement$AlarmReceiver"
+            android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
             </intent-filter>
