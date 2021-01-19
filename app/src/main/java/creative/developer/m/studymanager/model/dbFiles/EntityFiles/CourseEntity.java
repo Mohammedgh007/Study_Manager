@@ -162,12 +162,12 @@ public class CourseEntity{
     @Ignore
     public int[] getToMinuteNum() {
         int[] minutes = new int[6];
-        minutes[0] = (!sunFrom.equals("")) ? Integer.parseInt(sunTo.substring(sunTo.indexOf(":") + 1)) : -1;
-        minutes[1] = (!monFrom.equals("")) ? Integer.parseInt(monTo.substring(monTo.indexOf(":") + 1)) : -1;
-        minutes[2] = (!tueFrom.equals("")) ? Integer.parseInt(tueTo.substring(tueTo.indexOf(":") + 1)) : -1;
-        minutes[3] = (!wedFrom.equals("")) ? Integer.parseInt(wedTo.substring(wedTo.indexOf(":") + 1)) : -1;
-        minutes[4] = (!thrFrom.equals("")) ? Integer.parseInt(thrTo.substring(thrTo.indexOf(":") + 1)) : -1;
-        minutes[5] = (!friFrom.equals("")) ? Integer.parseInt(friTo.substring(friTo.indexOf(":") + 1)) : -1;
+        minutes[0] = (!sunTo.equals("")) ? Integer.parseInt(sunTo.substring(sunTo.indexOf(":") + 1)) : -1;
+        minutes[1] = (!monTo.equals("")) ? Integer.parseInt(monTo.substring(monTo.indexOf(":") + 1)) : -1;
+        minutes[2] = (!tueTo.equals("")) ? Integer.parseInt(tueTo.substring(tueTo.indexOf(":") + 1)) : -1;
+        minutes[3] = (!wedTo.equals("")) ? Integer.parseInt(wedTo.substring(wedTo.indexOf(":") + 1)) : -1;
+        minutes[4] = (!thrTo.equals("")) ? Integer.parseInt(thrTo.substring(thrTo.indexOf(":") + 1)) : -1;
+        minutes[5] = (!friTo.equals("")) ? Integer.parseInt(friTo.substring(friTo.indexOf(":") + 1)) : -1;
         return minutes;
     }
 }

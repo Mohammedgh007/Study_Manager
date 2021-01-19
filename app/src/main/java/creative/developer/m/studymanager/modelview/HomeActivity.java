@@ -208,6 +208,7 @@ public class HomeActivity extends Fragment implements Observer {
     private String getShownText(CourseEntity course, int dayIndex) {
         String shownText = course.getName() + "\n";
         shownText += course.getLocation() + "\n";
+        System.out.println("XXXTestingXXXX to " + course.getFriTo() + " dayIndex:" + dayIndex);
         shownText += StringMaker.getViewedTime(course.getFromHourNum()[dayIndex],
                 course.getFromMinuteNum()[dayIndex], course.getToHourNum()[dayIndex],
                 course.getToMinuteNum()[dayIndex], activityMain);
