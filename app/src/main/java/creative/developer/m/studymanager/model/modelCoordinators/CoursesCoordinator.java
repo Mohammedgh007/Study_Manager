@@ -48,7 +48,6 @@ public class CoursesCoordinator extends Observable {
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             repository = DataRepository.getInstance(AppDatabase.getInstance(context));
-            System.out.println("finished db");
             coursesList = repository.getCourses();
             lastId = 0;
             for (CourseEntity course : coursesList) {
@@ -56,7 +55,6 @@ public class CoursesCoordinator extends Observable {
             }
             CoursesCoordinator.this.setChanged();
             CoursesCoordinator.this.notifyObservers();
-            System.out.println("finished creating");
         });
     }
 

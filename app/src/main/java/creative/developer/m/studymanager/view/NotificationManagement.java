@@ -169,7 +169,6 @@ public class NotificationManagement {
         alarmIntent.putExtra("notifyID", timerID);
         alarmIntent.putExtra("isNotify", isNotify);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, timerID,  alarmIntent, 0);
-        System.out.println(timerID + " the dateTime is " + dateTime);
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, dateTime.getTimeInMillis(), pendingIntent);
     }
@@ -181,7 +180,6 @@ public class NotificationManagement {
         */
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println("in receive!!!!!");
             if (intent.getAction() != null &&
                     intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
                 // on device boot completed, reset the alarm
@@ -202,7 +200,7 @@ public class NotificationManagement {
         @param: context is the context from onReceive()
         */
         private void handleBooting(Context context) {
-            System.out.println("in booting");
+            //System.out.println("in booting");
         }
 
 
@@ -214,14 +212,12 @@ public class NotificationManagement {
         */
         private void handleReceiveNormalReminder(Context context, Intent intent){
             int timerID = intent.getIntExtra("notifyID", 1);
-            System.out.println("in receive normal reminders " + timerID);
             // note: Mod is used b/c each reminder has 7 ids for each day.
             int reminderID = (timerID > 6) ? timerID - (timerID % 7) : 0;
             ReminderEntity notifyReminder = ReminderCoordinator.getreminderByID(String.valueOf(reminderID), context);
 
             // checking if the user has deleted the reminder or not
             if (notifyReminder == null) {
-                System.out.println("id is " + reminderID);
                 return;
             }
 
@@ -235,7 +231,6 @@ public class NotificationManagement {
                     notifyTime.get(Calendar.HOUR_OF_DAY) != currTime.get(Calendar.HOUR_OF_DAY) &&
                     notifyTime.get(Calendar.MINUTE) != currTime.get(Calendar.MINUTE) &&
                     notifyTime.get(Calendar.YEAR) != currTime.get(Calendar.YEAR)) {
-                System.out.println("in if");
                 return;
             }
 
@@ -273,14 +268,10 @@ public class NotificationManagement {
          */
         private void handleReceiveNormalAssignment(Context context, Intent intent) {
             // getting the assignment that correspondence to the  notification.
-            System.out.println("in receive normal assignments 1");
             int assignmentID = intent.getIntExtra("notifyID", 1) * -1;
-            System.out.println("in receive normal assignments 2");
             AssignmentEntity notifyAss = AssignmentCoordinator.getAssignmentbyID(assignmentID, context);
-            System.out.println("in receive normal assignments 3");
             // checking if the user has deleted the assignment or not
             if (notifyAss == null) {
-                System.out.println("in null");
                 return;
             }
 
@@ -293,13 +284,11 @@ public class NotificationManagement {
                     notifyTime.get(Calendar.HOUR_OF_DAY) != currTime.get(Calendar.HOUR_OF_DAY) &&
                     notifyTime.get(Calendar.MINUTE) != currTime.get(Calendar.MINUTE) &&
                     notifyTime.get(Calendar.YEAR) != currTime.get(Calendar.YEAR)) {
-                System.out.println("in if");
                 return;
             }
 
             // making sure that the notification is done for unchecked assignment.
             if (notifyAss.getIsMarked()) {
-                System.out.println("is market");
                 return;
             }
 
@@ -320,7 +309,6 @@ public class NotificationManagement {
          */
         private void showNotificationView(int id, String appearance, String title, String disc,
                                                  Context context) {
-            System.out.println("in notify View!!");
             int importanceLevel = NotificationManager.IMPORTANCE_HIGH;
             NotificationCompat.Builder builder;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -344,11 +332,9 @@ public class NotificationManagement {
             NotificationManager notificationManager = (NotificationManager)
                     context.getSystemService(Context.NOTIFICATION_SERVICE);
             if (appearance.equals("notify")) { // for Assignments' notifications
-                System.out.println("notify");
                 builder.setOnlyAlertOnce(true);
                 notificationManager.notify(id, builder.build());
             } else { // for reminders' alarms
-                System.out.println("alarm");
                 Uri defaultUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM);
                 if (defaultUri != null) {
                     builder.setSound(defaultUri);

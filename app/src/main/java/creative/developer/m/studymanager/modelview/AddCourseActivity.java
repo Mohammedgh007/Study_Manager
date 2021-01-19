@@ -158,7 +158,6 @@ public class AddCourseActivity extends AppCompatActivity implements
 
         doneBtn.setOnClickListener((view) -> {
             String[] tt = getTimeArr("start");
-            System.out.println("tttt + " + tt[0]);
             if(isInputsValid()) {
                 String[] startTime = getTimeArr("start");
                 String[] finishTime = getTimeArr("finish");
