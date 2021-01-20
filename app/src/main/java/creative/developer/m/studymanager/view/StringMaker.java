@@ -42,7 +42,7 @@ public class StringMaker {
         } else {
             strMinute = Integer.toString(minute);
         }
-        String period = (hour < 13) ? "a.m" : "p.m";
+        String period = (hour < 12) ? "a.m" : "p.m";
         return strHour + ":" + strMinute + " " + period;
     }
 
@@ -59,7 +59,7 @@ public class StringMaker {
     public static String getViewedTime(int startHour, int startMinute, int endHour, int endMinute,
                                        Context context) {
         // computing for the start time.
-        String period = (startHour < 13) ? "a.m" : "p.m";
+        String period = (startHour < 12) ? "a.m" : "p.m";
         String hourStr;
         if (startHour == 0) { // if it is 12 am
             hourStr = "12";
@@ -72,7 +72,7 @@ public class StringMaker {
         }
         String shownText = hourStr + ":" + startMinute + " " + period;
         // computing for the end time.
-        period = (endHour < 13) ? "a.m" : "p.m";
+        period = (endHour < 12) ? "a.m" : "p.m";
         if (endHour == 0) { // if it is 12 am
             hourStr = "12";
         } else if (endHour < 13) {

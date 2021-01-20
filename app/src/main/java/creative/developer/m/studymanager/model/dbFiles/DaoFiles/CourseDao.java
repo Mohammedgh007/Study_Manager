@@ -34,8 +34,8 @@ public interface CourseDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void InsertCourse(CourseEntity... courseEntities);
 
-    @Delete
-    void deleteCourse(CourseEntity... courseEntities);
+    @Query("DELETE FROM CourseEntity WHERE name = :courseName")
+    void deleteCourse(String... courseName);
 
     @Update
     void updateCourse(CourseEntity... courseEntities);

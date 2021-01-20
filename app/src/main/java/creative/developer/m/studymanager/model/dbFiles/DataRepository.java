@@ -282,7 +282,7 @@ public class DataRepository {
     }
 
     public void removeCourse(CourseEntity removed) {
-        database.courseDao().deleteCourse(removed);
+        database.courseDao().deleteCourse(removed.getName());
     }
 
 

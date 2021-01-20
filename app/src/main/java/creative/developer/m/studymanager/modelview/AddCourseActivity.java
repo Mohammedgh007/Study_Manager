@@ -47,6 +47,8 @@ public class AddCourseActivity extends AppCompatActivity implements
     private boolean isStartTime;
     // It determines the day index in time arrays ^^. sun is 0, and fri is 5
     private int dayIndex;
+    // used only when this screen is opened for editing.
+    CourseEntity editedCourse;
     // the views
     private EditText courseET;
     private EditText roomET;
@@ -94,7 +96,6 @@ public class AddCourseActivity extends AppCompatActivity implements
         // checking if the user wants to edit a course, so that the view will be modified.
         Intent recieved = this.getIntent();
         String purpose = recieved.getExtras().getString("porpuse");
-        final CourseEntity editedCourse; // final because it will be used only to retrieve values from.
         if (purpose.equals("editing")) {
             // getting the course object from the model.
             editedCourse = model.getCourse(recieved.getStringExtra("courseName"));
@@ -158,7 +159,6 @@ public class AddCourseActivity extends AppCompatActivity implements
 
         doneBtn.setOnClickListener((view) -> {
             String[] tt = getTimeArr("start");
-            System.out.println("tttt + " + tt[0]);
             if(isInputsValid()) {
                 String[] startTime = getTimeArr("start");
                 String[] finishTime = getTimeArr("finish");
@@ -170,7 +170,7 @@ public class AddCourseActivity extends AppCompatActivity implements
                             , startTime[2], finishTime[2]
                             , startTime[3], finishTime[3]
                             , startTime[4], finishTime[4]
-                            , startTime[4], finishTime[5]);
+                            , startTime[5], finishTime[5]);
                     model.updateCourse(updatedCourse);
                 } else { // if this screen is opened for adding a course
                     model.addCourse(courseET.getText().toString().toUpperCase(),
@@ -179,7 +179,7 @@ public class AddCourseActivity extends AppCompatActivity implements
                             , startTime[2], finishTime[2]
                             , startTime[3], finishTime[3]
                             , startTime[4], finishTime[4]
-                            , startTime[4], finishTime[5]);
+                            , startTime[5], finishTime[5]);
                 }
                 Intent sendBack = new Intent(AddCourseActivity.this, HomeActivity.class);
                 sendBack.putExtra("courseName", courseET.getText().toString().toUpperCase());
@@ -239,7 +239,8 @@ public class AddCourseActivity extends AppCompatActivity implements
             Toast.makeText(getBaseContext(),
                     R.string.inputCourseNameFirst, Toast.LENGTH_LONG).show();
             return false;
-        } else if (MainActivity.coursesStr.contains(inputtedStr)) {
+        } else if (MainActivity.coursesStr.contains(inputtedStr) &&
+                (editedCourse != null && !inputtedStr.equalsIgnoreCase(editedCourse.getName()))) {
             Toast.makeText(getBaseContext(),
                     R.string.inputNonUsedCourse, Toast.LENGTH_LONG).show();
             return false;
