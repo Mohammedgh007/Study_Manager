@@ -186,7 +186,7 @@ public class AddReminderActivity extends Activity implements
     * @return string that display time as 12 hours system.
     */
     private String getDisplayedTimeText() {
-        String period = (selectedHour < 13) ? "a.m" : "p.m";
+        String period = (selectedHour < 12) ? "a.m" : "p.m";
         String hourStr;
         if (selectedHour == 0) { // if it is 12 am
             hourStr = "12";

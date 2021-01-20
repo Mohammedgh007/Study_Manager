@@ -111,7 +111,6 @@ public class HomeActivity extends Fragment implements Observer {
         } else if (requestCode == EDITING_SCHEDULE_CODE && resultCode == RESULT_OK) {
             // linearly search for the course object.
             String courseName = data.getStringExtra("courseName");
-            CourseEntity seectedCourse;
 
             String porpuse = data.getExtras().getString("porpuse");
             if (porpuse.equals("editing")) { // preparing for editing a course from the schedule.
@@ -137,7 +136,7 @@ public class HomeActivity extends Fragment implements Observer {
                             courseName + " " + getResources().getString(R.string.hasBeenedEdited),
                     Toast.LENGTH_LONG).show();
         }
-
+        MainActivity.coursesStr = model.getCoursesStr(); // update the courses' list whenever there's a change.
     }
 
     /*
