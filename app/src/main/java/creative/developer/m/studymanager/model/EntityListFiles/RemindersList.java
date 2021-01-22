@@ -31,7 +31,6 @@ public class RemindersList {
         for(ReminderEntity reminder : retrievedReminders){
             remindersList.add(reminder);
             lastID = Math.max(lastID, reminder.getReminderID());
-            System.out.println(lastID);
         }
     }
 

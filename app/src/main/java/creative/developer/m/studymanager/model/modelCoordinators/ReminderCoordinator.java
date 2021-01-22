@@ -103,7 +103,7 @@ public class ReminderCoordinator extends Observable {
                                       String disc, String days, boolean isRepeated) {
         lastId+= 7;
         ReminderEntity added = new
-                ReminderEntity(77, title, notificationTime, disc, days, isRepeated);
+                ReminderEntity(lastId, title, notificationTime, disc, days, isRepeated);
         remindersList.add(added);
         Executor executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> repository.addReminder(added));

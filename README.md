@@ -95,3 +95,9 @@ Selecting a course from drop-down list on adding/editing rather than typing it. 
 make the phone silent during the classes. <br />
 
 
+credits:
+Sounds's Crdits:
+1- https://freesound.org/people/JFRecords/sounds/420504/
+2- https://freesound.org/people/hykenfreak/sounds/202029/
+
+

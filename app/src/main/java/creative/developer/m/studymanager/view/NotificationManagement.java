@@ -23,15 +23,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.RingtoneManager;
+import android.graphics.Color;
+import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
-import android.os.PowerManager;
-import android.os.SystemClock;
-import android.util.Log;
+import android.os.Vibrator;
 
 
 import androidx.core.app.NotificationCompat;
@@ -47,6 +47,8 @@ import creative.developer.m.studymanager.model.dbFiles.EntityFiles.AssignmentEnt
 import creative.developer.m.studymanager.model.dbFiles.EntityFiles.ReminderEntity;
 import creative.developer.m.studymanager.model.modelCoordinators.AssignmentCoordinator;
 import creative.developer.m.studymanager.model.modelCoordinators.ReminderCoordinator;
+
+import static android.app.Notification.FLAG_INSISTENT;
 
 
 public class NotificationManagement {
@@ -214,6 +216,7 @@ public class NotificationManagement {
             int timerID = intent.getIntExtra("notifyID", 1);
             // note: Mod is used b/c each reminder has 7 ids for each day.
             int reminderID = (timerID > 6) ? timerID - (timerID % 7) : 0;
+            System.out.println("in Add-> i:" + timerID + " id:" + reminderID);
             ReminderEntity notifyReminder = ReminderCoordinator.getreminderByID(String.valueOf(reminderID), context);
 
             // checking if the user has deleted the reminder or not
@@ -310,18 +313,53 @@ public class NotificationManagement {
         private void showNotificationView(int id, String appearance, String title, String disc,
                                                  Context context) {
             int importanceLevel = NotificationManager.IMPORTANCE_HIGH;
+            NotificationManager notificationManager;
             NotificationCompat.Builder builder;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // sound
+                AudioAttributes audioAttr = new AudioAttributes.Builder()
+                        .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .build();
+                Uri notifySound;
+                if (appearance.equals("notify")) { // for Assignments' notifications
+                    notifySound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                            + context.getPackageName()+ "/" + R.raw.assignment_notify);
+                } else { // for reminders' alarms
+                    notifySound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                            + context.getPackageName() + "/" + R.raw.reminder_notify);
+                }
                 NotificationChannel channel = new NotificationChannel(String.valueOf(id)
                         , title, importanceLevel);
+                channel.setSound(notifySound, audioAttr);
+
                 channel.setDescription(disc);
-                NotificationManager notificationManager = context.
-                        getSystemService(NotificationManager.class);
-                notificationManager.createNotificationChannel(channel);
+
+                // vibration and lighting
+                channel.enableVibration(true);
+                channel.enableLights(true);
+
                 builder = new NotificationCompat.Builder(context,
                         String.valueOf(id));
+                builder.setChannelId(String.valueOf(id));
+                notificationManager = context.getSystemService(NotificationManager.class);
+                notificationManager.createNotificationChannel(channel);
             } else {
                 builder = new NotificationCompat.Builder(context);
+
+                // sound
+                Uri notifySound;
+                if (appearance.equals("notify")) { // for Assignments' notifications
+                    notifySound = Uri.parse("android.resource://"
+                            + context.getPackageName() + "/" + R.raw.assignment_notify);
+                } else { // for reminders' alarms
+                    notifySound = Uri.parse("android.resource://"
+                            + context.getPackageName() + "/" + R.raw.reminder_notify);
+                }
+                builder.setSound(notifySound);
+
+                notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             }
             builder.setPriority(Notification.PRIORITY_HIGH);
             NotificationCompat.BigTextStyle bigTextStyle = new NotificationCompat.BigTextStyle();
@@ -329,22 +367,11 @@ public class NotificationManagement {
             bigTextStyle.bigText(disc);
             builder.setStyle(bigTextStyle);
             builder.setSmallIcon(R.mipmap.app_icon);
-            NotificationManager notificationManager = (NotificationManager)
-                    context.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (appearance.equals("notify")) { // for Assignments' notifications
-                builder.setOnlyAlertOnce(true);
-                notificationManager.notify(id, builder.build());
-            } else { // for reminders' alarms
-                Uri defaultUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM);
-                if (defaultUri != null) {
-                    builder.setSound(defaultUri);
-                } else {
-                    builder.setDefaults(Notification.DEFAULT_SOUND);
-                }
-                Notification notification = builder.build();
-                notification.flags = Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
-                notificationManager.notify(id, notification);
-            }
+
+            Notification notification = builder.build();
+            notification.flags = Notification.FLAG_AUTO_CANCEL |  FLAG_INSISTENT;
+            notification.defaults |= Notification.DEFAULT_VIBRATE | Notification.DEFAULT_LIGHTS;
+            notificationManager.notify(id, notification);
         }
     }
 

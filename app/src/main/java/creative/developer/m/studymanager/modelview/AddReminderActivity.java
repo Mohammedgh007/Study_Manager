@@ -149,11 +149,12 @@ public class AddReminderActivity extends Activity implements
                             spinnerRepeat.getSelectedItem().toString().contains("every")
                     );
                 }
+
                 NotificationManagement alarm;
                 for (int i = 0; i < selectedDays.size(); i++) {
+                    System.out.println(String.format("in Add-> i:%d  id:%d\n", i, reminder.getReminderID()) );
                     alarm = new NotificationManagement(reminder, reminder.getReminderID() + i,
                             selectedDays.get(i));
-                    System.out.println("in Add id: " + reminder.getReminderID() + i);
                     alarm.setNotify(this);
                 }
                 setResult(RESULT_OK, intentSendback);
