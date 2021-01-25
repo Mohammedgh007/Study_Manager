@@ -19,7 +19,7 @@
         <item>Remind me every week</item>
         <item>Remind me this week only</item>
     </array>
-    <string name="title_activity_add_reminder">AddReminderActivity</string>
+    <string name="title_activity_add_reminder">ِAdd Reminder</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>

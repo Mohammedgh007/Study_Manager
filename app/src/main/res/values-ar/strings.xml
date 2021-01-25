@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">منظم المذاكرة</string>
     <string name="schedulePhotoIdMemory">scheduleId1232223</string>
-    <string name="title_activity_main">منظم الذاكرة</string>
+    <string name="title_activity_main">منظم المذاكرة</string>
     <string name="open_navigation_drawer">افتح القائمة الجانبية</string>
     <string name="close_navigation_drawer">اغلق القائمة الجانبية</string>
     <array name="notification_times">
@@ -20,12 +20,12 @@
         <item>ذكرني في كل اسبوع</item>
         <item>ذكرني في هذا لاسبوع فقط</item>
     </array>
-    <string name="title_activity_add_reminder">AddReminderActivity</string>
+    <string name="title_activity_add_reminder">اضافة تذكير</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="editCourse">تعديل الجدول</string>
-    <string name="room">اسم القاعة/الفصل</string>
+    <string name="room">اسم القاعة</string>
     <string name="allDaysSameTime">الماحاضرة تبدأ وتنتهي في نفس الوقت في جميع الايام المختارة</string>
     <string name="addCourse">اضافة مادة</string>
     <string name="next">التالي</string>
@@ -37,7 +37,7 @@
     <string name="thursday">الخميس</string>
     <string name="friday">الجمعة</string>
     <string name="selectDayTime">اختر الايام والوقت للمادة المضافة</string>
-    <string name="homeTitle">الواجهة الرئيسة</string>
+    <string name="homeTitle">الرئيسة</string>
     <string name="assignmentsTitle">الواجبات</string>
     <string name="remarksTitle">التقويم</string>
     <string name="notesTitle">ملاحظات الدروس</string>
@@ -79,7 +79,7 @@
     <string name="finish">انهاء</string>
     <string name="restart">اعادة بدء</string>
     <string name="closeWSave">اغلاق مع حفظ التغييرات</string>
-    <string name="closeWOSave">اغلاق بدون حفظ</string>
+    <string name="closeWOSave">اغلاق بدون الحفظ</string>
     <string name="inputNonUsedCourse">الرجاء ادخال اسم غير مستخدم للمادة</string>
     <string name="inputCourseNameFirst">الرجاء ادخال اسم المادة</string>
     <string name="card">بطاقة</string>
@@ -87,7 +87,7 @@
     <string name="cantDeleteLastCard">هذه البطاقة الاخيره ولا يمكن ازالها</string>
     <string name="lessonNotedited">لم يتم تعديل الدرس</string>
     <string name="fillLessonField">الرجاء ادخال النص في خانة الدرس</string>
-    <string name="lessonNameRepeated">الرجاء اختيار اسم للدرس لم يتم أختياره</string>
+    <string name="lessonNameRepeated">الرجاء اختيار اسم لدرس لم يتم أختياره</string>
     <string name="fillAllFields">الرجاء الكتابة في كل الخانات</string>
     <string name="showPhoto">اظهار الصورة</string>
     <string name="removePhoto">ازالة الصورة</string>
@@ -105,7 +105,7 @@
     <string name="tomorrow">غدا</string>
     <string name="selectCourseBefore">الرجاء اختيار المادة اولا</string>
     <string name="noteAdded">ملاحظات الدرس تمت اضافتها</string>
-    <string name="noteUpdated">ملاحظات الدروس تم تعديلها</string>
+    <string name="noteUpdated">ملاحظات الدرس تم تعديلها</string>
     <string name="cardsAdded">تمت اضافة بطاقات الفلاش</string>
     <string name="cardEdited">تم تعديل بطاقات الفلاش</string>
     <string name="courseAdded">تمت اضافة المادة</string>
